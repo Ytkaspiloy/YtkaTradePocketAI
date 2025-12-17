@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scalping Bot Pro | PocketOption</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/png" href="https://image2url.com/images/1766001097047-30fbff9b-a368-4dbf-965a-4f3ce2de2e5e.png">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo-container">
+                <img src="https://image2url.com/images/1766001097047-30fbff9b-a368-4dbf-965a-4f3ce2de2e5e.png" alt="PocketOption" class="broker-logo">
+                <h1 id="logo-text">Scalping Bot Pro</h1>
+                <div class="version-badge">v2.0</div>
+            </div>
+            
+            <div class="stats-widget">
+                <div class="stat-item">
+                    <span class="stat-label" id="accuracy-label">Точность:</span>
+                    <span class="stat-value" id="accuracy-value">78.5%</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label" id="signals-label">Сигналов:</span>
+                    <span class="stat-value" id="signals-count">1,247</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label" id="profit-label">Доходность:</span>
+                    <span class="stat-value profit-positive">+24.3%</span>
+                </div>
+            </div>
+
+            <div class="settings-panel">
+                <!-- Language Selector -->
+                <div class="input-group language-dropdown">
+                    <label id="language-label"><i class="fas fa-globe"></i> Язык</label>
+                    <div class="lang-select" id="custom-language-selector">
+                        <button class="lang-selected" onclick="toggleLangDropdown()">
+                            <img id="current-flag" src="https://flagcdn.com/w20/ru.png" alt="RU" class="flag-icon">
+                            <span id="current-lang-text">Русский</span>
+                            <i class="fas fa-chevron-down arrow-icon"></i>
+                        </button>
+                        <div class="lang-dropdown-content" id="lang-options">
+                            <div class="lang-item" data-lang="ru" data-flag="https://flagcdn.com/w20/ru.png">
+                                <img src="https://flagcdn.com/w20/ru.png" alt="RU"> Русский
+                            </div>
+                            <div class="lang-item" data-lang="en" data-flag="https://flagcdn.com/w20/gb.png">
+                                <img src="https://flagcdn.com/w20/gb.png" alt="EN"> English
+                            </div>
+                            <div class="lang-item" data-lang="uz" data-flag="https://flagcdn.com/w20/uz.png">
+                                <img src="https://flagcdn.com/w20/uz.png" alt="UZ"> O'zbek
+                            </div>
+                        </div>
+                    </div>
+                    <select id="language" style="display: none;">
+                        <option value="ru">Русский</option>
+                        <option value="en">English</option>
+                        <option value="uz">O'zbek</option>
+                    </select>
+                </div>
+
+                <!-- Asset Selection -->
+                <div class="input-group">
+                    <label id="currency-label"><i class="fas fa-chart-line"></i> Актив</label>
+                    <select id="currency-pair">
+                        <option value="EURJPY">EUR/JPY</option>
+                        <option value="CHFJPY">CHF/JPY</option>
+                        <option value="AUDCAD">AUD/CAD</option>
+                        <option value="USDCAD">USD/CAD</option>
+                        <option value="USDCHF">USD/CHF</option>
+                        <option value="GBPAUD">GBP/AUD</option>
+                        <option value="USDJPY">USD/JPY</option>
+                        <option value="EURUSD">EUR/USD</option>
+                        <option value="EURAUD">EUR/AUD</option>
+                        <option value="AUDUSD">AUD/USD</option>
+                        <option value="CADJPY">CAD/JPY</option>
+                        <option value="AUDJPY">AUD/JPY</option>
+                        <option value="EURGBP">EUR/GBP</option>
+                        <option value="GBPJPY">GBP/JPY</option>
+                        <option value="GBPCHF">GBP/CHF</option>
+                        <option value="EURCAD">EUR/CAD</option>
+                        <option value="CADCHF">CAD/CHF</option>
+                        <option value="AUDCHF">AUD/CHF</option>
+                    </select>
+                </div>
+
+                <!-- Timeframe Selection -->
+                <div class="input-group">
+                    <label id="timeframe-label"><i class="fas fa-clock"></i> Таймфрейм</label>
+                    <select id="timeframe">
+                        <option value="3">3 секунды</option>
+                        <option value="5">5 секунд</option>
+                        <option value="10">10 секунд</option>
+                        <option value="15">15 секунд</option>
+                        <option value="30">30 секунд</option>
+                        <option value="60">1 минута</option>
+                        <option value="120">2 минуты</option>
+                        <option value="180">3 минуты</option>
+                    </select>
+                </div>
+
+                <!-- Indicators Toggle -->
+                <div class="input-group indicators-group">
+                    <label><i class="fas fa-sliders-h"></i> Индикаторы</label>
+                    <div class="toggle-buttons">
+                        <button class="toggle-btn active" data-indicator="fibonacci">Фибо</button>
+                        <button class="toggle-btn active" data-indicator="support">Поддержка</button>
+                        <button class="toggle-btn active" data-indicator="resistance">Сопротивление</button>
+                        <button class="toggle-btn active" data-indicator="trend">Тренд</button>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="button-group">
+                    <button id="generate-btn" class="button button-green pulse-animation">
+                        <i class="fas fa-bolt"></i> <span id="generate-text">Получить сигнал</span>
+                    </button>
+                    <button id="auto-trading-btn" class="button button-blue">
+                        <i class="fas fa-robot"></i> <span id="auto-trading-text">Авто-торговля</span>
+                    </button>
+                    <a href="https://t.me/+hScZSoUXQe9jN2Ji" target="_blank" class="button button-telegram">
+                        <i class="fab fa-telegram"></i> Telegram Канал
+                    </a>
+                </div>
+
+                <!-- Countdown Timer -->
+                <div class="countdown-container">
+                    <div class="countdown-label" id="next-signal-label">Следующий сигнал через:</div>
+                    <div class="countdown-timer" id="countdown-timer">--:--</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Signal Display -->
+            <div class="signal-block">
+                <div class="signal-header">
+                    <h2 id="signal-title"><i class="fas fa-bell"></i> Торговый сигнал</h2>
+                    <div class="signal-time-container">
+                        <span id="signal-time">--:--:--</span>
+                        <div class="signal-status" id="signal-status"></div>
+                    </div>
+                </div>
+                <div id="signal-result" class="signal-result">
+                    <div class="signal-placeholder">
+                        <i class="fas fa-chart-line"></i>
+                        <p>Нажмите "Получить сигнал" для анализа</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart Container -->
+            <div class="chart-block">
+                <div class="chart-header">
+                    <h3 id="chart-title"><i class="fas fa-chart-candlestick"></i> График в реальном времени</h3>
+                    <div class="chart-controls">
+                        <button id="refresh-chart" class="chart-btn" title="Обновить">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                        <button id="fullscreen-chart" class="chart-btn" title="Полный экран">
+                            <i class="fas fa-expand"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="chart-container" class="chart-container">
+                    <div id="trading-chart"></div>
+                </div>
+                <div class="chart-indicators">
+                    <div class="indicator-item">
+                        <span class="indicator-dot bullish"></span>
+                        <span id="bullish-label">Бычий блок</span>
+                    </div>
+                    <div class="indicator-item">
+                        <span class="indicator-dot bearish"></span>
+                        <span id="bearish-label">Медвежий блок</span>
+                    </div>
+                    <div class="indicator-item">
+                        <span class="indicator-dot support"></span>
+                        <span id="support-label">Поддержка</span>
+                    </div>
+                    <div class="indicator-item">
+                        <span class="indicator-dot resistance"></span>
+                        <span id="resistance-label">Сопротивление</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Signal History -->
+            <div class="history-block">
+                <div class="history-header">
+                    <h3><i class="fas fa-history"></i> История сигналов</h3>
+                    <button id="clear-history" class="clear-btn">Очистить</button>
+                </div>
+                <div class="history-content">
+                    <table id="signals-history">
+                        <thead>
+                            <tr>
+                                <th>Время</th>
+                                <th>Актив</th>
+                                <th>Направление</th>
+                                <th>Таймфрейм</th>
+                                <th>Результат</th>
+                                <th>Прибыль</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Будет заполняться через JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p id="loading-text">Анализируем график...</p>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
