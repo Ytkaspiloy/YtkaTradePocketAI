@@ -3,285 +3,190 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ScalpBot Pro - AI Trading Signals</title>
+    <title>Scalping Robot Pro</title>
     <link rel="stylesheet" href="style.css">
-    <script src="https://d3js.org/d3.v7.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
 </head>
 <body>
     <div class="container">
-        <!-- Header with Broker Logo -->
         <div class="header">
-            <div class="broker-logo">
-                <img src="https://image2url.com/images/1766001097047-30fbff9b-a368-4dbf-965a-4f3ce2de2e5e.png" alt="PocketOption">
-                <span>Official Partner</span>
+            <div class="logo-container">
+                <img src="https://image2url.com/images/1766001097047-30fbff9b-a368-4dbf-965a-4f3ce2de2e5e.png" 
+                     alt="PocketOption" class="broker-logo">
+                <div class="title-group">
+                    <h1 class="main-title">SCALPING ROBOT PRO</h1>
+                    <p class="subtitle">AI-Powered Binary Options Trading</p>
+                </div>
             </div>
-            <div class="header-info">
-                <div class="live-price" id="live-price">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Loading prices...</span>
-                </div>
-                <div class="server-time" id="server-time">
-                    <i class="fas fa-clock"></i>
-                    <span>--:--:--</span>
-                </div>
+            <div class="language-switcher">
+                <button class="lang-btn active" data-lang="ru">RU</button>
+                <button class="lang-btn" data-lang="en">EN</button>
             </div>
         </div>
 
         <div class="main-wrapper">
-            <div class="sidebar">
-                <div class="logo">
-                    <h1><i class="fas fa-robot"></i> ScalpBot Pro</h1>
-                    <p class="tagline">AI-Powered Binary Trading</p>
+            <div class="control-panel">
+                <div class="panel-section">
+                    <h3 class="section-title" data-i18n="instrument">ИНСТРУМЕНТ</h3>
+                    <div class="asset-selector">
+                        <select id="asset-select">
+                            <option value="EURJPY">EUR/JPY</option>
+                            <option value="CHFJPY">CHF/JPY</option>
+                            <option value="AUDCAD">AUD/CAD</option>
+                            <option value="USDCAD">USD/CAD</option>
+                            <option value="USDCHF">USD/CHF</option>
+                            <option value="GBPAUD">GBP/AUD</option>
+                            <option value="USDJPY">USD/JPY</option>
+                            <option value="EURUSD">EUR/USD</option>
+                            <option value="EURAUD">EUR/AUD</option>
+                            <option value="AUDUSD">AUD/USD</option>
+                            <option value="CADJPY">CAD/JPY</option>
+                            <option value="AUDJPY">AUD/JPY</option>
+                            <option value="EURGBP">EUR/GBP</option>
+                            <option value="GBPJPY">GBP/JPY</option>
+                            <option value="GBPCHF">GBP/CHF</option>
+                            <option value="EURCAD">EUR/CAD</option>
+                            <option value="CADCHF">CAD/CHF</option>
+                            <option value="AUDCHF">AUD/CHF</option>
+                        </select>
+                    </div>
                 </div>
-                
-                <div class="settings-panel">
-                    <!-- Trading Pair Selector -->
-                    <div class="input-group">
-                        <label><i class="fas fa-chart-bar"></i> Trading Pair</label>
-                        <select id="currency-pair">
-                            <option>EUR/JPY</option>
-                            <option>CHF/JPY</option>
-                            <option>AUD/CAD</option>
-                            <option>USD/CAD</option>
-                            <option>USD/CHF</option>
-                            <option>GBP/AUD</option>
-                            <option>USD/JPY</option>
-                            <option>EUR/USD</option>
-                            <option>EUR/AUD</option>
-                            <option>AUD/USD</option>
-                            <option>CAD/JPY</option>
-                            <option>AUD/JPY</option>
-                            <option>EUR/GBP</option>
-                            <option>GBP/JPY</option>
-                            <option>GBP/CHF</option>
-                            <option>EUR/CAD</option>
-                            <option>CAD/CHF</option>
-                            <option>AUD/CHF</option>
-                        </select>
-                    </div>
 
-                    <!-- Timeframe Selector -->
-                    <div class="input-group">
-                        <label><i class="fas fa-stopwatch"></i> Expiry Time</label>
-                        <select id="timeframe">
-                            <option value="3">3 seconds</option>
-                            <option value="5">5 seconds</option>
-                            <option value="10">10 seconds</option>
-                            <option value="15">15 seconds</option>
-                            <option value="30">30 seconds</option>
-                            <option value="60">1 minute</option>
-                            <option value="120">2 minutes</option>
-                            <option value="180">3 minutes</option>
-                        </select>
+                <div class="panel-section">
+                    <h3 class="section-title" data-i18n="timeframe">ЭКСПИРАЦИЯ</h3>
+                    <div class="timeframe-grid">
+                        <button class="time-btn active" data-time="3">3s</button>
+                        <button class="time-btn" data-time="5">5s</button>
+                        <button class="time-btn" data-time="10">10s</button>
+                        <button class="time-btn" data-time="15">15s</button>
+                        <button class="time-btn" data-time="30">30s</button>
+                        <button class="time-btn" data-time="60">1m</button>
+                        <button class="time-btn" data-time="120">2m</button>
+                        <button class="time-btn" data-time="180">3m</button>
                     </div>
+                </div>
 
-                    <!-- Investment Amount -->
-                    <div class="input-group">
-                        <label><i class="fas fa-money-bill-wave"></i> Investment</label>
-                        <div class="amount-slider">
-                            <input type="range" id="amount" min="1" max="1000" value="100" class="slider">
-                            <div class="amount-display">
-                                <span id="amount-value">$100</span>
-                                <span class="profit-display" id="potential-profit">+$85</span>
-                            </div>
+                <div class="panel-section">
+                    <h3 class="section-title" data-i18n="analysis">АНАЛИЗ</h3>
+                    <div class="indicators">
+                        <div class="indicator-item">
+                            <span class="indicator-dot" style="background: #00ff88;"></span>
+                            <span data-i18n="fibonacci">Сетка Фибоначчи</span>
+                        </div>
+                        <div class="indicator-item">
+                            <span class="indicator-dot" style="background: #0066ff;"></span>
+                            <span data-i18n="support">Уровни поддержки</span>
+                        </div>
+                        <div class="indicator-item">
+                            <span class="indicator-dot" style="background: #ff4444;"></span>
+                            <span data-i18n="resistance">Уровни сопротивления</span>
+                        </div>
+                        <div class="indicator-item">
+                            <span class="indicator-dot" style="background: #22ff55;"></span>
+                            <span data-i18n="trend">Трендовые линии</span>
+                        </div>
+                        <div class="indicator-item">
+                            <span class="indicator-dot" style="background: #ffaa00;"></span>
+                            <span data-i18n="orderblocks">Ордер-блоки</span>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Trading Statistics -->
-                    <div class="stats-box">
-                        <div class="stat-item">
-                            <span class="stat-label">Accuracy</span>
-                            <span class="stat-value green">78.5%</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Win Rate</span>
-                            <span class="stat-value green">76/98</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-label">Total Profit</span>
-                            <span class="stat-value green">+$1,245</span>
-                        </div>
-                    </div>
-
-                    <!-- Control Buttons -->
-                    <div class="button-group">
-                        <button id="generate-btn" class="btn btn-primary">
-                            <i class="fas fa-bolt"></i>
-                            <span>Generate Signal</span>
+                <div class="panel-section">
+                    <h3 class="section-title" data-i18n="signal">СИГНАЛ</h3>
+                    <div class="signal-control">
+                        <button id="generate-signal" class="signal-btn" data-i18n="getSignal">
+                            <i class="fas fa-bolt"></i> ПОЛУЧИТЬ СИГНАЛ
                         </button>
-                        <button id="auto-trade" class="btn btn-secondary">
-                            <i class="fas fa-play-circle"></i>
-                            <span>Auto Trade (5s)</span>
-                        </button>
+                        <div class="cooldown-info" id="cooldown-timer">
+                            <i class="fas fa-clock"></i>
+                            <span data-i18n="ready">Готов к работе</span>
+                        </div>
                     </div>
+                </div>
 
-                    <!-- Current Signal Info -->
-                    <div class="signal-info" id="current-signal-info">
-                        <div class="info-header">
-                            <i class="fas fa-info-circle"></i>
-                            <span>Active Signal</span>
-                        </div>
-                        <div class="info-content">
-                            <div class="info-row">
-                                <span>Pair:</span>
-                                <span id="info-pair">--</span>
-                            </div>
-                            <div class="info-row">
-                                <span>Direction:</span>
-                                <span id="info-direction">--</span>
-                            </div>
-                            <div class="info-row">
-                                <span>Expires:</span>
-                                <span id="info-expiry">--</span>
-                            </div>
-                        </div>
+                <div class="stats-panel">
+                    <div class="stat-item">
+                        <span class="stat-label" data-i18n="accuracy">Точность:</span>
+                        <span class="stat-value" id="accuracy">87.4%</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label" data-i18n="winRate">Винрейт:</span>
+                        <span class="stat-value" id="win-rate">76.3%</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label" data-i18n="trades">Сделок:</span>
+                        <span class="stat-value" id="total-trades">1,247</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Main Content -->
-            <div class="main-content">
-                <!-- Signal Display -->
-                <div class="signal-block">
-                    <div class="signal-header">
-                        <h2><i class="fas fa-signal"></i> AI Trading Signal</h2>
-                        <div class="signal-timer" id="signal-timer">
-                            <i class="fas fa-hourglass-half"></i>
-                            <span>--:--</span>
-                        </div>
-                    </div>
-                    <div class="signal-content">
-                        <div id="signal-result">
-                            <div class="signal-placeholder">
-                                <i class="fas fa-chart-area"></i>
-                                <p>Click "Generate Signal" to get AI trading signal</p>
-                                <small>Powered by Neural Network Analysis</small>
-                            </div>
-                        </div>
-                        
-                        <!-- Signal Details -->
-                        <div class="signal-details" id="signal-details" style="display: none;">
-                            <div class="signal-main">
-                                <div class="signal-pair" id="signal-pair">EUR/USD</div>
-                                <div class="signal-direction" id="signal-direction">
-                                    <span class="direction-icon"><i class="fas fa-arrow-up"></i></span>
-                                    <span>BUY</span>
-                                </div>
-                                <div class="signal-timeframe" id="signal-timeframe">30 seconds</div>
-                            </div>
-                            
-                            <div class="signal-analysis">
-                                <div class="analysis-item">
-                                    <span>Confidence:</span>
-                                    <span class="confidence-bar">
-                                        <span class="confidence-fill" style="width: 85%"></span>
-                                    </span>
-                                    <span class="confidence-value">85%</span>
-                                </div>
-                                <div class="analysis-item">
-                                    <span>RSI:</span>
-                                    <span id="signal-rsi">42.5</span>
-                                </div>
-                                <div class="analysis-item">
-                                    <span>MACD:</span>
-                                    <span id="signal-macd">Bullish</span>
-                                </div>
-                                <div class="analysis-item">
-                                    <span>Support/Resistance:</span>
-                                    <span id="signal-sr">Strong Support</span>
-                                </div>
-                            </div>
-                            
-                            <div class="signal-result" id="signal-result-display">
-                                <div class="result-placeholder">
-                                    <div class="progress-container">
-                                        <div class="progress-label">Trade in progress...</div>
-                                        <div class="progress-bar">
-                                            <div class="progress-fill"></div>
-                                        </div>
-                                        <div class="progress-time" id="progress-time">00:00</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Chart Container -->
-                <div class="chart-block">
+            <div class="chart-area">
+                <div class="chart-container">
                     <div class="chart-header">
-                        <h3><i class="fas fa-chart-candlestick"></i> Live Chart Analysis</h3>
-                        <div class="chart-controls">
-                            <button class="chart-btn active" data-type="candle">
-                                <i class="fas fa-chart-candlestick"></i>
-                            </button>
-                            <button class="chart-btn" data-type="line">
-                                <i class="fas fa-chart-line"></i>
-                            </button>
-                            <button class="chart-btn" data-type="area">
-                                <i class="fas fa-chart-area"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="chart-container">
-                        <div id="trading-chart"></div>
-                        <div class="chart-overlay">
-                            <div class="indicator-display">
-                                <span class="indicator-item">RSI: <span id="live-rsi">--</span></span>
-                                <span class="indicator-item">MACD: <span id="live-macd">--</span></span>
-                                <span class="indicator-item">Volume: <span id="live-volume">--</span></span>
+                        <div class="chart-info">
+                            <h2 id="current-pair">EUR/JPY</h2>
+                            <div class="price-info">
+                                <span id="current-price">158.425</span>
+                                <span id="price-change" class="positive">+0.12%</span>
                             </div>
                         </div>
+                        <div class="chart-controls">
+                            <button class="chart-btn active" data-timeframe="5s">5s</button>
+                            <button class="chart-btn" data-timeframe="15s">15s</button>
+                            <button class="chart-btn" data-timeframe="1m">1m</button>
+                            <button class="chart-btn" data-timeframe="5m">5m</button>
+                        </div>
+                    </div>
+                    <div id="trading-chart"></div>
+                    <div class="chart-footer">
+                        <div class="time-display" id="current-time">
+                            <i class="far fa-clock"></i> 14:35:22 UTC
+                        </div>
+                        <div class="candle-count" data-i18n="candles">Анализ 150 свечей</div>
                     </div>
                 </div>
 
-                <!-- Trade History -->
-                <div class="history-block">
-                    <div class="history-header">
-                        <h3><i class="fas fa-history"></i> Recent Trades</h3>
-                        <div class="history-stats">
-                            <span class="win-rate">Win Rate: <strong>78.5%</strong></span>
+                <div class="signal-display">
+                    <div class="signal-header">
+                        <h3 data-i18n="currentSignal">ТЕКУЩИЙ СИГНАЛ</h3>
+                        <div class="signal-status" id="signal-status">
+                            <span class="status-dot"></span>
+                            <span data-i18n="waiting">Ожидание</span>
                         </div>
                     </div>
-                    <div class="history-content">
-                        <table id="trade-history">
-                            <thead>
-                                <tr>
-                                    <th>Time</th>
-                                    <th>Pair</th>
-                                    <th>Direction</th>
-                                    <th>Expiry</th>
-                                    <th>Result</th>
-                                    <th>Profit</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Filled by JavaScript -->
-                            </tbody>
-                        </table>
+                    <div class="signal-content" id="signal-content">
+                        <div class="signal-placeholder">
+                            <i class="fas fa-chart-line"></i>
+                            <p data-i18n="clickGenerate">Нажмите "Получить сигнал" для анализа</p>
+                        </div>
+                    </div>
+                    <div class="expiration-timer" id="expiration-timer">
+                        <div class="timer-progress">
+                            <div class="progress-bar" id="timer-bar"></div>
+                        </div>
+                        <div class="timer-text" data-i18n="expires">Истекает через: <span id="timer-value">--:--</span></div>
+                    </div>
+                    <div class="result-history">
+                        <h4 data-i18n="lastResults">ПОСЛЕДНИЕ РЕЗУЛЬТАТЫ</h4>
+                        <div class="results-list" id="results-list">
+                            <!-- Results will be added here dynamically -->
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Footer -->
         <div class="footer">
-            <div class="footer-content">
-                <div class="disclaimer">
-                    <p><i class="fas fa-exclamation-triangle"></i> <strong>Risk Warning:</strong> Trading binary options involves significant risk of loss. Past performance is not indicative of future results. Trade responsibly.</p>
-                </div>
-                <div class="copyright">
-                    <p>© 2024 ScalpBot Pro | AI Trading System | Partner: PocketOption</p>
-                </div>
-            </div>
+            <p class="disclaimer" data-i18n="disclaimer">
+                Торговля бинарными опционами связана с высокими рисками. Past performance is not indicative of future results.
+            </p>
+            <p class="copyright">© 2024 Scalping Robot Pro • Powered by PocketOption API</p>
         </div>
     </div>
 
-    <!-- JavaScript -->
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/luxon@2.4.0/build/global/luxon.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
-
