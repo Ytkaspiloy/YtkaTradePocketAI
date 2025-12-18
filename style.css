@@ -704,3 +704,92 @@ body {
 ::-webkit-scrollbar-thumb:hover {
     background: var(--accent-green);
 }
+/* Add to existing CSS */
+
+/* Loader animation */
+.loader {
+    display: inline-block;
+    width: 50px;
+    height: 50px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    border-top-color: #00ff88;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Pulse animation for status dot */
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Signal active animation */
+.signal-active {
+    animation: signalGlow 2s infinite alternate;
+}
+
+@keyframes signalGlow {
+    from {
+        box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+    }
+    to {
+        box-shadow: 0 0 30px rgba(0, 102, 255, 0.7);
+    }
+}
+
+/* Fix for chart container */
+#trading-chart {
+    width: 100% !important;
+    height: 500px !important;
+}
+
+/* Improve button responsiveness */
+.time-btn, .signal-btn {
+    cursor: pointer;
+    user-select: none;
+}
+
+.time-btn:active, .signal-btn:active {
+    transform: translateY(1px);
+}
+
+/* Fix for select dropdown */
+.asset-selector select {
+    cursor: pointer;
+}
+
+/* Improve result items */
+.result-item {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 10px;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    background: var(--bg-secondary);
+    transition: all 0.2s ease;
+}
+
+.result-item:hover {
+    background: var(--bg-hover);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .result-item {
+        grid-template-columns: 1fr 1fr;
+        gap: 5px;
+    }
+    
+    .result-time {
+        grid-column: span 2;
+        text-align: center;
+        font-size: 11px;
+    }
+}
+
