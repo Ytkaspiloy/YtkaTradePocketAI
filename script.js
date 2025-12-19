@@ -1805,3 +1805,149 @@ window.debug = {
         language: currentLanguage
     })
 };
+
+// Функция для улучшенного внешнего вида
+function enhanceUI() {
+    // Добавляем дополнительные стили для красивого отображения
+    const enhancedStyles = `
+        /* Эффект градиентных границ */
+        .control-panel, .chart-container, .signal-display {
+            position: relative;
+        }
+        
+        .control-panel:before, .chart-container:before, .signal-display:before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            right: -1px;
+            bottom: -1px;
+            background: linear-gradient(45deg, #00ff88, #0066ff, #00ff88);
+            border-radius: 21px;
+            z-index: -1;
+            opacity: 0.3;
+            filter: blur(5px);
+        }
+        
+        /* Анимация появления элементов */
+        .panel-section {
+            animation: fadeInUp 0.5s ease-out;
+            animation-fill-mode: both;
+        }
+        
+        .panel-section:nth-child(1) { animation-delay: 0.1s; }
+        .panel-section:nth-child(2) { animation-delay: 0.2s; }
+        .panel-section:nth-child(3) { animation-delay: 0.3s; }
+        .panel-section:nth-child(4) { animation-delay: 0.4s; }
+        .panel-section:nth-child(5) { animation-delay: 0.5s; }
+        .panel-section:nth-child(6) { animation-delay: 0.6s; }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Эффект при наведении на кнопки */
+        .signal-btn, .time-btn, .signal-type-btn {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        /* Анимация живых цен */
+        .live-price {
+            position: relative;
+        }
+        
+        .live-price:after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #00ff88, transparent);
+            opacity: 0;
+            animation: priceGlow 3s infinite;
+        }
+        
+        @keyframes priceGlow {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+        
+        /* Эффект свечения для активных элементов */
+        .active {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .active:after {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            background: radial-gradient(circle at center, rgba(0, 255, 136, 0.1), transparent 70%);
+            z-index: -1;
+        }
+    `;
+    
+    const styleSheet = document.createElement('style');
+    styleSheet.textContent = enhancedStyles;
+    document.head.appendChild(styleSheet);
+    
+    // Добавляем эффект параллакса для фона
+    document.body.addEventListener('mousemove', function(e) {
+        const x = (e.clientX / window.innerWidth - 0.5) * 20;
+        const y = (e.clientY / window.innerHeight - 0.5) * 20;
+        
+        document.body.style.backgroundPosition = `calc(50% + ${x}px) calc(50% + ${y}px)`;
+    });
+    
+    // Добавляем эффект при наведении на карточки
+    const cards = document.querySelectorAll('.panel-section, .stat-item, .indicator-item');
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            card.style.transform = 'translateY(-5px)';
+            card.style.boxShadow = '0 15px 35px rgba(0, 0, 0, 0.3)';
+        });
+        
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'translateY(0)';
+            card.style.boxShadow = 'none';
+        });
+    });
+    
+    // Добавляем плавное появление элементов при загрузке
+    document.querySelectorAll('.control-panel, .chart-container, .signal-display').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(30px)';
+        
+        setTimeout(() => {
+            el.style.transition = 'all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            el.style.opacity = '1';
+            el.style.transform = 'translateY(0)';
+        }, 100);
+    });
+}
+
+// Вызываем улучшение UI после загрузки
+window.addEventListener('load', function() {
+    setTimeout(enhanceUI, 500);
+    
+    // Добавляем плавное обновление цен
+    setInterval(() => {
+        document.querySelectorAll('.live-price').forEach(price => {
+            price.style.transform = 'scale(1.05)';
+            setTimeout(() => {
+                price.style.transform = 'scale(1)';
+            }, 200);
+        });
+    }, 5000);
+});
