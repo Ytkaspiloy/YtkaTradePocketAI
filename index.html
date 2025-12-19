@@ -6,7 +6,6 @@
     <title>Scalping Robot Pro</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
 </head>
 <body>
@@ -29,23 +28,23 @@
         <div class="main-wrapper">
             <div class="control-panel">
                 <div class="panel-section">
-                    <h3 class="section-title" data-i18n="instrument">ИНСТРУМЕНТ</h3>
+                    <h3 class="section-title">ИНСТРУМЕНТ</h3>
                     <div class="asset-selector">
                         <select id="asset-select">
                             <option value="EURJPY">EUR/JPY</option>
-                            <option value="CHFJPY">CHF/JPY</option>
-                            <option value="AUDCAD">AUD/CAD</option>
-                            <option value="USDCAD">USD/CAD</option>
-                            <option value="USDCHF">USD/CHF</option>
-                            <option value="GBPAUD">GBP/AUD</option>
                             <option value="USDJPY">USD/JPY</option>
                             <option value="EURUSD">EUR/USD</option>
-                            <option value="EURAUD">EUR/AUD</option>
-                            <option value="AUDUSD">AUD/USD</option>
-                            <option value="CADJPY">CAD/JPY</option>
-                            <option value="AUDJPY">AUD/JPY</option>
-                            <option value="EURGBP">EUR/GBP</option>
                             <option value="GBPJPY">GBP/JPY</option>
+                            <option value="AUDUSD">AUD/USD</option>
+                            <option value="USDCAD">USD/CAD</option>
+                            <option value="USDCHF">USD/CHF</option>
+                            <option value="EURGBP">EUR/GBP</option>
+                            <option value="AUDJPY">AUD/JPY</option>
+                            <option value="CHFJPY">CHF/JPY</option>
+                            <option value="AUDCAD">AUD/CAD</option>
+                            <option value="GBPAUD">GBP/AUD</option>
+                            <option value="EURAUD">EUR/AUD</option>
+                            <option value="CADJPY">CAD/JPY</option>
                             <option value="GBPCHF">GBP/CHF</option>
                             <option value="EURCAD">EUR/CAD</option>
                             <option value="CADCHF">CAD/CHF</option>
@@ -55,70 +54,64 @@
                 </div>
 
                 <div class="panel-section">
-                    <h3 class="section-title" data-i18n="timeframe">ЭКСПИРАЦИЯ</h3>
-                    <div class="timeframe-grid">
-                        <button class="time-btn active" data-time="3">3s</button>
-                        <button class="time-btn" data-time="5">5s</button>
-                        <button class="time-btn" data-time="10">10s</button>
-                        <button class="time-btn" data-time="15">15s</button>
-                        <button class="time-btn" data-time="30">30s</button>
-                        <button class="time-btn" data-time="60">1m</button>
-                        <button class="time-btn" data-time="120">2m</button>
-                        <button class="time-btn" data-time="180">3m</button>
+                    <h3 class="section-title">ЭКСПИРАЦИЯ</h3>
+                    <div class="timeframe-grid" id="timeframe-buttons">
+                        <button class="time-btn active" data-time="60">1 мин</button>
+                        <button class="time-btn" data-time="120">2 мин</button>
+                        <button class="time-btn" data-time="180">3 мин</button>
+                        <button class="time-btn" data-time="300">5 мин</button>
                     </div>
                 </div>
 
                 <div class="panel-section">
-                    <h3 class="section-title" data-i18n="analysis">АНАЛИЗ</h3>
-                    <div class="indicators">
-                        <div class="indicator-item">
-                            <span class="indicator-dot" style="background: #00ff88;"></span>
-                            <span data-i18n="fibonacci">Сетка Фибоначчи</span>
+                    <h3 class="section-title">ТОЧНОСТЬ СИГНАЛОВ</h3>
+                    <div class="accuracy-meter">
+                        <div class="accuracy-bar">
+                            <div class="accuracy-fill" style="width: 87%"></div>
                         </div>
-                        <div class="indicator-item">
-                            <span class="indicator-dot" style="background: #0066ff;"></span>
-                            <span data-i18n="support">Уровни поддержки</span>
+                        <div class="accuracy-value">87.4%</div>
+                    </div>
+                    <div class="accuracy-stats">
+                        <div class="stat-row">
+                            <span>Последние 24ч:</span>
+                            <span class="stat-value success">85.2%</span>
                         </div>
-                        <div class="indicator-item">
-                            <span class="indicator-dot" style="background: #ff4444;"></span>
-                            <span data-i18n="resistance">Уровни сопротивления</span>
+                        <div class="stat-row">
+                            <span>За неделю:</span>
+                            <span class="stat-value success">86.7%</span>
                         </div>
-                        <div class="indicator-item">
-                            <span class="indicator-dot" style="background: #22ff55;"></span>
-                            <span data-i18n="trend">Трендовые линии</span>
-                        </div>
-                        <div class="indicator-item">
-                            <span class="indicator-dot" style="background: #ffaa00;"></span>
-                            <span data-i18n="orderblocks">Ордер-блоки</span>
+                        <div class="stat-row">
+                            <span>Всего сигналов:</span>
+                            <span class="stat-value">1,247</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="panel-section">
-                    <h3 class="section-title" data-i18n="signal">СИГНАЛ</h3>
+                    <h3 class="section-title">СИГНАЛ</h3>
                     <div class="signal-control">
-                        <button id="generate-signal" class="signal-btn" data-i18n="getSignal">
+                        <button id="generate-signal" class="signal-btn">
                             <i class="fas fa-bolt"></i> ПОЛУЧИТЬ СИГНАЛ
                         </button>
                         <div class="cooldown-info" id="cooldown-timer">
                             <i class="fas fa-clock"></i>
-                            <span data-i18n="ready">Готов к работе</span>
+                            <span>Готов к работе</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="stats-panel">
                     <div class="stat-item">
-                        <span class="stat-label" data-i18n="accuracy">Точность:</span>
-                        <span class="stat-value" id="accuracy">87.4%</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label" data-i18n="winRate">Винрейт:</span>
+                        <span class="stat-label">Винрейт:</span>
                         <span class="stat-value" id="win-rate">76.3%</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-label" data-i18n="trades">Сделок:</span>
-                        <span class="stat-value" id="total-trades">1,247</span>
+                        <span class="stat-label">Профит фактор:</span>
+                        <span class="stat-value" id="profit-factor">2.45</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Сделок сегодня:</span>
+                        <span class="stat-value" id="today-trades">12</span>
                     </div>
                 </div>
             </div>
@@ -127,50 +120,83 @@
                 <div class="chart-container">
                     <div class="chart-header">
                         <div class="chart-info">
-                            <h2 id="current-pair">EUR/JPY</h2>
+                            <h2 id="current-pair">EUR/USD</h2>
                             <div class="price-info">
-                                <span id="current-price">158.425</span>
-                                <span id="price-change" class="positive">+0.12%</span>
+                                <span id="current-price">1.0830</span>
+                                <span id="price-change" class="negative">-0.02%</span>
                             </div>
                         </div>
-                        <div class="chart-controls">
-                            <button class="chart-btn active" data-timeframe="5s">5s</button>
-                            <button class="chart-btn" data-timeframe="15s">15s</button>
-                            <button class="chart-btn" data-timeframe="1m">1m</button>
-                            <button class="chart-btn" data-timeframe="5m">5m</button>
+                        <div class="timeframe-display">
+                            <span class="tf-label">Таймфрейм:</span>
+                            <span class="tf-value" id="current-tf">5 мин</span>
                         </div>
                     </div>
                     <div id="trading-chart"></div>
                     <div class="chart-footer">
                         <div class="time-display" id="current-time">
-                            <i class="far fa-clock"></i> 14:35:22 UTC
+                            <i class="far fa-clock"></i> <span id="time-text">12:38:32 UTC</span>
                         </div>
-                        <div class="candle-count" data-i18n="candles">Анализ 150 свечей</div>
+                        <div class="candle-count">
+                            <i class="fas fa-chart-candlestick"></i> <span id="candle-count">Анализ 150 свечей</span>
+                        </div>
                     </div>
                 </div>
 
                 <div class="signal-display">
                     <div class="signal-header">
-                        <h3 data-i18n="currentSignal">ТЕКУЩИЙ СИГНАЛ</h3>
+                        <h3><i class="fas fa-bell"></i> ТЕКУЩИЙ СИГНАЛ</h3>
                         <div class="signal-status" id="signal-status">
                             <span class="status-dot"></span>
-                            <span data-i18n="waiting">Ожидание</span>
+                            <span id="status-text">Ожидание</span>
                         </div>
                     </div>
+                    
                     <div class="signal-content" id="signal-content">
                         <div class="signal-placeholder">
                             <i class="fas fa-chart-line"></i>
-                            <p data-i18n="clickGenerate">Нажмите "Получить сигнал" для анализа</p>
+                            <p>Нажмите "Получить сигнал" для анализа</p>
                         </div>
                     </div>
-                    <div class="expiration-timer" id="expiration-timer">
+                    
+                    <div class="signal-details" id="signal-details" style="display: none;">
+                        <div class="detail-row">
+                            <span class="detail-label">Инструмент:</span>
+                            <span class="detail-value" id="signal-pair">EUR/USD</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Направление:</span>
+                            <span class="detail-value direction" id="signal-direction">ПОКУПКА</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Цена входа:</span>
+                            <span class="detail-value" id="signal-entry">1.0830</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Точность:</span>
+                            <span class="detail-value accuracy-high" id="signal-accuracy">87%</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Экспирация:</span>
+                            <span class="detail-value" id="signal-expiration">5 минут</span>
+                        </div>
+                        <div class="detail-row">
+                            <span class="detail-label">Время генерации:</span>
+                            <span class="detail-value" id="signal-time">12:38:32</span>
+                        </div>
+                    </div>
+                    
+                    <div class="expiration-timer" id="expiration-timer" style="display: none;">
                         <div class="timer-progress">
                             <div class="progress-bar" id="timer-bar"></div>
                         </div>
-                        <div class="timer-text" data-i18n="expires">Истекает через: <span id="timer-value">--:--</span></div>
+                        <div class="timer-text">
+                            <i class="fas fa-hourglass-half"></i> 
+                            Истекает через: <span id="timer-value">05:00</span>
+                        </div>
                     </div>
+                    
                     <div class="result-history">
-                        <h4 data-i18n="lastResults">ПОСЛЕДНИЕ РЕЗУЛЬТАТЫ</h4>
+                        <h4><i class="fas fa-history"></i> ПОСЛЕДНИЕ РЕЗУЛЬТАТЫ</h4>
                         <div class="results-list" id="results-list">
                             <!-- Results will be added here dynamically -->
                         </div>
@@ -180,7 +206,8 @@
         </div>
 
         <div class="footer">
-            <p class="disclaimer" data-i18n="disclaimer">
+            <p class="disclaimer">
+                <i class="fas fa-exclamation-triangle"></i>
                 Торговля бинарными опционами связана с высокими рисками. Past performance is not indicative of future results.
             </p>
             <p class="copyright">© 2024 Scalping Robot Pro • Powered by PocketOption API</p>
