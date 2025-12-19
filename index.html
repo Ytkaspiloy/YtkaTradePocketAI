@@ -28,7 +28,7 @@
         <div class="main-wrapper">
             <div class="control-panel">
                 <div class="panel-section">
-                    <h3 class="section-title">ИНСТРУМЕНТ</h3>
+                    <h3 class="section-title" data-i18n="instrument">ИНСТРУМЕНТ</h3>
                     <div class="asset-selector">
                         <select id="asset-select">
                             <option value="EURJPY">EUR/JPY</option>
@@ -54,7 +54,7 @@
                 </div>
 
                 <div class="panel-section">
-                    <h3 class="section-title">ЭКСПИРАЦИЯ</h3>
+                    <h3 class="section-title" data-i18n="expiration">ЭКСПИРАЦИЯ</h3>
                     <div class="timeframe-grid" id="timeframe-buttons">
                         <button class="time-btn active" data-time="60">1 мин</button>
                         <button class="time-btn" data-time="120">2 мин</button>
@@ -64,7 +64,7 @@
                 </div>
 
                 <div class="panel-section">
-                    <h3 class="section-title">ТОЧНОСТЬ СИГНАЛОВ</h3>
+                    <h3 class="section-title" data-i18n="signalAccuracy">ТОЧНОСТЬ СИГНАЛОВ</h3>
                     <div class="accuracy-meter">
                         <div class="accuracy-bar">
                             <div class="accuracy-fill" style="width: 87%"></div>
@@ -73,51 +73,51 @@
                     </div>
                     <div class="accuracy-stats">
                         <div class="stat-row">
-                            <span>Последние 24ч:</span>
+                            <span data-i18n="last24h">Последние 24ч:</span>
                             <span class="stat-value success">85.2%</span>
                         </div>
                         <div class="stat-row">
-                            <span>За неделю:</span>
+                            <span data-i18n="weekly">За неделю:</span>
                             <span class="stat-value success">86.7%</span>
                         </div>
                         <div class="stat-row">
-                            <span>Всего сигналов:</span>
+                            <span data-i18n="totalSignals">Всего сигналов:</span>
                             <span class="stat-value">1,247</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="panel-section">
-                    <h3 class="section-title">СИГНАЛ</h3>
+                    <h3 class="section-title" data-i18n="signal">СИГНАЛ</h3>
                     <div class="signal-control">
                         <button id="generate-signal" class="signal-btn">
-                            <i class="fas fa-bolt"></i> ПОЛУЧИТЬ СИГНАЛ
+                            <i class="fas fa-bolt"></i> <span data-i18n="getSignal">ПОЛУЧИТЬ СИГНАЛ</span>
                         </button>
                         <div class="cooldown-info" id="cooldown-timer">
                             <i class="fas fa-clock"></i>
-                            <span>Готов к работе</span>
+                            <span data-i18n="ready">Готов к работе</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="stats-panel">
                     <div class="stat-item">
-                        <span class="stat-label">Винрейт:</span>
+                        <span class="stat-label" data-i18n="winRate">Винрейт:</span>
                         <span class="stat-value" id="win-rate">76.3%</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-label">Профит фактор:</span>
+                        <span class="stat-label" data-i18n="profitFactor">Профит фактор:</span>
                         <span class="stat-value" id="profit-factor">2.45</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-label">Сделок сегодня:</span>
+                        <span class="stat-label" data-i18n="todayTrades">Сделок сегодня:</span>
                         <span class="stat-value" id="today-trades">12</span>
                     </div>
                 </div>
             </div>
 
             <div class="chart-area">
-                <div class="chart-container">
+                <div class="chart-container" id="chart-container" style="display: none;">
                     <div class="chart-header">
                         <div class="chart-info">
                             <h2 id="current-pair">EUR/USD</h2>
@@ -127,8 +127,8 @@
                             </div>
                         </div>
                         <div class="timeframe-display">
-                            <span class="tf-label">Таймфрейм:</span>
-                            <span class="tf-value" id="current-tf">5 мин</span>
+                            <span class="tf-label" data-i18n="timeframe">Таймфрейм:</span>
+                            <span class="tf-value" id="current-tf">1 мин</span>
                         </div>
                     </div>
                     <div id="trading-chart"></div>
@@ -137,50 +137,61 @@
                             <i class="far fa-clock"></i> <span id="time-text">12:38:32 UTC</span>
                         </div>
                         <div class="candle-count">
-                            <i class="fas fa-chart-candlestick"></i> <span id="candle-count">Анализ 150 свечей</span>
+                            <i class="fas fa-chart-candlestick"></i> <span id="candle-count" data-i18n="analyzing150">Анализ 150 свечей</span>
                         </div>
+                    </div>
+                </div>
+
+                <div class="no-chart-message" id="no-chart-message">
+                    <div class="message-content">
+                        <i class="fas fa-chart-line"></i>
+                        <h3 data-i18n="waitingForSignal">Ожидание сигнала</h3>
+                        <p data-i18n="chartWillAppear">График появится здесь после генерации сигнала</p>
+                        <button id="generate-first-signal" class="signal-btn-small">
+                            <i class="fas fa-bolt"></i> <span data-i18n="generateFirstSignal">Сгенерировать первый сигнал</span>
+                        </button>
                     </div>
                 </div>
 
                 <div class="signal-display">
                     <div class="signal-header">
-                        <h3><i class="fas fa-bell"></i> ТЕКУЩИЙ СИГНАЛ</h3>
+                        <h3><i class="fas fa-bell"></i> <span data-i18n="currentSignal">ТЕКУЩИЙ СИГНАЛ</span></h3>
                         <div class="signal-status" id="signal-status">
                             <span class="status-dot"></span>
-                            <span id="status-text">Ожидание</span>
+                            <span id="status-text" data-i18n="waiting">Ожидание</span>
                         </div>
                     </div>
                     
                     <div class="signal-content" id="signal-content">
                         <div class="signal-placeholder">
                             <i class="fas fa-chart-line"></i>
-                            <p>Нажмите "Получить сигнал" для анализа</p>
+                            <p data-i18n="clickGenerate">Нажмите "Получить сигнал" для анализа</p>
                         </div>
                     </div>
                     
                     <div class="signal-details" id="signal-details" style="display: none;">
                         <div class="detail-row">
-                            <span class="detail-label">Инструмент:</span>
+                            <span class="detail-label" data-i18n="instrument">Инструмент:</span>
                             <span class="detail-value" id="signal-pair">EUR/USD</span>
                         </div>
                         <div class="detail-row">
-                            <span class="detail-label">Направление:</span>
+                            <span class="detail-label" data-i18n="direction">Направление:</span>
                             <span class="detail-value direction" id="signal-direction">ПОКУПКА</span>
                         </div>
                         <div class="detail-row">
-                            <span class="detail-label">Цена входа:</span>
+                            <span class="detail-label" data-i18n="entryPrice">Цена входа:</span>
                             <span class="detail-value" id="signal-entry">1.0830</span>
                         </div>
                         <div class="detail-row">
-                            <span class="detail-label">Точность:</span>
+                            <span class="detail-label" data-i18n="accuracy">Точность:</span>
                             <span class="detail-value accuracy-high" id="signal-accuracy">87%</span>
                         </div>
                         <div class="detail-row">
-                            <span class="detail-label">Экспирация:</span>
-                            <span class="detail-value" id="signal-expiration">5 минут</span>
+                            <span class="detail-label" data-i18n="expiration">Экспирация:</span>
+                            <span class="detail-value" id="signal-expiration">1 минута</span>
                         </div>
                         <div class="detail-row">
-                            <span class="detail-label">Время генерации:</span>
+                            <span class="detail-label" data-i18n="generationTime">Время генерации:</span>
                             <span class="detail-value" id="signal-time">12:38:32</span>
                         </div>
                     </div>
@@ -191,12 +202,12 @@
                         </div>
                         <div class="timer-text">
                             <i class="fas fa-hourglass-half"></i> 
-                            Истекает через: <span id="timer-value">05:00</span>
+                            <span data-i18n="expiresIn">Истекает через:</span> <span id="timer-value">01:00</span>
                         </div>
                     </div>
                     
                     <div class="result-history">
-                        <h4><i class="fas fa-history"></i> ПОСЛЕДНИЕ РЕЗУЛЬТАТЫ</h4>
+                        <h4><i class="fas fa-history"></i> <span data-i18n="lastResults">ПОСЛЕДНИЕ РЕЗУЛЬТАТЫ</span></h4>
                         <div class="results-list" id="results-list">
                             <!-- Results will be added here dynamically -->
                         </div>
@@ -208,7 +219,7 @@
         <div class="footer">
             <p class="disclaimer">
                 <i class="fas fa-exclamation-triangle"></i>
-                Торговля бинарными опционами связана с высокими рисками. Past performance is not indicative of future results.
+                <span data-i18n="disclaimer">Торговля бинарными опционами связана с высокими рисками. Past performance is not indicative of future results.</span>
             </p>
             <p class="copyright">© 2024 Scalping Robot Pro • Powered by PocketOption API</p>
         </div>
