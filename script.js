@@ -96,6 +96,8 @@ const TRANSLATIONS = {
         apiInfo: "Используются реальные котировки Forex. Обновление каждые 5 секунд.",
         disclaimer: "Торговля бинарными опционами связана с высокими рисками.",
         dataSource: "Источник: Twelve Data API",
+        confidence: "Уверенность:",
+        direction: "Направление:",
         
         // Кнопки
         getSignal: "ПОЛУЧИТЬ СИГНАЛ",
@@ -137,7 +139,8 @@ const TRANSLATIONS = {
         bearish: "Медвежий",
         uptrend: "Восходящий ↗",
         downtrend: "Нисходящий ↘",
-        sideTrend: "Боковой ↔"
+        sideTrend: "Боковой ↔",
+        analysis: "Анализ..."
     },
     en: {
         // Headers
@@ -156,6 +159,8 @@ const TRANSLATIONS = {
         apiInfo: "Using real Forex quotes. Updated every 5 seconds.",
         disclaimer: "Binary options trading involves high risks.",
         dataSource: "Source: Twelve Data API",
+        confidence: "Confidence:",
+        direction: "Direction:",
         
         // Buttons
         getSignal: "GET SIGNAL",
@@ -197,7 +202,8 @@ const TRANSLATIONS = {
         bearish: "Bearish",
         uptrend: "Uptrend ↗",
         downtrend: "Downtrend ↘",
-        sideTrend: "Sideways ↔"
+        sideTrend: "Sideways ↔",
+        analysis: "Analysis..."
     }
 };
 
@@ -217,6 +223,8 @@ let currentLanguage = 'ru';
 let signalType = 'smart';
 let drawingMode = null;
 let drawings = [];
+let isDrawing = false;
+let lastClickTime = 0;
 
 // Инициализация при загрузке
 document.addEventListener('DOMContentLoaded', function() {
@@ -240,8 +248,35 @@ document.addEventListener('DOMContentLoaded', function() {
     // Загрузка истории
     loadHistory();
     
+    // Установка начального активного состояния
+    setActiveStates();
+    
     console.log('✅ Scalping Robot Pro ready!');
 });
+
+// Установка начальных активных состояний
+function setActiveStates() {
+    // Устанавливаем активный таймфрейм
+    document.querySelectorAll('.time-btn').forEach(btn => {
+        if (parseInt(btn.dataset.time) === currentTimeframe) {
+            btn.classList.add('active');
+        }
+    });
+    
+    // Устанавливаем активный тип сигнала
+    document.querySelectorAll('.signal-type-btn').forEach(btn => {
+        if (btn.dataset.type === signalType) {
+            btn.classList.add('active');
+        }
+    });
+    
+    // Устанавливаем активный тип графика
+    document.querySelectorAll('.chart-type-btn').forEach(btn => {
+        if (btn.dataset.type === chartType) {
+            btn.classList.add('active');
+        }
+    });
+}
 
 // Инициализация локализации
 function initLanguage() {
@@ -293,12 +328,12 @@ function initChart() {
     generateTestChartData();
     
     // Настройки графика
-    const chartConfig = {
+    currentChart = new Chart(ctx, {
         type: 'candlestick',
         data: {
             labels: chartData.labels,
             datasets: [{
-                label: 'Цена',
+                label: 'Price',
                 data: chartData.candles,
                 borderColor: '#00ff88',
                 backgroundColor: (ctx) => {
@@ -354,9 +389,7 @@ function initChart() {
                 mode: 'index'
             }
         }
-    };
-    
-    currentChart = new Chart(ctx, chartConfig);
+    });
 }
 
 // Генерация тестовых свечных данных
@@ -376,7 +409,7 @@ function generateTestChartData() {
                    time.getMinutes().toString().padStart(2, '0'));
         
         // Генерируем реалистичную свечу
-        const volatility = 0.0003; // 3 пипса
+        const volatility = 0.0003;
         const open = currentPrice;
         const high = open * (1 + Math.random() * volatility);
         const low = open * (1 - Math.random() * volatility);
@@ -418,28 +451,161 @@ function switchChartType(type) {
     
     if (!currentChart) return;
     
-    if (type === 'candlestick') {
-        currentChart.config.type = 'candlestick';
-        currentChart.data.datasets[0].data = chartData.candles;
-    } else if (type === 'line') {
-        currentChart.config.type = 'line';
-        currentChart.data.datasets[0].data = chartData.prices;
-        currentChart.data.datasets[0].borderColor = '#00ff88';
-        currentChart.data.datasets[0].backgroundColor = 'rgba(0, 255, 136, 0.1)';
-        currentChart.data.datasets[0].fill = true;
-    }
+    // Сохраняем старые данные
+    const oldData = currentChart.data;
     
-    currentChart.update();
+    if (type === 'candlestick') {
+        currentChart.destroy();
+        currentChart = null;
+        
+        // Создаем новый свечной график
+        const ctx = document.getElementById('trading-chart').getContext('2d');
+        currentChart = new Chart(ctx, {
+            type: 'candlestick',
+            data: {
+                labels: chartData.labels,
+                datasets: [{
+                    label: 'Price',
+                    data: chartData.candles,
+                    borderColor: '#00ff88',
+                    backgroundColor: (ctx) => {
+                        const candle = ctx.dataset.data[ctx.dataIndex];
+                        return candle.c >= candle.o ? 'rgba(0, 255, 136, 0.3)' : 'rgba(255, 68, 68, 0.3)';
+                    },
+                    borderWidth: 1,
+                    pointRadius: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        backgroundColor: 'rgba(26, 34, 56, 0.95)',
+                        titleColor: '#8b9dc3',
+                        bodyColor: '#ffffff',
+                        borderColor: '#2a3655',
+                        borderWidth: 1
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { 
+                            color: 'rgba(42, 54, 85, 0.3)',
+                            drawBorder: false
+                        },
+                        ticks: { 
+                            color: '#8b9dc3',
+                            maxRotation: 0
+                        }
+                    },
+                    y: {
+                        position: 'right',
+                        grid: { 
+                            color: 'rgba(42, 54, 85, 0.3)',
+                            drawBorder: false
+                        },
+                        ticks: { 
+                            color: '#8b9dc3',
+                            callback: function(value) {
+                                return value.toFixed(4);
+                            }
+                        }
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                }
+            }
+        });
+    } else if (type === 'line') {
+        currentChart.destroy();
+        currentChart = null;
+        
+        // Создаем новый линейный график
+        const ctx = document.getElementById('trading-chart').getContext('2d');
+        currentChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: chartData.labels,
+                datasets: [{
+                    label: 'Price',
+                    data: chartData.prices,
+                    borderColor: '#00ff88',
+                    backgroundColor: 'rgba(0, 255, 136, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        backgroundColor: 'rgba(26, 34, 56, 0.95)',
+                        titleColor: '#8b9dc3',
+                        bodyColor: '#ffffff',
+                        borderColor: '#2a3655',
+                        borderWidth: 1
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { 
+                            color: 'rgba(42, 54, 85, 0.3)',
+                            drawBorder: false
+                        },
+                        ticks: { 
+                            color: '#8b9dc3',
+                            maxRotation: 0
+                        }
+                    },
+                    y: {
+                        position: 'right',
+                        grid: { 
+                            color: 'rgba(42, 54, 85, 0.3)',
+                            drawBorder: false
+                        },
+                        ticks: { 
+                            color: '#8b9dc3',
+                            callback: function(value) {
+                                return value.toFixed(4);
+                            }
+                        }
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                }
+            }
+        });
+    }
 }
 
 // Инициализация событий
 function initEvents() {
     console.log('🎯 Initializing event handlers...');
     
-    // Переключение языка
+    // Переключение языка - исправленная версия
     document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            setLanguage(this.dataset.lang);
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const newLang = this.dataset.lang;
+            if (newLang !== currentLanguage) {
+                setLanguage(newLang);
+            }
         });
     });
     
@@ -454,23 +620,34 @@ function initEvents() {
             generateTestChartData();
             
             if (currentChart) {
-                currentChart.data.datasets[0].data = chartType === 'candlestick' ? 
-                    chartData.candles : chartData.prices;
+                if (chartType === 'candlestick') {
+                    currentChart.data.datasets[0].data = chartData.candles;
+                } else {
+                    currentChart.data.datasets[0].data = chartData.prices;
+                }
                 currentChart.update();
             }
         });
     }
     
-    // Кнопки таймфреймов
+    // Кнопки таймфреймов - исправленная версия
     document.querySelectorAll('.time-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Снимаем активный класс со всех кнопок таймфреймов
             document.querySelectorAll('.time-btn').forEach(b => {
                 b.classList.remove('active');
             });
             
+            // Добавляем активный класс нажатой кнопке
             this.classList.add('active');
+            
+            // Обновляем таймфрейм
             currentTimeframe = parseInt(this.dataset.time);
             
+            // Обновляем отображение
             const timeText = getTimeframeText(currentTimeframe);
             document.getElementById('current-tf').textContent = timeText;
             
@@ -478,77 +655,183 @@ function initEvents() {
         });
     });
     
-    // Тип сигнала
+    // Тип сигнала - исправленная версия
     document.querySelectorAll('.signal-type-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Снимаем активный класс со всех кнопок типа сигнала
             document.querySelectorAll('.signal-type-btn').forEach(b => {
                 b.classList.remove('active');
             });
             
+            // Добавляем активный класс нажатой кнопке
             this.classList.add('active');
+            
+            // Обновляем тип сигнала
             signalType = this.dataset.type;
             console.log('🎯 Signal type changed:', signalType);
         });
     });
     
-    // Тип графика
+    // Тип графика - исправленная версия
     document.querySelectorAll('.chart-type-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Снимаем активный класс со всех кнопок типа графика
             document.querySelectorAll('.chart-type-btn').forEach(b => {
                 b.classList.remove('active');
             });
             
+            // Добавляем активный класс нажатой кнопке
             this.classList.add('active');
+            
+            // Переключаем тип графика
             switchChartType(this.dataset.type);
         });
     });
     
-    // Инструменты рисования
-    document.getElementById('draw-line').addEventListener('click', function() {
-        drawingMode = drawingMode === 'line' ? null : 'line';
-        this.classList.toggle('active');
+    // Инструменты рисования - исправленная версия
+    document.getElementById('draw-line').addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Сбрасываем другие инструменты
+        document.getElementById('draw-horizontal').classList.remove('active');
+        
+        // Переключаем режим рисования линии
+        if (drawingMode === 'line') {
+            drawingMode = null;
+            this.classList.remove('active');
+        } else {
+            drawingMode = 'line';
+            this.classList.add('active');
+        }
+        
+        console.log('📐 Drawing mode:', drawingMode);
     });
     
-    document.getElementById('draw-horizontal').addEventListener('click', function() {
-        drawingMode = drawingMode === 'horizontal' ? null : 'horizontal';
-        this.classList.toggle('active');
+    document.getElementById('draw-horizontal').addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Сбрасываем другие инструменты
+        document.getElementById('draw-line').classList.remove('active');
+        
+        // Переключаем режим рисования горизонтальной линии
+        if (drawingMode === 'horizontal') {
+            drawingMode = null;
+            this.classList.remove('active');
+        } else {
+            drawingMode = 'horizontal';
+            this.classList.add('active');
+        }
+        
+        console.log('📐 Drawing mode:', drawingMode);
     });
     
-    document.getElementById('clear-drawings').addEventListener('click', function() {
+    document.getElementById('clear-drawings').addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Очищаем рисунки
         drawings = [];
         drawingMode = null;
+        
+        // Сбрасываем все активные кнопки рисования
         document.querySelectorAll('.tool-btn.active').forEach(btn => {
             btn.classList.remove('active');
         });
-        // Здесь можно добавить очистку нарисованных линий
+        
+        console.log('🗑️ Drawings cleared');
+        
+        // Здесь можно добавить очистку визуальных элементов
+        alert('Drawings cleared! (Visual cleanup would be implemented with canvas drawing)');
     });
     
-    // Кнопка генерации сигнала
+    // Кнопка генерации сигнала - исправленная версия
     const generateBtn = document.getElementById('generate-signal');
     if (generateBtn) {
-        generateBtn.addEventListener('click', generateSignal);
+        generateBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            generateSignal();
+        });
     }
     
-    // Обработка кликов по графику для рисования
+    // Обработка двойного клика (предотвращение зума)
     const chartCanvas = document.getElementById('trading-chart');
+    chartCanvas.addEventListener('dblclick', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    });
+    
+    // Обработка кликов по графику для рисования
     chartCanvas.addEventListener('click', function(event) {
         if (!drawingMode) return;
+        
+        const now = Date.now();
+        if (now - lastClickTime < 300) return; // Защита от двойного клика
+        lastClickTime = now;
         
         const rect = this.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
         
-        drawings.push({ type: drawingMode, x, y });
-        console.log(`📐 Drawing added: ${drawingMode} at (${x}, ${y})`);
+        drawings.push({ 
+            type: drawingMode, 
+            x, 
+            y,
+            time: new Date().toLocaleTimeString()
+        });
+        
+        console.log(`📐 Drawing added: ${drawingMode} at (${x.toFixed(0)}, ${y.toFixed(0)})`);
+        
+        // Показываем временное уведомление
+        showDrawingNotification(`Added ${drawingMode} line`);
     });
     
     console.log('✅ Event handlers initialized');
 }
 
+// Показать уведомление о рисовании
+function showDrawingNotification(message) {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: rgba(26, 34, 56, 0.95);
+        color: #00ff88;
+        padding: 10px 20px;
+        border-radius: 8px;
+        border: 1px solid #2a3655;
+        z-index: 1000;
+        font-size: 14px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        animation: slideIn 0.3s ease-out;
+    `;
+    
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease-out';
+        setTimeout(() => {
+            if (notification.parentNode) {
+                notification.parentNode.removeChild(notification);
+            }
+        }, 300);
+    }, 2000);
+}
+
 // Получение текста таймфрейма
 function getTimeframeText(seconds) {
     const minutes = Math.floor(seconds / 60);
-    return `${minutes} ${getTranslation('1min').split(' ')[1]}`;
+    return `${minutes} ${currentLanguage === 'ru' ? 'мин' : 'min'}`;
 }
 
 // Загрузка начальных цен
@@ -695,7 +978,7 @@ function updateAssetDisplay() {
         document.getElementById('price-time').textContent = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
     }
     
-    document.getElementById('chart-time').textContent = `Updated: ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'})} UTC`;
+    document.getElementById('chart-time').textContent = `${currentLanguage === 'ru' ? 'Обновлено' : 'Updated'}: ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'})} UTC`;
 }
 
 // Обновление ленты цен
@@ -713,21 +996,25 @@ function updatePriceFeed() {
 // Генерация сигнала
 async function generateSignal() {
     if (isSignalActive) {
-        alert('⏳ Wait for current signal to complete');
+        alert(currentLanguage === 'ru' ? '⏳ Дождитесь завершения текущего сигнала' : '⏳ Wait for current signal to complete');
         return;
     }
     
     isSignalActive = true;
     
     const btn = document.getElementById('generate-signal');
+    const originalText = btn.innerHTML;
     btn.disabled = true;
-    btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${getTranslation('priceUpdate')}`;
+    btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${getTranslation('analysis')}`;
     
-    updateSignalStatus('Market analysis...', '#ffaa00');
+    updateSignalStatus(getTranslation('analysis'), '#ffaa00');
     showAnalysisAnimation();
     
+    // Имитация анализа (3 секунды)
     setTimeout(() => {
         createSignal();
+        btn.disabled = false;
+        btn.innerHTML = originalText;
     }, 3000);
 }
 
@@ -740,12 +1027,14 @@ function showAnalysisAnimation() {
                 <div style="display: inline-block; width: 60px; height: 60px; border: 3px solid #2a3655; border-top-color: #00ff88; border-radius: 50%; animation: spin 1s linear infinite;"></div>
                 <p style="margin-top: 15px; color: #8b9dc3; font-size: 14px;">
                     <i class="fas fa-chart-line"></i><br>
-                    Analyzing real quotes...
+                    ${currentLanguage === 'ru' ? 'Анализ рынка...' : 'Market analysis...'}
                 </p>
                 <div style="margin-top: 10px; font-size: 12px; color: #5d6d97;">
-                    Using ${signalType === 'smart' ? 'Smart Money concepts' : 
-                           signalType === 'indicators' ? 'technical indicators' : 
-                           'combined analysis'}
+                    ${signalType === 'smart' ? 
+                      (currentLanguage === 'ru' ? 'Используются концепции Smart Money' : 'Using Smart Money concepts') : 
+                      signalType === 'indicators' ? 
+                      (currentLanguage === 'ru' ? 'Технический анализ индикаторов' : 'Technical indicators analysis') : 
+                      (currentLanguage === 'ru' ? 'Комбинированный анализ' : 'Combined analysis')}
                 </div>
             </div>
         `;
@@ -825,12 +1114,8 @@ function performTechnicalAnalysis() {
     const prices = priceHistory;
     const indicators = calculateAllIndicators(prices);
     
-    let direction = 'BUY';
-    let confidence = 75;
-    
-    // Комплексный анализ индикаторов
-    const buySignals = 0;
-    const sellSignals = 0;
+    let buySignals = 0;
+    let sellSignals = 0;
     
     // RSI
     if (indicators.rsi < 30) buySignals++;
@@ -852,6 +1137,9 @@ function performTechnicalAnalysis() {
     // Stochastic
     if (indicators.stochastic.k < 20) buySignals++;
     if (indicators.stochastic.k > 80) sellSignals++;
+    
+    let direction = 'BUY';
+    let confidence = 75;
     
     if (buySignals > sellSignals) {
         direction = 'BUY';
@@ -953,20 +1241,22 @@ function calculateRSI(prices) {
 function calculateMACD(prices) {
     if (prices.length < 26) return { histogram: 0, signal: 0, macd: 0 };
     
+    // Простая реализация MACD
     const ema12 = calculateEMA(prices, 12);
     const ema26 = calculateEMA(prices, 26);
     const macd = ema12 - ema26;
-    const signal = calculateEMA(prices.slice(-9), 9); // Сигнальная линия
     
     return {
-        histogram: macd - signal,
-        signal: signal,
+        histogram: macd,
+        signal: macd * 0.9,
         macd: macd
     };
 }
 
 // Расчет EMA
 function calculateEMA(prices, period) {
+    if (prices.length < period) return prices[prices.length - 1];
+    
     const multiplier = 2 / (period + 1);
     let ema = prices[0];
     
@@ -988,7 +1278,9 @@ function calculateBollingerBands(prices, period = 20, deviations = 2) {
     const sum = slice.reduce((a, b) => a + b, 0);
     const middle = sum / period;
     
-    const variance = slice.reduce((a, b) => a + Math.pow(b - middle, 2), 0) / period;
+    // Простой расчет стандартного отклонения
+    const squaredDiffs = slice.map(price => Math.pow(price - middle, 2));
+    const variance = squaredDiffs.reduce((a, b) => a + b, 0) / period;
     const stdDev = Math.sqrt(variance);
     
     return {
@@ -1019,15 +1311,7 @@ function calculateStochastic(prices, period = 14) {
     
     const k = ((current - low) / (high - low)) * 100;
     
-    // Простой расчет %D (среднее за 3 периода)
-    let d = k;
-    if (prices.length >= period + 2) {
-        const k1 = ((prices[prices.length - 2] - low) / (high - low)) * 100;
-        const k2 = ((prices[prices.length - 3] - low) / (high - low)) * 100;
-        d = (k + k1 + k2) / 3;
-    }
-    
-    return { k, d };
+    return { k, d: k };
 }
 
 // Расчет ATR
@@ -1035,30 +1319,24 @@ function calculateATR(prices, period = 14) {
     if (prices.length < period) return 0;
     
     let trSum = 0;
-    for (let i = prices.length - period; i < prices.length - 1; i++) {
+    const start = Math.max(0, prices.length - period);
+    
+    for (let i = start; i < prices.length - 1; i++) {
         const high = Math.max(prices[i], prices[i + 1]);
         const low = Math.min(prices[i], prices[i + 1]);
         trSum += high - low;
     }
     
-    return trSum / period;
+    return trSum / Math.min(period, prices.length - start);
 }
 
 // Поиск уровня поддержки
 function findSupportLevel(prices) {
     if (prices.length < 10) return prices[prices.length - 1];
     
-    // Простой алгоритм поиска минимумов
     const lookback = Math.min(20, prices.length);
-    let min = prices[prices.length - 1];
-    
-    for (let i = 1; i < lookback; i++) {
-        if (prices[prices.length - i] < min) {
-            min = prices[prices.length - i];
-        }
-    }
-    
-    return min;
+    const slice = prices.slice(-lookback);
+    return Math.min(...slice);
 }
 
 // Поиск уровня сопротивления
@@ -1066,15 +1344,8 @@ function findResistanceLevel(prices) {
     if (prices.length < 10) return prices[prices.length - 1];
     
     const lookback = Math.min(20, prices.length);
-    let max = prices[prices.length - 1];
-    
-    for (let i = 1; i < lookback; i++) {
-        if (prices[prices.length - i] > max) {
-            max = prices[prices.length - i];
-        }
-    }
-    
-    return max;
+    const slice = prices.slice(-lookback);
+    return Math.max(...slice);
 }
 
 // Расчет SMA
@@ -1133,6 +1404,13 @@ function displaySignal() {
                     ${signal.confidence}%
                 </span>
             </div>
+            
+            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(42, 54, 85, 0.5);">
+                <div style="font-size: 11px; color: #5d6d97;">
+                    <i class="far fa-clock"></i>
+                    ${signal.timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                </div>
+            </div>
         </div>
     `;
     
@@ -1142,10 +1420,6 @@ function displaySignal() {
     displayIndicators();
     
     updateSignalStatus('ACTIVE', signal.direction === 'BUY' ? '#00ff88' : '#ff4444');
-    
-    const btn = document.getElementById('generate-signal');
-    btn.disabled = false;
-    btn.innerHTML = `<i class="fas fa-bolt"></i> ${getTranslation('getSignal')}`;
 }
 
 // Отображение индикаторов
@@ -1248,10 +1522,12 @@ function startExpirationTimer() {
     
     if (!timerBar || !timerValue) return;
     
+    // Сброс анимации
     timerBar.style.transition = 'none';
     timerBar.style.transform = 'scaleX(1)';
     void timerBar.offsetWidth;
     
+    // Запуск новой анимации
     timerBar.style.transition = `transform ${totalTime}s linear`;
     timerBar.style.transform = 'scaleX(0)';
     
@@ -1289,29 +1565,29 @@ function finishSignal() {
         if (currentPrice > entryPrice * 1.0001) {
             result = 'WIN';
             resultColor = '#00ff88';
-            resultText = getTranslation('buy');
+            resultText = 'WIN';
         } else if (currentPrice < entryPrice * 0.9999) {
             result = 'LOSS';
             resultColor = '#ff4444';
-            resultText = getTranslation('sell');
+            resultText = 'LOSS';
         } else {
             result = 'REFUND';
             resultColor = '#8b9dc3';
-            resultText = getTranslation('neutral');
+            resultText = 'REFUND';
         }
     } else {
         if (currentPrice < entryPrice * 0.9999) {
             result = 'WIN';
             resultColor = '#00ff88';
-            resultText = getTranslation('sell');
+            resultText = 'WIN';
         } else if (currentPrice > entryPrice * 1.0001) {
             result = 'LOSS';
             resultColor = '#ff4444';
-            resultText = getTranslation('buy');
+            resultText = 'LOSS';
         } else {
             result = 'REFUND';
             resultColor = '#8b9dc3';
-            resultText = getTranslation('neutral');
+            resultText = 'REFUND';
         }
     }
     
@@ -1330,19 +1606,19 @@ function showSignalResult(result, resultText, resultColor, exitPrice) {
         <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid ${resultColor}30;">
             <div style="text-align: center;">
                 <div style="font-size: 28px; font-weight: 800; color: ${resultColor}; margin-bottom: 5px;">
-                    ${result === 'WIN' ? 'WIN' : result === 'LOSS' ? 'LOSS' : 'REFUND'}
+                    ${resultText}
                 </div>
                 <div style="font-size: 14px; color: #8b9dc3; margin-bottom: 15px;">
-                    Signal completed
+                    ${currentLanguage === 'ru' ? 'Сигнал завершен' : 'Signal completed'}
                 </div>
                 
                 <div style="display: flex; justify-content: center; gap: 30px; margin-bottom: 15px;">
                     <div style="text-align: center;">
-                        <div style="font-size: 11px; color: #5d6d97;">Entry</div>
+                        <div style="font-size: 11px; color: #5d6d97;">${currentLanguage === 'ru' ? 'Вход' : 'Entry'}</div>
                         <div style="font-size: 16px; font-weight: 700;">${currentSignal.entryPrice.toFixed(5)}</div>
                     </div>
                     <div style="text-align: center;">
-                        <div style="font-size: 11px; color: #5d6d97;">Exit</div>
+                        <div style="font-size: 11px; color: #5d6d97;">${currentLanguage === 'ru' ? 'Выход' : 'Exit'}</div>
                         <div style="font-size: 16px; font-weight: 700;">${exitPrice.toFixed(5)}</div>
                     </div>
                 </div>
@@ -1360,7 +1636,7 @@ function showSignalResult(result, resultText, resultColor, exitPrice) {
         detailsElement.innerHTML += resultHTML;
     }
     
-    updateSignalStatus(result === 'WIN' ? 'WIN' : result === 'LOSS' ? 'LOSS' : 'REFUND', resultColor);
+    updateSignalStatus(resultText, resultColor);
 }
 
 // Добавление в историю
@@ -1372,6 +1648,7 @@ function addToHistory() {
                        currentSignal.result === 'LOSS' ? '#ff4444' : '#8b9dc3';
     
     const historyItem = document.createElement('div');
+    historyItem.className = 'history-item';
     historyItem.style.cssText = `
         background: rgba(19, 26, 45, 0.8);
         padding: 10px 15px;
@@ -1382,6 +1659,7 @@ function addToHistory() {
         align-items: center;
         font-size: 13px;
         transition: all 0.2s;
+        margin-bottom: 5px;
     `;
     
     historyItem.innerHTML = `
@@ -1400,7 +1678,10 @@ function addToHistory() {
         </div>
     `;
     
+    // Добавляем в начало
     resultsList.insertBefore(historyItem, resultsList.firstChild);
+    
+    // Сохраняем историю
     saveHistory();
 }
 
@@ -1487,8 +1768,23 @@ style.textContent = `
         50% { opacity: 0.5; }
     }
     
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    
+    @keyframes slideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+    }
+    
     .live-price {
         animation: pulse 2s infinite;
+    }
+    
+    .history-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 `;
 document.head.appendChild(style);
@@ -1500,5 +1796,12 @@ window.debug = {
     getAllPrices: () => ASSETS,
     forcePriceUpdate: updatePrices,
     simulateSignal: generateSignal,
-    switchLanguage: setLanguage
+    switchLanguage: setLanguage,
+    getCurrentState: () => ({
+        asset: currentAsset,
+        timeframe: currentTimeframe,
+        chartType: chartType,
+        signalType: signalType,
+        language: currentLanguage
+    })
 };
