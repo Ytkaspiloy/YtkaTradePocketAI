@@ -1,3 +1,108 @@
+// Конфигурация приложения
+const APP_CONFIG = {
+    currentLang: 'ru',
+    chartType: 'candlestick',
+    signalType: 'smart',
+    drawingMode: null,
+    drawings: []
+};
+
+// Локализация
+const TRANSLATIONS = {
+    ru: {
+        instrument: 'ИНСТРУМЕНТ',
+        expiration: 'ЭКСПИРАЦИЯ',
+        signalType: 'ТИП СИГНАЛА',
+        realQuotes: 'РЕАЛЬНЫЕ КОТИРОВКИ',
+        signal: 'СИГНАЛ',
+        getSignal: 'ПОЛУЧИТЬ СИГНАЛ',
+        priceUpdate: 'Обновление цен...',
+        currentPrice: 'Текущая цена:',
+        change: 'Изменение:',
+        time: 'Время:',
+        timeframe: 'Таймфрейм:',
+        dataSource: 'Источник: Twelve Data API',
+        currentSignal: 'ТЕКУЩИЙ СИГНАЛ',
+        waiting: 'Ожидание',
+        clickForAnalysis: 'Нажмите "Получить сигнал" для анализа',
+        indicators: 'ИНДИКАТОРЫ',
+        expiresIn: 'Истекает через:',
+        lastResults: 'ПОСЛЕДНИЕ РЕЗУЛЬТАТЫ',
+        apiInfo: 'Используются реальные котировки Forex. Обновление каждые 5 секунд.',
+        disclaimer: 'Торговля бинарными опционами связана с высокими рисками.',
+        analysis: 'АНАЛИЗ РЫНКА...',
+        smartMoney: 'Смарт-Мани',
+        indicatorsBtn: 'Индикаторы',
+        buy: 'ПОКУПКА',
+        sell: 'ПРОДАЖА',
+        entryPrice: 'Цена входа:',
+        accuracy: 'Точность:',
+        trend: 'Тренд:',
+        upTrend: 'Восходящий ↗',
+        downTrend: 'Нисходящий ↘',
+        rsi: 'RSI:',
+        macd: 'MACD:',
+        bollinger: 'Боллинджер:',
+        stochastic: 'Стохастик:',
+        volume: 'Объем:',
+        support: 'Поддержка:',
+        resistance: 'Сопротивление:',
+        win: 'ВЫИГРЫШ',
+        loss: 'ПРОИГРЫШ',
+        refund: 'ВОЗВРАТ',
+        entry: 'Вход',
+        exit: 'Выход',
+        modeDemo: 'Режим: Демо',
+        modeReal: 'Режим: Реальный'
+    },
+    en: {
+        instrument: 'INSTRUMENT',
+        expiration: 'EXPIRATION',
+        signalType: 'SIGNAL TYPE',
+        realQuotes: 'REAL QUOTES',
+        signal: 'SIGNAL',
+        getSignal: 'GET SIGNAL',
+        priceUpdate: 'Updating prices...',
+        currentPrice: 'Current price:',
+        change: 'Change:',
+        time: 'Time:',
+        timeframe: 'Timeframe:',
+        dataSource: 'Source: Twelve Data API',
+        currentSignal: 'CURRENT SIGNAL',
+        waiting: 'Waiting',
+        clickForAnalysis: 'Click "Get Signal" for analysis',
+        indicators: 'INDICATORS',
+        expiresIn: 'Expires in:',
+        lastResults: 'LAST RESULTS',
+        apiInfo: 'Using real Forex quotes. Updated every 5 seconds.',
+        disclaimer: 'Binary options trading involves high risks.',
+        analysis: 'MARKET ANALYSIS...',
+        smartMoney: 'Smart Money',
+        indicatorsBtn: 'Indicators',
+        buy: 'BUY',
+        sell: 'SELL',
+        entryPrice: 'Entry price:',
+        accuracy: 'Accuracy:',
+        trend: 'Trend:',
+        upTrend: 'Upward ↗',
+        downTrend: 'Downward ↘',
+        rsi: 'RSI:',
+        macd: 'MACD:',
+        bollinger: 'Bollinger:',
+        stochastic: 'Stochastic:',
+        volume: 'Volume:',
+        support: 'Support:',
+        resistance: 'Resistance:',
+        win: 'WIN',
+        loss: 'LOSS',
+        refund: 'REFUND',
+        entry: 'Entry',
+        exit: 'Exit',
+        modeDemo: 'Mode: Demo',
+        modeReal: 'Mode: Real'
+    }
+};
+
 // Конфигурация API для реальных котировок
 const API_CONFIG = {
     baseUrl: 'https://api.twelvedata.com',
@@ -77,136 +182,6 @@ const ASSETS = {
     }
 };
 
-// Локализация
-const TRANSLATIONS = {
-    ru: {
-        // Заголовки
-        instrument: "ИНСТРУМЕНТ",
-        expiration: "ЭКСПИРАЦИЯ",
-        signalType: "ТИП СИГНАЛА",
-        realQuotes: "РЕАЛЬНЫЕ КОТИРОВКИ",
-        signal: "СИГНАЛ",
-        currentPrice: "Текущая цена:",
-        change: "Изменение:",
-        time: "Время:",
-        timeframe: "Таймфрейм:",
-        currentSignal: "ТЕКУЩИЙ СИГНАЛ",
-        recentResults: "ПОСЛЕДНИЕ РЕЗУЛЬТАТЫ",
-        expiresIn: "Истекает через:",
-        apiInfo: "Используются реальные котировки Forex. Обновление каждые 5 секунд.",
-        disclaimer: "Торговля бинарными опционами связана с высокими рисками.",
-        dataSource: "Источник: Twelve Data API",
-        confidence: "Уверенность:",
-        direction: "Направление:",
-        
-        // Кнопки
-        getSignal: "ПОЛУЧИТЬ СИГНАЛ",
-        smartMoney: "Smart Money",
-        indicators: "Индикаторы",
-        combined: "Комбинированный",
-        
-        // Таймфреймы
-        "1min": "1 мин",
-        "2min": "2 мин",
-        "3min": "3 мин",
-        "5min": "5 мин",
-        
-        // Статусы
-        waiting: "Ожидание",
-        priceUpdate: "Обновление цен...",
-        clickForAnalysis: "Нажмите 'Получить сигнал' для анализа",
-        modeDemo: "Режим: Демо",
-        
-        // Анализ
-        indicatorsAnalysis: "АНАЛИЗ ИНДИКАТОРОВ",
-        trend: "Тренд",
-        rsi: "RSI",
-        macd: "MACD",
-        bollinger: "Боллинджер",
-        movingAverage: "Скользящие",
-        stochastic: "Стохастик",
-        volume: "Объем",
-        support: "Поддержка",
-        resistance: "Сопротивление",
-        buy: "ПОКУПКА",
-        sell: "ПРОДАЖА",
-        strongBuy: "Сильная покупка",
-        strongSell: "Сильная продажа",
-        neutral: "Нейтрально",
-        overbought: "Перекупленность",
-        oversold: "Перепроданность",
-        bullish: "Бычий",
-        bearish: "Медвежий",
-        uptrend: "Восходящий ↗",
-        downtrend: "Нисходящий ↘",
-        sideTrend: "Боковой ↔",
-        analysis: "Анализ..."
-    },
-    en: {
-        // Headers
-        instrument: "INSTRUMENT",
-        expiration: "EXPIRATION",
-        signalType: "SIGNAL TYPE",
-        realQuotes: "REAL QUOTES",
-        signal: "SIGNAL",
-        currentPrice: "Current price:",
-        change: "Change:",
-        time: "Time:",
-        timeframe: "Timeframe:",
-        currentSignal: "CURRENT SIGNAL",
-        recentResults: "RECENT RESULTS",
-        expiresIn: "Expires in:",
-        apiInfo: "Using real Forex quotes. Updated every 5 seconds.",
-        disclaimer: "Binary options trading involves high risks.",
-        dataSource: "Source: Twelve Data API",
-        confidence: "Confidence:",
-        direction: "Direction:",
-        
-        // Buttons
-        getSignal: "GET SIGNAL",
-        smartMoney: "Smart Money",
-        indicators: "Indicators",
-        combined: "Combined",
-        
-        // Timeframes
-        "1min": "1 min",
-        "2min": "2 min",
-        "3min": "3 min",
-        "5min": "5 min",
-        
-        // Statuses
-        waiting: "Waiting",
-        priceUpdate: "Price update...",
-        clickForAnalysis: "Click 'Get Signal' for analysis",
-        modeDemo: "Mode: Demo",
-        
-        // Analysis
-        indicatorsAnalysis: "INDICATORS ANALYSIS",
-        trend: "Trend",
-        rsi: "RSI",
-        macd: "MACD",
-        bollinger: "Bollinger",
-        movingAverage: "Moving Average",
-        stochastic: "Stochastic",
-        volume: "Volume",
-        support: "Support",
-        resistance: "Resistance",
-        buy: "BUY",
-        sell: "SELL",
-        strongBuy: "Strong buy",
-        strongSell: "Strong sell",
-        neutral: "Neutral",
-        overbought: "Overbought",
-        oversold: "Oversold",
-        bullish: "Bullish",
-        bearish: "Bearish",
-        uptrend: "Uptrend ↗",
-        downtrend: "Downtrend ↘",
-        sideTrend: "Sideways ↔",
-        analysis: "Analysis..."
-    }
-};
-
 // Глобальные переменные
 let currentChart = null;
 let currentSignal = null;
@@ -216,22 +191,19 @@ let resultsHistory = [];
 let currentAsset = 'EURUSD';
 let currentTimeframe = 60;
 let priceUpdateInterval = null;
-let chartData = [];
+let chartData = {
+    labels: [],
+    prices: [],
+    candles: []
+};
 let priceHistory = [];
-let chartType = 'candlestick';
-let currentLanguage = 'ru';
-let signalType = 'smart';
-let drawingMode = null;
-let drawings = [];
-let isDrawing = false;
-let lastClickTime = 0;
 
 // Инициализация при загрузке
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🚀 Initializing Scalping Robot Pro...');
+    console.log('🚀 Инициализация Scalping Robot Pro...');
     
     // Инициализация локализации
-    initLanguage();
+    initLocalization();
     
     // Инициализация графика
     initChart();
@@ -248,76 +220,41 @@ document.addEventListener('DOMContentLoaded', function() {
     // Загрузка истории
     loadHistory();
     
-    // Установка начального активного состояния
-    setActiveStates();
-    
-    console.log('✅ Scalping Robot Pro ready!');
+    console.log('✅ Scalping Robot Pro готов к работе!');
 });
 
-// Установка начальных активных состояний
-function setActiveStates() {
-    // Устанавливаем активный таймфрейм
-    document.querySelectorAll('.time-btn').forEach(btn => {
-        if (parseInt(btn.dataset.time) === currentTimeframe) {
-            btn.classList.add('active');
-        }
-    });
-    
-    // Устанавливаем активный тип сигнала
-    document.querySelectorAll('.signal-type-btn').forEach(btn => {
-        if (btn.dataset.type === signalType) {
-            btn.classList.add('active');
-        }
-    });
-    
-    // Устанавливаем активный тип графика
-    document.querySelectorAll('.chart-type-btn').forEach(btn => {
-        if (btn.dataset.type === chartType) {
-            btn.classList.add('active');
-        }
-    });
-}
-
 // Инициализация локализации
-function initLanguage() {
-    const savedLang = localStorage.getItem('scalpingRobotLang') || 'ru';
-    setLanguage(savedLang);
+function initLocalization() {
+    // Установка обработчиков для кнопок переключения языка
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const lang = this.dataset.lang;
+            setLanguage(lang);
+            
+            // Обновляем активную кнопку
+            document.querySelectorAll('.lang-btn').forEach(b => {
+                b.classList.remove('active');
+            });
+            this.classList.add('active');
+        });
+    });
 }
 
 // Установка языка
 function setLanguage(lang) {
-    if (!TRANSLATIONS[lang]) return;
+    APP_CONFIG.currentLang = lang;
     
-    currentLanguage = lang;
-    localStorage.setItem('scalpingRobotLang', lang);
-    
-    // Обновляем все элементы с атрибутом data-i18n
-    document.querySelectorAll('[data-i18n]').forEach(element => {
-        const key = element.getAttribute('data-i18n');
-        if (TRANSLATIONS[lang][key]) {
-            if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
-                element.placeholder = TRANSLATIONS[lang][key];
-            } else {
-                element.textContent = TRANSLATIONS[lang][key];
-            }
-        }
+    // Обновляем все текстовые элементы
+    Object.keys(TRANSLATIONS[lang]).forEach(key => {
+        document.querySelectorAll(`[data-i18n="${key}"]`).forEach(el => {
+            el.textContent = TRANSLATIONS[lang][key];
+        });
     });
     
-    // Обновляем активные кнопки языка
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.classList.remove('active');
-        if (btn.dataset.lang === lang) {
-            btn.classList.add('active');
-        }
-    });
+    // Обновляем текст режима
+    document.getElementById('mode-text').textContent = TRANSLATIONS[lang].modeDemo;
     
-    // Обновляем статус
-    updateSignalStatus(getTranslation('waiting'), '#00ff88');
-}
-
-// Получение перевода
-function getTranslation(key) {
-    return TRANSLATIONS[currentLanguage][key] || key;
+    console.log(`🌐 Язык изменен на: ${lang}`);
 }
 
 // Инициализация графика
@@ -327,20 +264,32 @@ function initChart() {
     // Генерация тестовых данных
     generateTestChartData();
     
-    // Настройки графика
+    // Создаем свечной график
     currentChart = new Chart(ctx, {
-        type: 'candlestick',
+        type: APP_CONFIG.chartType === 'candlestick' ? 'candlestick' : 'line',
         data: {
             labels: chartData.labels,
-            datasets: [{
-                label: 'Price',
+            datasets: [APP_CONFIG.chartType === 'candlestick' ? {
+                label: 'Цена',
                 data: chartData.candles,
                 borderColor: '#00ff88',
-                backgroundColor: (ctx) => {
-                    const candle = ctx.dataset.data[ctx.dataIndex];
-                    return candle.c >= candle.o ? 'rgba(0, 255, 136, 0.3)' : 'rgba(255, 68, 68, 0.3)';
-                },
+                backgroundColor: chartData.candles.map(c => 
+                    c.o <= c.c ? 'rgba(0, 255, 136, 0.8)' : 'rgba(255, 68, 68, 0.8)'
+                ),
                 borderWidth: 1,
+                color: {
+                    up: '#00ff88',
+                    down: '#ff4444',
+                    unchanged: '#8b9dc3'
+                }
+            } : {
+                label: 'Цена',
+                data: chartData.prices,
+                borderColor: '#00ff88',
+                backgroundColor: 'rgba(0, 255, 136, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
                 pointRadius: 0
             }]
         },
@@ -352,7 +301,7 @@ function initChart() {
                 tooltip: {
                     mode: 'index',
                     intersect: false,
-                    backgroundColor: 'rgba(26, 34, 56, 0.95)',
+                    backgroundColor: 'rgba(26, 34, 56, 0.9)',
                     titleColor: '#8b9dc3',
                     bodyColor: '#ffffff',
                     borderColor: '#2a3655',
@@ -362,7 +311,7 @@ function initChart() {
             scales: {
                 x: {
                     grid: { 
-                        color: 'rgba(42, 54, 85, 0.3)',
+                        color: 'rgba(42, 54, 85, 0.5)',
                         drawBorder: false
                     },
                     ticks: { 
@@ -373,7 +322,7 @@ function initChart() {
                 y: {
                     position: 'right',
                     grid: { 
-                        color: 'rgba(42, 54, 85, 0.3)',
+                        color: 'rgba(42, 54, 85, 0.5)',
                         drawBorder: false
                     },
                     ticks: { 
@@ -392,256 +341,111 @@ function initChart() {
     });
 }
 
-// Генерация тестовых свечных данных
+// Генерация тестовых данных для графика
 function generateTestChartData() {
     const labels = [];
-    const candles = [];
     const prices = [];
+    const candles = [];
     const now = new Date();
     
-    // 50 свечей
-    let currentPrice = ASSETS[currentAsset].price;
-    
-    for (let i = 49; i >= 0; i--) {
+    // 24 часа данных
+    for (let i = 23; i >= 0; i--) {
         const time = new Date(now);
-        time.setMinutes(time.getMinutes() - i);
-        labels.push(time.getHours().toString().padStart(2, '0') + ':' + 
-                   time.getMinutes().toString().padStart(2, '0'));
+        time.setHours(time.getHours() - i);
+        const hour = time.getHours().toString().padStart(2, '0');
+        const minute = Math.floor(Math.random() * 60).toString().padStart(2, '0');
+        labels.push(`${hour}:${minute}`);
         
-        // Генерируем реалистичную свечу
-        const volatility = 0.0003;
-        const open = currentPrice;
-        const high = open * (1 + Math.random() * volatility);
-        const low = open * (1 - Math.random() * volatility);
-        const close = low + Math.random() * (high - low);
+        // Начинаем с текущей цены
+        const basePrice = ASSETS[currentAsset].price;
+        const lastPrice = prices.length > 0 ? prices[prices.length - 1] : basePrice;
+        
+        // Реалистичное движение цены для свечей
+        const volatility = 0.0005;
+        const change = (Math.random() - 0.5) * volatility;
+        const newPrice = lastPrice * (1 + change);
+        
+        // Создаем свечу
+        const open = lastPrice;
+        const close = newPrice;
+        const high = Math.max(open, close) * (1 + Math.random() * 0.0003);
+        const low = Math.min(open, close) * (1 - Math.random() * 0.0003);
         
         candles.push({ o: open, h: high, l: low, c: close });
-        prices.push(close);
-        
-        currentPrice = close;
+        prices.push(newPrice);
     }
     
-    chartData = { labels, candles, prices };
+    chartData = { labels, prices, candles };
     priceHistory = prices;
 }
 
 // Обновление графика реальными данными
 function updateChartWithRealData() {
-    if (!currentChart || chartData.candles.length === 0) return;
+    if (!currentChart || chartData.prices.length === 0) return;
     
     const currentPrice = ASSETS[currentAsset].price;
+    const now = new Date();
     
-    // Обновляем последнюю свечу
-    const lastCandle = chartData.candles[chartData.candles.length - 1];
-    lastCandle.h = Math.max(lastCandle.h, currentPrice);
-    lastCandle.l = Math.min(lastCandle.l, currentPrice);
-    lastCandle.c = currentPrice;
-    
-    // Обновляем график
-    currentChart.data.datasets[0].data = chartData.candles;
-    currentChart.update('none');
-    
-    // Сохраняем историю
-    priceHistory = chartData.candles.map(c => c.c);
-}
-
-// Переключение типа графика
-function switchChartType(type) {
-    chartType = type;
-    
-    if (!currentChart) return;
-    
-    // Сохраняем старые данные
-    const oldData = currentChart.data;
-    
-    if (type === 'candlestick') {
-        currentChart.destroy();
-        currentChart = null;
+    if (APP_CONFIG.chartType === 'candlestick') {
+        // Обновляем свечи
+        const lastCandle = chartData.candles[chartData.candles.length - 1];
+        lastCandle.c = currentPrice;
+        lastCandle.h = Math.max(lastCandle.h, currentPrice);
+        lastCandle.l = Math.min(lastCandle.l, currentPrice);
         
-        // Создаем новый свечной график
-        const ctx = document.getElementById('trading-chart').getContext('2d');
-        currentChart = new Chart(ctx, {
-            type: 'candlestick',
-            data: {
-                labels: chartData.labels,
-                datasets: [{
-                    label: 'Price',
-                    data: chartData.candles,
-                    borderColor: '#00ff88',
-                    backgroundColor: (ctx) => {
-                        const candle = ctx.dataset.data[ctx.dataIndex];
-                        return candle.c >= candle.o ? 'rgba(0, 255, 136, 0.3)' : 'rgba(255, 68, 68, 0.3)';
-                    },
-                    borderWidth: 1,
-                    pointRadius: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        mode: 'index',
-                        intersect: false,
-                        backgroundColor: 'rgba(26, 34, 56, 0.95)',
-                        titleColor: '#8b9dc3',
-                        bodyColor: '#ffffff',
-                        borderColor: '#2a3655',
-                        borderWidth: 1
-                    }
-                },
-                scales: {
-                    x: {
-                        grid: { 
-                            color: 'rgba(42, 54, 85, 0.3)',
-                            drawBorder: false
-                        },
-                        ticks: { 
-                            color: '#8b9dc3',
-                            maxRotation: 0
-                        }
-                    },
-                    y: {
-                        position: 'right',
-                        grid: { 
-                            color: 'rgba(42, 54, 85, 0.3)',
-                            drawBorder: false
-                        },
-                        ticks: { 
-                            color: '#8b9dc3',
-                            callback: function(value) {
-                                return value.toFixed(4);
-                            }
-                        }
-                    }
-                },
-                interaction: {
-                    intersect: false,
-                    mode: 'index'
-                }
-            }
-        });
-    } else if (type === 'line') {
-        currentChart.destroy();
-        currentChart = null;
+        // Обновляем график
+        currentChart.data.datasets[0].data = chartData.candles;
+        currentChart.data.datasets[0].backgroundColor = chartData.candles.map(c => 
+            c.o <= c.c ? 'rgba(0, 255, 136, 0.8)' : 'rgba(255, 68, 68, 0.8)'
+        );
+    } else {
+        // Обновляем линейный график
+        chartData.prices.push(currentPrice);
+        chartData.prices.shift();
         
-        // Создаем новый линейный график
-        const ctx = document.getElementById('trading-chart').getContext('2d');
-        currentChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: chartData.labels,
-                datasets: [{
-                    label: 'Price',
-                    data: chartData.prices,
-                    borderColor: '#00ff88',
-                    backgroundColor: 'rgba(0, 255, 136, 0.1)',
-                    borderWidth: 2,
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        mode: 'index',
-                        intersect: false,
-                        backgroundColor: 'rgba(26, 34, 56, 0.95)',
-                        titleColor: '#8b9dc3',
-                        bodyColor: '#ffffff',
-                        borderColor: '#2a3655',
-                        borderWidth: 1
-                    }
-                },
-                scales: {
-                    x: {
-                        grid: { 
-                            color: 'rgba(42, 54, 85, 0.3)',
-                            drawBorder: false
-                        },
-                        ticks: { 
-                            color: '#8b9dc3',
-                            maxRotation: 0
-                        }
-                    },
-                    y: {
-                        position: 'right',
-                        grid: { 
-                            color: 'rgba(42, 54, 85, 0.3)',
-                            drawBorder: false
-                        },
-                        ticks: { 
-                            color: '#8b9dc3',
-                            callback: function(value) {
-                                return value.toFixed(4);
-                            }
-                        }
-                    }
-                },
-                interaction: {
-                    intersect: false,
-                    mode: 'index'
-                }
-            }
-        });
+        // Обновляем метки времени
+        chartData.labels.push(now.getHours().toString().padStart(2, '0') + ':' + 
+                             now.getMinutes().toString().padStart(2, '0'));
+        chartData.labels.shift();
+        
+        // Обновляем график
+        currentChart.data.labels = chartData.labels;
+        currentChart.data.datasets[0].data = chartData.prices;
     }
+    
+    currentChart.update('none');
+    priceHistory = [...chartData.prices];
 }
 
 // Инициализация событий
 function initEvents() {
-    console.log('🎯 Initializing event handlers...');
-    
-    // Переключение языка - исправленная версия
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            const newLang = this.dataset.lang;
-            if (newLang !== currentLanguage) {
-                setLanguage(newLang);
-            }
-        });
-    });
+    console.log('🎯 Инициализация обработчиков событий...');
     
     // Выбор актива
     const assetSelect = document.getElementById('asset-select');
     if (assetSelect) {
         assetSelect.addEventListener('change', function() {
             currentAsset = this.value;
-            console.log('📊 Asset changed to:', currentAsset);
+            console.log('📊 Актив изменен на:', currentAsset);
             
+            // Обновляем отображение
             updateAssetDisplay();
-            generateTestChartData();
             
-            if (currentChart) {
-                if (chartType === 'candlestick') {
-                    currentChart.data.datasets[0].data = chartData.candles;
-                } else {
-                    currentChart.data.datasets[0].data = chartData.prices;
-                }
-                currentChart.update();
-            }
+            // Перезагружаем данные графика
+            generateTestChartData();
+            updateChart();
         });
     }
     
-    // Кнопки таймфреймов - исправленная версия
+    // Кнопки таймфреймов
     document.querySelectorAll('.time-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            // Снимаем активный класс со всех кнопок таймфреймов
+        btn.addEventListener('click', function() {
+            // Снимаем активный класс
             document.querySelectorAll('.time-btn').forEach(b => {
                 b.classList.remove('active');
             });
             
-            // Добавляем активный класс нажатой кнопке
+            // Добавляем активный класс
             this.classList.add('active');
             
             // Обновляем таймфрейм
@@ -651,197 +455,171 @@ function initEvents() {
             const timeText = getTimeframeText(currentTimeframe);
             document.getElementById('current-tf').textContent = timeText;
             
-            console.log('⏱️ Timeframe changed:', timeText);
+            console.log('⏱️ Таймфрейм изменен на:', timeText);
         });
     });
     
-    // Тип сигнала - исправленная версия
+    // Выбор типа сигнала
     document.querySelectorAll('.signal-type-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            // Снимаем активный класс со всех кнопок типа сигнала
+        btn.addEventListener('click', function() {
             document.querySelectorAll('.signal-type-btn').forEach(b => {
                 b.classList.remove('active');
             });
-            
-            // Добавляем активный класс нажатой кнопке
             this.classList.add('active');
-            
-            // Обновляем тип сигнала
-            signalType = this.dataset.type;
-            console.log('🎯 Signal type changed:', signalType);
+            APP_CONFIG.signalType = this.dataset.type;
+            console.log('🔧 Тип сигнала изменен на:', APP_CONFIG.signalType);
         });
     });
     
-    // Тип графика - исправленная версия
+    // Выбор типа графика
     document.querySelectorAll('.chart-type-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            // Снимаем активный класс со всех кнопок типа графика
+        btn.addEventListener('click', function() {
             document.querySelectorAll('.chart-type-btn').forEach(b => {
                 b.classList.remove('active');
             });
-            
-            // Добавляем активный класс нажатой кнопке
             this.classList.add('active');
+            APP_CONFIG.chartType = this.dataset.type;
             
-            // Переключаем тип графика
-            switchChartType(this.dataset.type);
+            // Обновляем график
+            updateChartType();
+            console.log('📈 Тип графика изменен на:', APP_CONFIG.chartType);
         });
     });
     
-    // Инструменты рисования - исправленная версия
-    document.getElementById('draw-line').addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        // Сбрасываем другие инструменты
-        document.getElementById('draw-horizontal').classList.remove('active');
-        
-        // Переключаем режим рисования линии
-        if (drawingMode === 'line') {
-            drawingMode = null;
-            this.classList.remove('active');
-        } else {
-            drawingMode = 'line';
-            this.classList.add('active');
-        }
-        
-        console.log('📐 Drawing mode:', drawingMode);
-    });
-    
-    document.getElementById('draw-horizontal').addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        // Сбрасываем другие инструменты
-        document.getElementById('draw-line').classList.remove('active');
-        
-        // Переключаем режим рисования горизонтальной линии
-        if (drawingMode === 'horizontal') {
-            drawingMode = null;
-            this.classList.remove('active');
-        } else {
-            drawingMode = 'horizontal';
-            this.classList.add('active');
-        }
-        
-        console.log('📐 Drawing mode:', drawingMode);
-    });
-    
-    document.getElementById('clear-drawings').addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        // Очищаем рисунки
-        drawings = [];
-        drawingMode = null;
-        
-        // Сбрасываем все активные кнопки рисования
-        document.querySelectorAll('.tool-btn.active').forEach(btn => {
-            btn.classList.remove('active');
+    // Инструменты рисования
+    document.querySelectorAll('.draw-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            if (this.dataset.tool === 'clear') {
+                clearDrawings();
+                document.querySelectorAll('.draw-btn').forEach(b => {
+                    b.classList.remove('active');
+                });
+                this.classList.add('active');
+            } else {
+                APP_CONFIG.drawingMode = this.dataset.tool;
+                document.querySelectorAll('.draw-btn').forEach(b => {
+                    b.classList.remove('active');
+                });
+                this.classList.add('active');
+                console.log('🎨 Режим рисования:', APP_CONFIG.drawingMode);
+            }
         });
-        
-        console.log('🗑️ Drawings cleared');
-        
-        // Здесь можно добавить очистку визуальных элементов
-        alert('Drawings cleared! (Visual cleanup would be implemented with canvas drawing)');
     });
     
-    // Кнопка генерации сигнала - исправленная версия
+    // Кнопка генерации сигнала
     const generateBtn = document.getElementById('generate-signal');
     if (generateBtn) {
-        generateBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            generateSignal();
-        });
+        generateBtn.addEventListener('click', generateSignal);
     }
     
-    // Обработка двойного клика (предотвращение зума)
+    // Обработка кликов на графике для рисования
     const chartCanvas = document.getElementById('trading-chart');
-    chartCanvas.addEventListener('dblclick', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-    });
+    if (chartCanvas) {
+        chartCanvas.addEventListener('click', handleChartClick);
+    }
     
-    // Обработка кликов по графику для рисования
-    chartCanvas.addEventListener('click', function(event) {
-        if (!drawingMode) return;
-        
-        const now = Date.now();
-        if (now - lastClickTime < 300) return; // Защита от двойного клика
-        lastClickTime = now;
-        
-        const rect = this.getBoundingClientRect();
-        const x = event.clientX - rect.left;
-        const y = event.clientY - rect.top;
-        
-        drawings.push({ 
-            type: drawingMode, 
-            x, 
-            y,
-            time: new Date().toLocaleTimeString()
-        });
-        
-        console.log(`📐 Drawing added: ${drawingMode} at (${x.toFixed(0)}, ${y.toFixed(0)})`);
-        
-        // Показываем временное уведомление
-        showDrawingNotification(`Added ${drawingMode} line`);
-    });
-    
-    console.log('✅ Event handlers initialized');
+    console.log('✅ Обработчики событий инициализированы');
 }
 
-// Показать уведомление о рисовании
-function showDrawingNotification(message) {
-    const notification = document.createElement('div');
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: rgba(26, 34, 56, 0.95);
-        color: #00ff88;
-        padding: 10px 20px;
-        border-radius: 8px;
-        border: 1px solid #2a3655;
-        z-index: 1000;
-        font-size: 14px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        animation: slideIn 0.3s ease-out;
-    `;
+// Обновление типа графика
+function updateChartType() {
+    if (!currentChart) return;
     
-    notification.textContent = message;
-    document.body.appendChild(notification);
+    // Изменяем тип графика
+    currentChart.config.type = APP_CONFIG.chartType === 'candlestick' ? 'candlestick' : 'line';
     
-    setTimeout(() => {
-        notification.style.animation = 'slideOut 0.3s ease-out';
-        setTimeout(() => {
-            if (notification.parentNode) {
-                notification.parentNode.removeChild(notification);
+    if (APP_CONFIG.chartType === 'candlestick') {
+        currentChart.data.datasets[0] = {
+            label: 'Цена',
+            data: chartData.candles,
+            borderColor: '#00ff88',
+            backgroundColor: chartData.candles.map(c => 
+                c.o <= c.c ? 'rgba(0, 255, 136, 0.8)' : 'rgba(255, 68, 68, 0.8)'
+            ),
+            borderWidth: 1,
+            color: {
+                up: '#00ff88',
+                down: '#ff4444',
+                unchanged: '#8b9dc3'
             }
-        }, 300);
-    }, 2000);
+        };
+    } else {
+        currentChart.data.datasets[0] = {
+            label: 'Цена',
+            data: chartData.prices,
+            borderColor: '#00ff88',
+            backgroundColor: 'rgba(0, 255, 136, 0.1)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 0
+        };
+    }
+    
+    currentChart.update();
+}
+
+// Обработка кликов на графике для рисования
+function handleChartClick(event) {
+    if (!APP_CONFIG.drawingMode || !currentChart) return;
+    
+    const rect = currentChart.canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    
+    // Преобразуем координаты в данные графика
+    const xScale = currentChart.scales.x;
+    const yScale = currentChart.scales.y;
+    const xValue = xScale.getValueForPixel(x);
+    const yValue = yScale.getValueForPixel(y);
+    
+    const drawing = {
+        type: APP_CONFIG.drawingMode,
+        x: xValue,
+        y: yValue,
+        timestamp: new Date()
+    };
+    
+    APP_CONFIG.drawings.push(drawing);
+    console.log('📐 Добавлен рисунок:', drawing);
+}
+
+// Очистка рисунков
+function clearDrawings() {
+    APP_CONFIG.drawings = [];
+    APP_CONFIG.drawingMode = null;
+    console.log('🧹 Все рисунки очищены');
+}
+
+// Обновление графика
+function updateChart() {
+    if (currentChart) {
+        if (APP_CONFIG.chartType === 'candlestick') {
+            currentChart.data.datasets[0].data = chartData.candles;
+            currentChart.data.datasets[0].backgroundColor = chartData.candles.map(c => 
+                c.o <= c.c ? 'rgba(0, 255, 136, 0.8)' : 'rgba(255, 68, 68, 0.8)'
+            );
+        } else {
+            currentChart.data.datasets[0].data = chartData.prices;
+        }
+        currentChart.update();
+    }
 }
 
 // Получение текста таймфрейма
 function getTimeframeText(seconds) {
     const minutes = Math.floor(seconds / 60);
-    return `${minutes} ${currentLanguage === 'ru' ? 'мин' : 'min'}`;
+    return `${minutes} мин`;
 }
 
 // Загрузка начальных цен
 async function loadInitialPrices() {
-    console.log('📡 Loading initial prices...');
+    console.log('📡 Загрузка начальных цен...');
     
     try {
         await fetchRealPrices();
     } catch (error) {
-        console.warn('⚠️ Failed to load real prices, using demo data');
+        console.warn('⚠️ Не удалось загрузить реальные цены, используем демо-данные');
         useDemoPrices();
     }
     
@@ -859,51 +637,44 @@ async function fetchRealPrices() {
         const data = await response.json();
         
         if (data.rates) {
-            // EUR/USD
+            // Обновляем цены
             if (data.rates.EUR) {
                 ASSETS.EURUSD.price = 1 / data.rates.EUR;
             }
             
-            // USD/JPY
             if (data.rates.JPY) {
                 ASSETS.USDJPY.price = data.rates.JPY;
             }
             
-            // GBP/USD
             if (data.rates.GBP) {
                 ASSETS.GBPUSD.price = 1 / data.rates.GBP;
             }
             
-            // AUD/USD
             if (data.rates.AUD) {
                 ASSETS.AUDUSD.price = 1 / data.rates.AUD;
             }
             
-            // USD/CAD
             if (data.rates.CAD) {
                 ASSETS.USDCAD.price = data.rates.CAD;
             }
             
-            // USD/CHF
             if (data.rates.CHF) {
                 ASSETS.USDCHF.price = data.rates.CHF;
             }
             
-            // EUR/JPY
             if (data.rates.EUR && data.rates.JPY) {
                 ASSETS.EURJPY.price = (1 / data.rates.EUR) * data.rates.JPY;
             }
             
-            // GBP/JPY
             if (data.rates.GBP && data.rates.JPY) {
                 ASSETS.GBPJPY.price = (1 / data.rates.GBP) * data.rates.JPY;
             }
             
-            console.log('✅ Real prices loaded');
+            console.log('✅ Реальные цены загружены');
             return true;
         }
     } catch (error) {
-        console.error('❌ Error loading real prices:', error);
+        console.error('❌ Ошибка загрузки реальных цен:', error);
         throw error;
     }
 }
@@ -929,7 +700,7 @@ function startPriceUpdates() {
                 updateChartWithRealData();
             }
         } catch (error) {
-            console.warn('⚠️ Price update error:', error);
+            console.warn('⚠️ Ошибка обновления цен:', error);
             useDemoPrices();
             updateAssetDisplay();
             updatePriceFeed();
@@ -958,14 +729,10 @@ function updateAssetDisplay() {
     const pairElement = document.getElementById('current-pair');
     const changeElement = document.getElementById('price-change');
     
-    if (priceElement) {
-        priceElement.textContent = asset.price.toFixed(5);
-    }
+    if (priceElement) priceElement.textContent = asset.price.toFixed(5);
+    if (pairElement) pairElement.textContent = asset.name;
     
-    if (pairElement) {
-        pairElement.textContent = asset.name;
-    }
-    
+    // Рассчитываем изменение
     if (changeElement) {
         const changePercent = (Math.random() - 0.5) * 0.1;
         const changeValue = asset.price * changePercent;
@@ -973,12 +740,14 @@ function updateAssetDisplay() {
         changeElement.textContent = `${changePercent >= 0 ? '+' : ''}${changePercent.toFixed(2)}%`;
         changeElement.className = changePercent >= 0 ? 'positive' : 'negative';
         
+        // Обновляем статистику
         document.getElementById('current-price-display').textContent = asset.price.toFixed(5);
         document.getElementById('price-change-display').textContent = `${changePercent >= 0 ? '+' : ''}${changePercent.toFixed(2)}%`;
         document.getElementById('price-time').textContent = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
     }
     
-    document.getElementById('chart-time').textContent = `${currentLanguage === 'ru' ? 'Обновлено' : 'Updated'}: ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'})} UTC`;
+    // Обновляем время на графике
+    document.getElementById('chart-time').textContent = `Обновлено: ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'})} UTC`;
 }
 
 // Обновление ленты цен
@@ -996,25 +765,21 @@ function updatePriceFeed() {
 // Генерация сигнала
 async function generateSignal() {
     if (isSignalActive) {
-        alert(currentLanguage === 'ru' ? '⏳ Дождитесь завершения текущего сигнала' : '⏳ Wait for current signal to complete');
+        alert('⏳ Дождитесь завершения текущего сигнала');
         return;
     }
     
     isSignalActive = true;
     
     const btn = document.getElementById('generate-signal');
-    const originalText = btn.innerHTML;
     btn.disabled = true;
-    btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${getTranslation('analysis')}`;
+    btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${TRANSLATIONS[APP_CONFIG.currentLang].analysis}`;
     
-    updateSignalStatus(getTranslation('analysis'), '#ffaa00');
+    updateSignalStatus(TRANSLATIONS[APP_CONFIG.currentLang].analysis, '#ffaa00');
     showAnalysisAnimation();
     
-    // Имитация анализа (3 секунды)
     setTimeout(() => {
         createSignal();
-        btn.disabled = false;
-        btn.innerHTML = originalText;
     }, 3000);
 }
 
@@ -1027,14 +792,10 @@ function showAnalysisAnimation() {
                 <div style="display: inline-block; width: 60px; height: 60px; border: 3px solid #2a3655; border-top-color: #00ff88; border-radius: 50%; animation: spin 1s linear infinite;"></div>
                 <p style="margin-top: 15px; color: #8b9dc3; font-size: 14px;">
                     <i class="fas fa-chart-line"></i><br>
-                    ${currentLanguage === 'ru' ? 'Анализ рынка...' : 'Market analysis...'}
+                    ${APP_CONFIG.signalType === 'smart' ? 'Анализ Смарт-Мани...' : 'Анализ индикаторов...'}
                 </p>
                 <div style="margin-top: 10px; font-size: 12px; color: #5d6d97;">
-                    ${signalType === 'smart' ? 
-                      (currentLanguage === 'ru' ? 'Используются концепции Smart Money' : 'Using Smart Money concepts') : 
-                      signalType === 'indicators' ? 
-                      (currentLanguage === 'ru' ? 'Технический анализ индикаторов' : 'Technical indicators analysis') : 
-                      (currentLanguage === 'ru' ? 'Комбинированный анализ' : 'Combined analysis')}
+                    Используются актуальные рыночные данные
                 </div>
             </div>
         `;
@@ -1047,14 +808,9 @@ function createSignal() {
     if (!asset) return;
     
     // Анализ в зависимости от типа сигнала
-    let analysis;
-    if (signalType === 'smart') {
-        analysis = performSmartMoneyAnalysis();
-    } else if (signalType === 'indicators') {
-        analysis = performTechnicalAnalysis();
-    } else {
-        analysis = performCombinedAnalysis();
-    }
+    const analysis = APP_CONFIG.signalType === 'smart' 
+        ? performSmartMoneyAnalysis() 
+        : performIndicatorsAnalysis();
     
     currentSignal = {
         asset: currentAsset,
@@ -1065,154 +821,157 @@ function createSignal() {
         analysis: analysis,
         timestamp: new Date(),
         result: null,
-        signalType: signalType
+        signalType: APP_CONFIG.signalType
     };
     
-    console.log('🎯 Signal created:', currentSignal);
+    console.log('🎯 Создан сигнал:', currentSignal);
     
     displaySignal();
     startExpirationTimer();
 }
 
-// Анализ Smart Money
+// Анализ Смарт-Мани
 function performSmartMoneyAnalysis() {
-    const prices = priceHistory;
+    const prices = priceHistory.length > 0 ? priceHistory : chartData.prices;
     
-    // Smart Money концепции
-    const orderFlow = Math.random() > 0.6 ? 'BUYING' : 'SELLING';
-    const liquidity = Math.random() > 0.5 ? 'ABSORBED' : 'SWEPT';
-    const imbalance = Math.random() > 0.5 ? 'BUY' : 'SELL';
+    // Комплексный анализ Смарт-Мани
+    const lastPrice = prices[prices.length - 1];
+    const volume = Math.random() * 1000000 + 500000; // Имитация объема
     
+    // Определяем уровни поддержки и сопротивления
+    const support = Math.min(...prices.slice(-20)) * 0.9995;
+    const resistance = Math.max(...prices.slice(-20)) * 1.0005;
+    
+    // Логика Смарт-Мани
     let direction = 'BUY';
-    let confidence = 75;
+    let confidence = 80;
     
-    if (orderFlow === 'BUYING' && imbalance === 'BUY') {
+    // Если цена около поддержки - покупаем
+    if (lastPrice <= support * 1.001) {
         direction = 'BUY';
         confidence = 85 + Math.random() * 10;
-    } else if (orderFlow === 'SELLING' && imbalance === 'SELL') {
+    }
+    // Если цена около сопротивления - продаем
+    else if (lastPrice >= resistance * 0.999) {
         direction = 'SELL';
         confidence = 85 + Math.random() * 10;
-    } else {
-        direction = Math.random() > 0.5 ? 'BUY' : 'SELL';
-        confidence = 70 + Math.random() * 10;
+    }
+    // Случайный выбор с учетом тренда
+    else {
+        const trend = lastPrice > prices[prices.length - 10] ? 'UP' : 'DOWN';
+        direction = trend === 'UP' ? 'BUY' : 'SELL';
+        confidence = 75 + Math.random() * 15;
     }
     
     return {
         direction,
-        confidence: Math.round(confidence),
-        analysisType: 'Smart Money',
-        orderFlow,
-        liquidity,
-        imbalance,
-        marketStructure: Math.random() > 0.5 ? 'BULLISH' : 'BEARISH',
-        volumeAnalysis: Math.random() > 0.5 ? 'HIGH' : 'LOW'
+        confidence: Math.min(99, Math.round(confidence)),
+        rsi: calculateRSI(prices),
+        macd: calculateMACD(prices),
+        bollinger: calculateBollinger(prices),
+        stochastic: calculateStochastic(prices),
+        volume: volume,
+        support: support,
+        resistance: resistance,
+        trend: lastPrice > prices[prices.length - 20] ? 'UP' : 'DOWN'
     };
 }
 
-// Технический анализ
-function performTechnicalAnalysis() {
-    const prices = priceHistory;
-    const indicators = calculateAllIndicators(prices);
+// Анализ по индикаторам
+function performIndicatorsAnalysis() {
+    const prices = priceHistory.length > 0 ? priceHistory : chartData.prices;
     
+    // Множественные индикаторы
+    const rsi = calculateRSI(prices);
+    const macd = calculateMACD(prices);
+    const bollinger = calculateBollinger(prices);
+    const stochastic = calculateStochastic(prices);
+    const sma20 = calculateSMA(prices, 20);
+    const sma50 = calculateSMA(prices, 50);
+    
+    let direction = 'BUY';
+    let confidence = 75;
+    let indicatorsCount = 0;
     let buySignals = 0;
     let sellSignals = 0;
     
-    // RSI
-    if (indicators.rsi < 30) buySignals++;
-    if (indicators.rsi > 70) sellSignals++;
+    // Анализ RSI
+    if (rsi < 30) {
+        buySignals++;
+        confidence += 5;
+    } else if (rsi > 70) {
+        sellSignals++;
+        confidence += 5;
+    }
+    indicatorsCount++;
     
-    // MACD
-    if (indicators.macd.histogram > 0) buySignals++;
-    if (indicators.macd.histogram < 0) sellSignals++;
+    // Анализ MACD
+    if (macd.signal > macd.histogram) {
+        buySignals++;
+    } else {
+        sellSignals++;
+    }
+    indicatorsCount++;
     
-    // Bollinger Bands
+    // Анализ Боллинджера
     const lastPrice = prices[prices.length - 1];
-    if (lastPrice < indicators.bollinger.lower) buySignals++;
-    if (lastPrice > indicators.bollinger.upper) sellSignals++;
-    
-    // Moving Averages
-    if (indicators.ma.ema20 > indicators.ma.sma50) buySignals++;
-    if (indicators.ma.ema20 < indicators.ma.sma50) sellSignals++;
-    
-    // Stochastic
-    if (indicators.stochastic.k < 20) buySignals++;
-    if (indicators.stochastic.k > 80) sellSignals++;
-    
-    let direction = 'BUY';
-    let confidence = 75;
-    
-    if (buySignals > sellSignals) {
-        direction = 'BUY';
-        confidence = 70 + (buySignals * 5);
-    } else if (sellSignals > buySignals) {
-        direction = 'SELL';
-        confidence = 70 + (sellSignals * 5);
-    } else {
-        direction = Math.random() > 0.5 ? 'BUY' : 'SELL';
-        confidence = 65;
+    if (lastPrice < bollinger.lower) {
+        buySignals++;
+        confidence += 5;
+    } else if (lastPrice > bollinger.upper) {
+        sellSignals++;
+        confidence += 5;
     }
+    indicatorsCount++;
     
-    confidence = Math.min(95, Math.round(confidence));
+    // Анализ Стохастика
+    if (stochastic.k < 20) {
+        buySignals++;
+        confidence += 3;
+    } else if (stochastic.k > 80) {
+        sellSignals++;
+        confidence += 3;
+    }
+    indicatorsCount++;
+    
+    // Анализ скользящих средних
+    if (sma20 > sma50 && lastPrice > sma20) {
+        buySignals++;
+        confidence += 7;
+    } else if (sma20 < sma50 && lastPrice < sma20) {
+        sellSignals++;
+        confidence += 7;
+    }
+    indicatorsCount++;
+    
+    // Определяем направление по большинству сигналов
+    direction = buySignals > sellSignals ? 'BUY' : 'SELL';
+    
+    // Расчет уверенности на основе согласованности индикаторов
+    const agreement = Math.max(buySignals, sellSignals) / indicatorsCount;
+    confidence = 70 + (agreement * 25);
     
     return {
         direction,
-        confidence,
-        analysisType: 'Technical Indicators',
-        indicators: indicators,
-        buySignals,
-        sellSignals,
-        signalStrength: Math.abs(buySignals - sellSignals)
+        confidence: Math.min(99, Math.round(confidence)),
+        rsi,
+        macd,
+        bollinger,
+        stochastic,
+        sma20,
+        sma50,
+        trend: lastPrice > sma20 ? 'UP' : 'DOWN',
+        agreement: Math.round(agreement * 100)
     };
 }
 
-// Комбинированный анализ
-function performCombinedAnalysis() {
-    const smartAnalysis = performSmartMoneyAnalysis();
-    const techAnalysis = performTechnicalAnalysis();
-    
-    let direction = 'BUY';
-    let confidence = 75;
-    
-    if (smartAnalysis.direction === techAnalysis.direction) {
-        direction = smartAnalysis.direction;
-        confidence = Math.round((smartAnalysis.confidence + techAnalysis.confidence) / 2);
-    } else {
-        // Если сигналы противоречат, выбираем более уверенный
-        if (smartAnalysis.confidence > techAnalysis.confidence) {
-            direction = smartAnalysis.direction;
-            confidence = smartAnalysis.confidence;
-        } else {
-            direction = techAnalysis.direction;
-            confidence = techAnalysis.confidence;
-        }
-        confidence = Math.round(confidence * 0.9); // Снижаем уверенность при конфликте
-    }
-    
-    return {
-        direction,
-        confidence,
-        analysisType: 'Combined Analysis',
-        smartMoney: smartAnalysis,
-        technical: techAnalysis,
-        consensus: smartAnalysis.direction === techAnalysis.direction ? 'STRONG' : 'WEAK'
-    };
+// Расчет индикаторов
+function calculateSMA(prices, period) {
+    if (prices.length < period) return prices[prices.length - 1];
+    const slice = prices.slice(-period);
+    return slice.reduce((a, b) => a + b, 0) / period;
 }
 
-// Расчет всех индикаторов
-function calculateAllIndicators(prices) {
-    return {
-        rsi: calculateRSI(prices),
-        macd: calculateMACD(prices),
-        bollinger: calculateBollingerBands(prices),
-        ma: calculateMovingAverages(prices),
-        stochastic: calculateStochastic(prices),
-        atr: calculateATR(prices),
-        support: findSupportLevel(prices),
-        resistance: findResistanceLevel(prices)
-    };
-}
-
-// Расчет RSI
 function calculateRSI(prices) {
     if (prices.length < 14) return 50;
     
@@ -1232,128 +991,63 @@ function calculateRSI(prices) {
     const avgLoss = losses / 14;
     
     if (avgLoss === 0) return 100;
-    
     const rs = avgGain / avgLoss;
     return 100 - (100 / (1 + rs));
 }
 
-// Расчет MACD
 function calculateMACD(prices) {
-    if (prices.length < 26) return { histogram: 0, signal: 0, macd: 0 };
-    
-    // Простая реализация MACD
     const ema12 = calculateEMA(prices, 12);
     const ema26 = calculateEMA(prices, 26);
-    const macd = ema12 - ema26;
+    const macdLine = ema12 - ema26;
+    const signalLine = calculateEMA(prices.slice(-9).concat([macdLine]), 9);
+    const histogram = macdLine - signalLine;
     
-    return {
-        histogram: macd,
-        signal: macd * 0.9,
-        macd: macd
-    };
+    return { macdLine, signalLine, histogram };
 }
 
-// Расчет EMA
 function calculateEMA(prices, period) {
-    if (prices.length < period) return prices[prices.length - 1];
-    
-    const multiplier = 2 / (period + 1);
+    const k = 2 / (period + 1);
     let ema = prices[0];
     
     for (let i = 1; i < prices.length; i++) {
-        ema = (prices[i] - ema) * multiplier + ema;
+        ema = prices[i] * k + ema * (1 - k);
     }
     
     return ema;
 }
 
-// Расчет Bollinger Bands
-function calculateBollingerBands(prices, period = 20, deviations = 2) {
+function calculateBollinger(prices) {
+    const period = 20;
     if (prices.length < period) {
         const price = prices[prices.length - 1];
-        return { upper: price, middle: price, lower: price };
+        return { upper: price * 1.02, middle: price, lower: price * 0.98 };
     }
     
     const slice = prices.slice(-period);
-    const sum = slice.reduce((a, b) => a + b, 0);
-    const middle = sum / period;
-    
-    // Простой расчет стандартного отклонения
-    const squaredDiffs = slice.map(price => Math.pow(price - middle, 2));
-    const variance = squaredDiffs.reduce((a, b) => a + b, 0) / period;
+    const sma = slice.reduce((a, b) => a + b, 0) / period;
+    const variance = slice.reduce((sum, price) => sum + Math.pow(price - sma, 2), 0) / period;
     const stdDev = Math.sqrt(variance);
     
     return {
-        upper: middle + (deviations * stdDev),
-        middle: middle,
-        lower: middle - (deviations * stdDev)
+        upper: sma + (stdDev * 2),
+        middle: sma,
+        lower: sma - (stdDev * 2)
     };
 }
 
-// Расчет скользящих средних
-function calculateMovingAverages(prices) {
-    return {
-        sma20: calculateSMA(prices, 20),
-        sma50: calculateSMA(prices, 50),
-        ema20: calculateEMA(prices, 20),
-        ema50: calculateEMA(prices, 50)
-    };
-}
-
-// Расчет Stochastic
-function calculateStochastic(prices, period = 14) {
+function calculateStochastic(prices) {
+    const period = 14;
     if (prices.length < period) return { k: 50, d: 50 };
     
     const slice = prices.slice(-period);
-    const high = Math.max(...slice);
-    const low = Math.min(...slice);
-    const current = prices[prices.length - 1];
+    const lowest = Math.min(...slice);
+    const highest = Math.max(...slice);
+    const k = ((prices[prices.length - 1] - lowest) / (highest - lowest)) * 100;
     
-    const k = ((current - low) / (high - low)) * 100;
+    // Упрощенный расчет %D
+    const d = k * 0.7 + 50 * 0.3;
     
-    return { k, d: k };
-}
-
-// Расчет ATR
-function calculateATR(prices, period = 14) {
-    if (prices.length < period) return 0;
-    
-    let trSum = 0;
-    const start = Math.max(0, prices.length - period);
-    
-    for (let i = start; i < prices.length - 1; i++) {
-        const high = Math.max(prices[i], prices[i + 1]);
-        const low = Math.min(prices[i], prices[i + 1]);
-        trSum += high - low;
-    }
-    
-    return trSum / Math.min(period, prices.length - start);
-}
-
-// Поиск уровня поддержки
-function findSupportLevel(prices) {
-    if (prices.length < 10) return prices[prices.length - 1];
-    
-    const lookback = Math.min(20, prices.length);
-    const slice = prices.slice(-lookback);
-    return Math.min(...slice);
-}
-
-// Поиск уровня сопротивления
-function findResistanceLevel(prices) {
-    if (prices.length < 10) return prices[prices.length - 1];
-    
-    const lookback = Math.min(20, prices.length);
-    const slice = prices.slice(-lookback);
-    return Math.max(...slice);
-}
-
-// Расчет SMA
-function calculateSMA(prices, period) {
-    if (prices.length < period) return prices[prices.length - 1];
-    
-    const slice = prices.slice(-period);
-    return slice.reduce((a, b) => a + b, 0) / period;
+    return { k, d };
 }
 
 // Отображение сигнала
@@ -1363,52 +1057,56 @@ function displaySignal() {
     
     document.getElementById('signal-content').style.display = 'none';
     document.getElementById('signal-details').style.display = 'block';
-    document.getElementById('indicators-panel').style.display = 'block';
+    document.getElementById('signal-indicators').style.display = 'block';
     document.getElementById('expiration-timer').style.display = 'block';
     
-    // Детали сигнала
+    const t = TRANSLATIONS[APP_CONFIG.currentLang];
     const detailsHTML = `
         <div style="padding: 20px;">
             <div style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
-                <span style="color: #8b9dc3; font-size: 13px;">${getTranslation('instrument')}:</span>
+                <span style="color: #8b9dc3; font-size: 13px;">${t.instrument}:</span>
                 <span style="font-weight: 700; font-size: 16px;">${signal.pair}</span>
             </div>
             
             <div style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
-                <span style="color: #8b9dc3; font-size: 13px;">${getTranslation('signalType')}:</span>
-                <span style="font-weight: 600; font-size: 13px; color: ${signalType === 'smart' ? '#ffaa00' : 
-                         signalType === 'indicators' ? '#00aaff' : '#aa00ff'}">
-                    ${signalType === 'smart' ? 'Smart Money' : 
-                      signalType === 'indicators' ? 'Technical' : 'Combined'}
+                <span style="color: #8b9dc3; font-size: 13px;">${t.signalType}:</span>
+                <span style="font-weight: 600; font-size: 14px; color: #00ff88;">
+                    ${signal.signalType === 'smart' ? t.smartMoney : t.indicatorsBtn}
                 </span>
             </div>
             
             <div style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
-                <span style="color: #8b9dc3; font-size: 13px;">${getTranslation('direction')}:</span>
+                <span style="color: #8b9dc3; font-size: 13px;">${t.direction}:</span>
                 <span style="font-weight: 800; font-size: 18px; color: ${signal.direction === 'BUY' ? '#00ff88' : '#ff4444'}; text-transform: uppercase;">
-                    ${signal.direction === 'BUY' ? getTranslation('buy') : getTranslation('sell')}
+                    ${signal.direction === 'BUY' ? t.buy : t.sell}
                 </span>
             </div>
             
             <div style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
-                <span style="color: #8b9dc3; font-size: 13px;">${getTranslation('currentPrice')}:</span>
+                <span style="color: #8b9dc3; font-size: 13px;">${t.entryPrice}:</span>
                 <span style="font-weight: 700; font-family: 'Courier New', monospace; font-size: 16px;">
                     ${signal.entryPrice.toFixed(5)}
                 </span>
             </div>
             
             <div style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
-                <span style="color: #8b9dc3; font-size: 13px;">${getTranslation('confidence')}:</span>
-                <span style="font-weight: 800; color: ${signal.confidence > 80 ? '#00ff88' : 
-                         signal.confidence > 60 ? '#ffaa00' : '#ff4444'}; font-size: 18px;">
+                <span style="color: #8b9dc3; font-size: 13px;">${t.accuracy}:</span>
+                <span style="font-weight: 800; color: #00ff88; font-size: 18px;">
                     ${signal.confidence}%
                 </span>
             </div>
             
-            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(42, 54, 85, 0.5);">
-                <div style="font-size: 11px; color: #5d6d97;">
+            <div style="margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;">
+                <span style="color: #8b9dc3; font-size: 13px;">${t.trend}:</span>
+                <span style="font-weight: 600; color: ${signal.analysis.trend === 'UP' ? '#00ff88' : '#ff4444'}">
+                    ${signal.analysis.trend === 'UP' ? t.upTrend : t.downTrend}
+                </span>
+            </div>
+            
+            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(42, 54, 85, 0.5);">
+                <div style="font-size: 11px; color: #5d6d97; text-align: center;">
                     <i class="far fa-clock"></i>
-                    ${signal.timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                    ${signal.timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'})}
                 </div>
             </div>
         </div>
@@ -1416,84 +1114,68 @@ function displaySignal() {
     
     document.getElementById('signal-details').innerHTML = detailsHTML;
     
-    // Отображение индикаторов
-    displayIndicators();
+    // Показываем индикаторы
+    displayIndicators(signal.analysis);
     
-    updateSignalStatus('ACTIVE', signal.direction === 'BUY' ? '#00ff88' : '#ff4444');
+    updateSignalStatus('АКТИВЕН', signal.direction === 'BUY' ? '#00ff88' : '#ff4444');
+    
+    const btn = document.getElementById('generate-signal');
+    btn.disabled = false;
+    btn.innerHTML = `<i class="fas fa-bolt"></i> ${t.getSignal}`;
 }
 
 // Отображение индикаторов
-function displayIndicators() {
-    const indicators = calculateAllIndicators(priceHistory);
-    const lastPrice = priceHistory[priceHistory.length - 1];
+function displayIndicators(analysis) {
+    const t = TRANSLATIONS[APP_CONFIG.currentLang];
+    const indicatorsGrid = document.getElementById('indicators-grid');
     
-    const indicatorsHTML = `
-        <div class="indicators-grid">
+    let indicatorsHTML = `
+        <div class="indicators-row">
             <div class="indicator-item">
-                <span class="indicator-label">${getTranslation('trend')}:</span>
-                <span class="indicator-value" style="color: ${indicators.ma.ema20 > indicators.ma.sma50 ? '#00ff88' : '#ff4444'}">
-                    ${indicators.ma.ema20 > indicators.ma.sma50 ? getTranslation('bullish') : getTranslation('bearish')}
+                <span class="indicator-label">${t.rsi}</span>
+                <span class="indicator-value ${analysis.rsi < 30 ? 'oversold' : analysis.rsi > 70 ? 'overbought' : 'neutral'}">
+                    ${analysis.rsi.toFixed(1)}
                 </span>
             </div>
-            
             <div class="indicator-item">
-                <span class="indicator-label">${getTranslation('rsi')}:</span>
-                <span class="indicator-value" style="color: ${indicators.rsi < 30 ? '#00ff88' : 
-                         indicators.rsi > 70 ? '#ff4444' : '#8b9dc3'}">
-                    ${indicators.rsi.toFixed(1)} 
-                    ${indicators.rsi < 30 ? `(${getTranslation('oversold')})` : 
-                      indicators.rsi > 70 ? `(${getTranslation('overbought')})` : ''}
+                <span class="indicator-label">${t.macd}</span>
+                <span class="indicator-value ${analysis.macd.histogram > 0 ? 'positive' : 'negative'}">
+                    ${analysis.macd.histogram.toFixed(4)}
                 </span>
             </div>
-            
+        </div>
+        <div class="indicators-row">
             <div class="indicator-item">
-                <span class="indicator-label">${getTranslation('macd')}:</span>
-                <span class="indicator-value" style="color: ${indicators.macd.histogram > 0 ? '#00ff88' : '#ff4444'}">
-                    ${indicators.macd.histogram.toFixed(4)}
+                <span class="indicator-label">${t.stochastic}</span>
+                <span class="indicator-value ${analysis.stochastic.k < 20 ? 'oversold' : analysis.stochastic.k > 80 ? 'overbought' : 'neutral'}">
+                    K: ${analysis.stochastic.k.toFixed(1)} D: ${analysis.stochastic.d.toFixed(1)}
                 </span>
             </div>
-            
             <div class="indicator-item">
-                <span class="indicator-label">${getTranslation('bollinger')}:</span>
-                <span class="indicator-value" style="color: ${lastPrice < indicators.bollinger.lower ? '#00ff88' : 
-                         lastPrice > indicators.bollinger.upper ? '#ff4444' : '#8b9dc3'}">
-                    ${lastPrice < indicators.bollinger.lower ? getTranslation('oversold') : 
-                      lastPrice > indicators.bollinger.upper ? getTranslation('overbought') : 'Normal'}
-                </span>
-            </div>
-            
-            <div class="indicator-item">
-                <span class="indicator-label">${getTranslation('movingAverage')}:</span>
+                <span class="indicator-label">${t.volume}</span>
                 <span class="indicator-value">
-                    EMA20: ${indicators.ma.ema20.toFixed(4)}
-                </span>
-            </div>
-            
-            <div class="indicator-item">
-                <span class="indicator-label">${getTranslation('stochastic')}:</span>
-                <span class="indicator-value" style="color: ${indicators.stochastic.k < 20 ? '#00ff88' : 
-                         indicators.stochastic.k > 80 ? '#ff4444' : '#8b9dc3'}">
-                    %K: ${indicators.stochastic.k.toFixed(1)}
-                </span>
-            </div>
-            
-            <div class="indicator-item">
-                <span class="indicator-label">${getTranslation('support')}:</span>
-                <span class="indicator-value">
-                    ${indicators.support.toFixed(4)}
-                </span>
-            </div>
-            
-            <div class="indicator-item">
-                <span class="indicator-label">${getTranslation('resistance')}:</span>
-                <span class="indicator-value">
-                    ${indicators.resistance.toFixed(4)}
+                    ${(analysis.volume / 1000000).toFixed(2)}M
                 </span>
             </div>
         </div>
     `;
     
-    document.getElementById('indicators-grid').innerHTML = indicatorsHTML;
+    if (analysis.support && analysis.resistance) {
+        indicatorsHTML += `
+            <div class="indicators-row">
+                <div class="indicator-item">
+                    <span class="indicator-label">${t.support}</span>
+                    <span class="indicator-value">${analysis.support.toFixed(5)}</span>
+                </div>
+                <div class="indicator-item">
+                    <span class="indicator-label">${t.resistance}</span>
+                    <span class="indicator-value">${analysis.resistance.toFixed(5)}</span>
+                </div>
+            </div>
+        `;
+    }
+    
+    indicatorsGrid.innerHTML = indicatorsHTML;
 }
 
 // Обновление статуса
@@ -1522,12 +1204,10 @@ function startExpirationTimer() {
     
     if (!timerBar || !timerValue) return;
     
-    // Сброс анимации
     timerBar.style.transition = 'none';
     timerBar.style.transform = 'scaleX(1)';
     void timerBar.offsetWidth;
     
-    // Запуск новой анимации
     timerBar.style.transition = `transform ${totalTime}s linear`;
     timerBar.style.transform = 'scaleX(0)';
     
@@ -1558,6 +1238,7 @@ function finishSignal() {
     
     const currentPrice = ASSETS[currentAsset].price;
     const entryPrice = currentSignal.entryPrice;
+    const t = TRANSLATIONS[APP_CONFIG.currentLang];
     
     let result, resultColor, resultText;
     
@@ -1565,29 +1246,29 @@ function finishSignal() {
         if (currentPrice > entryPrice * 1.0001) {
             result = 'WIN';
             resultColor = '#00ff88';
-            resultText = 'WIN';
+            resultText = t.win;
         } else if (currentPrice < entryPrice * 0.9999) {
             result = 'LOSS';
             resultColor = '#ff4444';
-            resultText = 'LOSS';
+            resultText = t.loss;
         } else {
             result = 'REFUND';
             resultColor = '#8b9dc3';
-            resultText = 'REFUND';
+            resultText = t.refund;
         }
     } else {
         if (currentPrice < entryPrice * 0.9999) {
             result = 'WIN';
             resultColor = '#00ff88';
-            resultText = 'WIN';
+            resultText = t.win;
         } else if (currentPrice > entryPrice * 1.0001) {
             result = 'LOSS';
             resultColor = '#ff4444';
-            resultText = 'LOSS';
+            resultText = t.loss;
         } else {
             result = 'REFUND';
             resultColor = '#8b9dc3';
-            resultText = 'REFUND';
+            resultText = t.refund;
         }
     }
     
@@ -1597,11 +1278,13 @@ function finishSignal() {
     
     showSignalResult(result, resultText, resultColor, currentPrice);
     addToHistory();
+    
     setTimeout(resetSignal, 5000);
 }
 
 // Показать результат сигнала
 function showSignalResult(result, resultText, resultColor, exitPrice) {
+    const t = TRANSLATIONS[APP_CONFIG.currentLang];
     const resultHTML = `
         <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid ${resultColor}30;">
             <div style="text-align: center;">
@@ -1609,16 +1292,16 @@ function showSignalResult(result, resultText, resultColor, exitPrice) {
                     ${resultText}
                 </div>
                 <div style="font-size: 14px; color: #8b9dc3; margin-bottom: 15px;">
-                    ${currentLanguage === 'ru' ? 'Сигнал завершен' : 'Signal completed'}
+                    Сигнал завершен
                 </div>
                 
                 <div style="display: flex; justify-content: center; gap: 30px; margin-bottom: 15px;">
                     <div style="text-align: center;">
-                        <div style="font-size: 11px; color: #5d6d97;">${currentLanguage === 'ru' ? 'Вход' : 'Entry'}</div>
+                        <div style="font-size: 11px; color: #5d6d97;">${t.entry}</div>
                         <div style="font-size: 16px; font-weight: 700;">${currentSignal.entryPrice.toFixed(5)}</div>
                     </div>
                     <div style="text-align: center;">
-                        <div style="font-size: 11px; color: #5d6d97;">${currentLanguage === 'ru' ? 'Выход' : 'Exit'}</div>
+                        <div style="font-size: 11px; color: #5d6d97;">${t.exit}</div>
                         <div style="font-size: 16px; font-weight: 700;">${exitPrice.toFixed(5)}</div>
                     </div>
                 </div>
@@ -1646,9 +1329,9 @@ function addToHistory() {
     
     const resultColor = currentSignal.result === 'WIN' ? '#00ff88' : 
                        currentSignal.result === 'LOSS' ? '#ff4444' : '#8b9dc3';
+    const t = TRANSLATIONS[APP_CONFIG.currentLang];
     
     const historyItem = document.createElement('div');
-    historyItem.className = 'history-item';
     historyItem.style.cssText = `
         background: rgba(19, 26, 45, 0.8);
         padding: 10px 15px;
@@ -1659,17 +1342,16 @@ function addToHistory() {
         align-items: center;
         font-size: 13px;
         transition: all 0.2s;
-        margin-bottom: 5px;
     `;
     
     historyItem.innerHTML = `
         <div style="display: flex; align-items: center; gap: 10px;">
             <span style="font-weight: 700; min-width: 70px;">${currentSignal.pair}</span>
             <span style="color: ${currentSignal.direction === 'BUY' ? '#00ff88' : '#ff4444'}; font-weight: 600;">
-                ${currentSignal.direction === 'BUY' ? getTranslation('buy') : getTranslation('sell')}
+                ${currentSignal.direction === 'BUY' ? t.buy : t.sell}
             </span>
             <span style="color: ${resultColor}; font-weight: 800;">
-                ${currentSignal.result === 'WIN' ? 'WIN' : currentSignal.result === 'LOSS' ? 'LOSS' : 'REFUND'}
+                ${currentSignal.result === 'WIN' ? t.win : currentSignal.result === 'LOSS' ? t.loss : t.refund}
             </span>
         </div>
         <div style="color: #5d6d97; font-size: 11px; text-align: right;">
@@ -1678,44 +1360,39 @@ function addToHistory() {
         </div>
     `;
     
-    // Добавляем в начало
     resultsList.insertBefore(historyItem, resultsList.firstChild);
-    
-    // Сохраняем историю
     saveHistory();
 }
 
 // Сохранение истории
 function saveHistory() {
     try {
-        const history = {
+        let savedHistory = JSON.parse(localStorage.getItem('tradingHistory') || '[]');
+        savedHistory.unshift({
             signal: currentSignal,
             timestamp: new Date().toISOString()
-        };
-        
-        let savedHistory = JSON.parse(localStorage.getItem('scalpingHistory') || '[]');
-        savedHistory.unshift(history);
+        });
         
         if (savedHistory.length > 50) {
             savedHistory = savedHistory.slice(0, 50);
         }
         
-        localStorage.setItem('scalpingHistory', JSON.stringify(savedHistory));
+        localStorage.setItem('tradingHistory', JSON.stringify(savedHistory));
     } catch (error) {
-        console.error('History save error:', error);
+        console.error('Ошибка сохранения истории:', error);
     }
 }
 
 // Загрузка истории
 function loadHistory() {
     try {
-        const savedHistory = JSON.parse(localStorage.getItem('scalpingHistory') || '[]');
+        const savedHistory = JSON.parse(localStorage.getItem('tradingHistory') || '[]');
         
         if (savedHistory.length > 0) {
-            console.log(`📚 Loaded ${savedHistory.length} history records`);
+            console.log(`📚 Загружено ${savedHistory.length} записей истории`);
         }
     } catch (error) {
-        console.error('History load error:', error);
+        console.error('Ошибка загрузки истории:', error);
     }
 }
 
@@ -1726,7 +1403,7 @@ function resetSignal() {
     
     document.getElementById('signal-content').style.display = 'flex';
     document.getElementById('signal-details').style.display = 'none';
-    document.getElementById('indicators-panel').style.display = 'none';
+    document.getElementById('signal-indicators').style.display = 'none';
     document.getElementById('expiration-timer').style.display = 'none';
     
     const signalContent = document.getElementById('signal-content');
@@ -1734,12 +1411,12 @@ function resetSignal() {
         signalContent.innerHTML = `
             <div class="signal-placeholder">
                 <i class="fas fa-chart-line"></i>
-                <p>${getTranslation('clickForAnalysis')}</p>
+                <p>${TRANSLATIONS[APP_CONFIG.currentLang].clickForAnalysis}</p>
             </div>
         `;
     }
     
-    updateSignalStatus(getTranslation('waiting'), '#00ff88');
+    updateSignalStatus(TRANSLATIONS[APP_CONFIG.currentLang].waiting, '#00ff88');
     
     const timerBar = document.getElementById('timer-bar');
     const timerValue = document.getElementById('timer-value');
@@ -1767,25 +1444,6 @@ style.textContent = `
         0%, 100% { opacity: 1; }
         50% { opacity: 0.5; }
     }
-    
-    @keyframes slideIn {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
-    }
-    
-    @keyframes slideOut {
-        from { transform: translateX(0); opacity: 1; }
-        to { transform: translateX(100%); opacity: 0; }
-    }
-    
-    .live-price {
-        animation: pulse 2s infinite;
-    }
-    
-    .history-item:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    }
 `;
 document.head.appendChild(style);
 
@@ -1795,159 +1453,5 @@ window.debug = {
     getAssetInfo: () => ASSETS[currentAsset],
     getAllPrices: () => ASSETS,
     forcePriceUpdate: updatePrices,
-    simulateSignal: generateSignal,
-    switchLanguage: setLanguage,
-    getCurrentState: () => ({
-        asset: currentAsset,
-        timeframe: currentTimeframe,
-        chartType: chartType,
-        signalType: signalType,
-        language: currentLanguage
-    })
+    simulateSignal: generateSignal
 };
-
-// Функция для улучшенного внешнего вида
-function enhanceUI() {
-    // Добавляем дополнительные стили для красивого отображения
-    const enhancedStyles = `
-        /* Эффект градиентных границ */
-        .control-panel, .chart-container, .signal-display {
-            position: relative;
-        }
-        
-        .control-panel:before, .chart-container:before, .signal-display:before {
-            content: '';
-            position: absolute;
-            top: -1px;
-            left: -1px;
-            right: -1px;
-            bottom: -1px;
-            background: linear-gradient(45deg, #00ff88, #0066ff, #00ff88);
-            border-radius: 21px;
-            z-index: -1;
-            opacity: 0.3;
-            filter: blur(5px);
-        }
-        
-        /* Анимация появления элементов */
-        .panel-section {
-            animation: fadeInUp 0.5s ease-out;
-            animation-fill-mode: both;
-        }
-        
-        .panel-section:nth-child(1) { animation-delay: 0.1s; }
-        .panel-section:nth-child(2) { animation-delay: 0.2s; }
-        .panel-section:nth-child(3) { animation-delay: 0.3s; }
-        .panel-section:nth-child(4) { animation-delay: 0.4s; }
-        .panel-section:nth-child(5) { animation-delay: 0.5s; }
-        .panel-section:nth-child(6) { animation-delay: 0.6s; }
-        
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        /* Эффект при наведении на кнопки */
-        .signal-btn, .time-btn, .signal-type-btn {
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        
-        /* Анимация живых цен */
-        .live-price {
-            position: relative;
-        }
-        
-        .live-price:after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, #00ff88, transparent);
-            opacity: 0;
-            animation: priceGlow 3s infinite;
-        }
-        
-        @keyframes priceGlow {
-            0%, 100% { opacity: 0; }
-            50% { opacity: 1; }
-        }
-        
-        /* Эффект свечения для активных элементов */
-        .active {
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .active:after {
-            content: '';
-            position: absolute;
-            top: -10px;
-            left: -10px;
-            right: -10px;
-            bottom: -10px;
-            background: radial-gradient(circle at center, rgba(0, 255, 136, 0.1), transparent 70%);
-            z-index: -1;
-        }
-    `;
-    
-    const styleSheet = document.createElement('style');
-    styleSheet.textContent = enhancedStyles;
-    document.head.appendChild(styleSheet);
-    
-    // Добавляем эффект параллакса для фона
-    document.body.addEventListener('mousemove', function(e) {
-        const x = (e.clientX / window.innerWidth - 0.5) * 20;
-        const y = (e.clientY / window.innerHeight - 0.5) * 20;
-        
-        document.body.style.backgroundPosition = `calc(50% + ${x}px) calc(50% + ${y}px)`;
-    });
-    
-    // Добавляем эффект при наведении на карточки
-    const cards = document.querySelectorAll('.panel-section, .stat-item, .indicator-item');
-    cards.forEach(card => {
-        card.addEventListener('mouseenter', () => {
-            card.style.transform = 'translateY(-5px)';
-            card.style.boxShadow = '0 15px 35px rgba(0, 0, 0, 0.3)';
-        });
-        
-        card.addEventListener('mouseleave', () => {
-            card.style.transform = 'translateY(0)';
-            card.style.boxShadow = 'none';
-        });
-    });
-    
-    // Добавляем плавное появление элементов при загрузке
-    document.querySelectorAll('.control-panel, .chart-container, .signal-display').forEach(el => {
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(30px)';
-        
-        setTimeout(() => {
-            el.style.transition = 'all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-            el.style.opacity = '1';
-            el.style.transform = 'translateY(0)';
-        }, 100);
-    });
-}
-
-// Вызываем улучшение UI после загрузки
-window.addEventListener('load', function() {
-    setTimeout(enhanceUI, 500);
-    
-    // Добавляем плавное обновление цен
-    setInterval(() => {
-        document.querySelectorAll('.live-price').forEach(price => {
-            price.style.transform = 'scale(1.05)';
-            setTimeout(() => {
-                price.style.transform = 'scale(1)';
-            }, 200);
-        });
-    }, 5000);
-});
