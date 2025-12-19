@@ -22,29 +22,116 @@ const TRADING_CONFIG = {
     },
     
     timeframes: {
-        60: '1 мин',
-        120: '2 мин',
-        180: '3 мин',
-        300: '5 мин'
+        60: { name: '1 минута', seconds: 60 },
+        120: { name: '2 минуты', seconds: 120 },
+        180: { name: '3 минуты', seconds: 180 },
+        300: { name: '5 минут', seconds: 300 }
+    }
+};
+
+// Translation dictionaries
+const translations = {
+    ru: {
+        instrument: 'ИНСТРУМЕНТ',
+        expiration: 'ЭКСПИРАЦИЯ',
+        signalAccuracy: 'ТОЧНОСТЬ СИГНАЛОВ',
+        signal: 'СИГНАЛ',
+        getSignal: 'ПОЛУЧИТЬ СИГНАЛ',
+        ready: 'Готов к работе',
+        winRate: 'Винрейт:',
+        profitFactor: 'Профит фактор:',
+        todayTrades: 'Сделок сегодня:',
+        last24h: 'Последние 24ч:',
+        weekly: 'За неделю:',
+        totalSignals: 'Всего сигналов:',
+        timeframe: 'Таймфрейм:',
+        analyzing150: 'Анализ 150 свечей',
+        waitingForSignal: 'Ожидание сигнала',
+        chartWillAppear: 'График появится здесь после генерации сигнала',
+        generateFirstSignal: 'Сгенерировать первый сигнал',
+        currentSignal: 'ТЕКУЩИЙ СИГНАЛ',
+        waiting: 'Ожидание',
+        clickGenerate: 'Нажмите "Получить сигнал" для анализа',
+        direction: 'Направление:',
+        entryPrice: 'Цена входа:',
+        accuracy: 'Точность:',
+        generationTime: 'Время генерации:',
+        expiresIn: 'Истекает через:',
+        lastResults: 'ПОСЛЕДНИЕ РЕЗУЛЬТАТЫ',
+        disclaimer: 'Торговля бинарными опционами связана с высокими рисками. Past performance is not indicative of future results.',
+        exitPrice: 'Цена выхода:',
+        result: 'Результат:',
+        buy: 'ПОКУПКА',
+        sell: 'ПРОДАЖА',
+        win: 'ВЫИГРЫШ',
+        loss: 'ПРОИГРЫШ',
+        refund: 'ВОЗВРАТ',
+        expand: 'Развернуть',
+        collapse: 'Свернуть',
+        priceChart: 'График цены:',
+        time: 'Время:'
+    },
+    en: {
+        instrument: 'INSTRUMENT',
+        expiration: 'EXPIRATION',
+        signalAccuracy: 'SIGNAL ACCURACY',
+        signal: 'SIGNAL',
+        getSignal: 'GET SIGNAL',
+        ready: 'Ready to trade',
+        winRate: 'Win Rate:',
+        profitFactor: 'Profit Factor:',
+        todayTrades: 'Today Trades:',
+        last24h: 'Last 24h:',
+        weekly: 'Weekly:',
+        totalSignals: 'Total Signals:',
+        timeframe: 'Timeframe:',
+        analyzing150: 'Analyzing 150 candles',
+        waitingForSignal: 'Waiting for signal',
+        chartWillAppear: 'Chart will appear here after signal generation',
+        generateFirstSignal: 'Generate first signal',
+        currentSignal: 'CURRENT SIGNAL',
+        waiting: 'Waiting',
+        clickGenerate: 'Click "Get Signal" to analyze',
+        direction: 'Direction:',
+        entryPrice: 'Entry Price:',
+        accuracy: 'Accuracy:',
+        generationTime: 'Generation Time:',
+        expiresIn: 'Expires in:',
+        lastResults: 'LAST RESULTS',
+        disclaimer: 'Binary options trading involves high risks. Past performance is not indicative of future results.',
+        exitPrice: 'Exit Price:',
+        result: 'Result:',
+        buy: 'BUY',
+        sell: 'SELL',
+        win: 'WIN',
+        loss: 'LOSS',
+        refund: 'REFUND',
+        expand: 'Expand',
+        collapse: 'Collapse',
+        priceChart: 'Price Chart:',
+        time: 'Time:'
     }
 };
 
 // Global Variables
 let currentChart = null;
-let candlestickSeries = null;
 let currentSignal = null;
 let isSignalActive = false;
 let expirationTimer = null;
 let resultsHistory = [];
 let currentAsset = 'EURUSD';
-let currentTimeframe = 300; // 5 минут по умолчанию
-let candlesData = [];
-let chartInitialized = false;
+let currentTimeframe = 60; // 1 minute by default
+let currentLanguage = 'ru';
+let priceHistory = [];
 
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Initializing Scalping Robot Pro...');
     
+    // Set default timeframe
+    document.getElementById('current-tf').textContent = TRADING_CONFIG.timeframes[currentTimeframe].name;
+    
+    initializeLanguage();
     initializeEventListeners();
     updateTimeDisplay();
     loadResultsHistory();
@@ -53,11 +140,129 @@ document.addEventListener('DOMContentLoaded', function() {
     // Update time every second
     setInterval(updateTimeDisplay, 1000);
     
-    // Initialize chart after a short delay to ensure DOM is ready
-    setTimeout(initializeChart, 500);
-    
     console.log('Scalping Robot Pro initialized successfully!');
 });
+
+// Initialize language system
+function initializeLanguage() {
+    // Set up language buttons
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            currentLanguage = this.dataset.lang;
+            
+            // Update active button
+            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Apply translations
+            applyTranslations();
+        });
+    });
+    
+    // Apply initial translations
+    applyTranslations();
+}
+
+// Apply translations to all elements
+function applyTranslations() {
+    const dict = translations[currentLanguage];
+    
+    // Update all elements with data-i18n attribute
+    document.querySelectorAll('[data-i18n]').forEach(element => {
+        const key = element.getAttribute('data-i18n');
+        if (dict[key]) {
+            if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+                element.placeholder = dict[key];
+            } else {
+                element.textContent = dict[key];
+            }
+        }
+    });
+    
+    // Update signal button text
+    const signalBtn = document.getElementById('generate-signal');
+    if (signalBtn) {
+        const span = signalBtn.querySelector('span');
+        if (span) span.textContent = dict.getSignal;
+    }
+    
+    // Update first signal button
+    const firstSignalBtn = document.getElementById('generate-first-signal');
+    if (firstSignalBtn) {
+        const span = firstSignalBtn.querySelector('span');
+        if (span) span.textContent = dict.generateFirstSignal;
+    }
+    
+    // Update status text if waiting
+    const statusText = document.getElementById('status-text');
+    if (statusText && !isSignalActive) {
+        statusText.textContent = dict.waiting;
+    }
+}
+
+// Initialize event listeners
+function initializeEventListeners() {
+    console.log('Initializing event listeners...');
+    
+    // Asset selection
+    const assetSelect = document.getElementById('asset-select');
+    if (assetSelect) {
+        assetSelect.addEventListener('change', function() {
+            currentAsset = this.value;
+            console.log('Asset changed to:', currentAsset);
+            updateAssetInfo();
+        });
+    }
+    
+    // Timeframe buttons
+    document.querySelectorAll('.time-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Remove active class from all buttons
+            document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+            
+            // Add active class to clicked button
+            this.classList.add('active');
+            
+            // Update current timeframe
+            currentTimeframe = parseInt(this.dataset.time);
+            console.log('Timeframe changed to:', currentTimeframe);
+            
+            // Update display
+            document.getElementById('current-tf').textContent = 
+                TRADING_CONFIG.timeframes[currentTimeframe].name;
+        });
+    });
+    
+    // Generate signal button
+    const generateBtn = document.getElementById('generate-signal');
+    if (generateBtn) {
+        generateBtn.addEventListener('click', generateSignal);
+    }
+    
+    // Generate first signal button
+    const firstSignalBtn = document.getElementById('generate-first-signal');
+    if (firstSignalBtn) {
+        firstSignalBtn.addEventListener('click', generateSignal);
+    }
+    
+    // Handle window resize
+    window.addEventListener('resize', handleResize);
+    
+    console.log('Event listeners initialized');
+}
+
+// Handle window resize
+function handleResize() {
+    if (currentChart) {
+        const chartContainer = document.getElementById('trading-chart');
+        if (chartContainer) {
+            currentChart.resize(
+                chartContainer.clientWidth,
+                chartContainer.clientHeight
+            );
+        }
+    }
+}
 
 // Initialize TradingView Lightweight Charts
 function initializeChart() {
@@ -121,26 +326,10 @@ function initializeChart() {
             },
         });
         
-        // Create candlestick series
-        candlestickSeries = currentChart.addCandlestickSeries({
-            upColor: '#00ff88',
-            downColor: '#ff4444',
-            borderDownColor: '#ff4444',
-            borderUpColor: '#00ff88',
-            wickDownColor: '#ff4444',
-            wickUpColor: '#00ff88',
-            priceFormat: {
-                type: 'price',
-                precision: 4,
-                minMove: 0.0001,
-            }
-        });
-        
-        chartInitialized = true;
         console.log('Chart initialized successfully');
         
-        // Generate initial data
-        generateCandles();
+        // Generate initial chart data
+        generateChartData();
         
     } catch (error) {
         console.error('Error creating chart:', error);
@@ -154,34 +343,48 @@ function initializeChart() {
     }
 }
 
-// Generate random candle data
-function generateCandles() {
-    if (!chartInitialized) return;
+// Generate chart data with technical analysis
+function generateChartData() {
+    if (!currentChart) return;
     
-    console.log('Generating candles for', currentAsset);
     const asset = TRADING_CONFIG.assets[currentAsset];
     const basePrice = asset.price;
     const volatility = asset.volatility;
     
-    candlesData = [];
-    const now = Math.floor(Date.now() / 1000);
-    const timeframe = currentTimeframe;
+    // Clear existing series
+    currentChart.removeSeries(currentChart._series || []);
+    
+    // Create candlestick series
+    const candlestickSeries = currentChart.addCandlestickSeries({
+        upColor: '#00ff88',
+        downColor: '#ff4444',
+        borderDownColor: '#ff4444',
+        borderUpColor: '#00ff88',
+        wickDownColor: '#ff4444',
+        wickUpColor: '#00ff88',
+        priceFormat: {
+            type: 'price',
+            precision: 4,
+            minMove: 0.0001,
+        }
+    });
     
     // Generate 150 candles
+    const candlesData = [];
+    const now = Math.floor(Date.now() / 1000);
+    
     for (let i = 150; i >= 0; i--) {
-        const time = now - (i * timeframe);
+        const time = now - (i * 60); // 1 minute candles
         
         if (i === 0) {
-            // Current candle
             candlesData.push({
                 time: time,
-                open: basePrice * (1 + (Math.random() - 0.5) * 0.001),
-                high: basePrice * (1 + Math.random() * 0.002),
-                low: basePrice * (1 - Math.random() * 0.002),
+                open: basePrice,
+                high: basePrice * (1 + Math.random() * 0.001),
+                low: basePrice * (1 - Math.random() * 0.001),
                 close: basePrice,
             });
         } else {
-            // Historical candles
             const prevClose = i === 150 ? basePrice : candlesData[candlesData.length - 1].close;
             const change = (Math.random() - 0.5) * volatility * 0.01;
             const open = prevClose;
@@ -199,121 +402,97 @@ function generateCandles() {
         }
     }
     
-    updateChart();
-}
-
-// Update chart with current data
-function updateChart() {
-    if (!chartInitialized || !candlestickSeries || candlesData.length === 0) {
-        console.log('Chart not ready or no data');
-        return;
-    }
+    // Set candle data
+    candlestickSeries.setData(candlesData);
     
-    console.log('Updating chart with', candlesData.length, 'candles');
+    // Store price history for mini-charts
+    priceHistory = candlesData.map(c => ({ time: c.time, price: c.close }));
     
-    try {
-        // Set data
-        candlestickSeries.setData(candlesData);
-        
-        // Draw technical analysis
-        drawTechnicalAnalysis();
-        
-        // Fit content
-        currentChart.timeScale().fitContent();
-        
-        console.log('Chart updated successfully');
-    } catch (error) {
-        console.error('Error updating chart:', error);
-    }
+    // Draw technical analysis
+    drawTechnicalAnalysis(candlesData);
+    
+    // Fit content
+    currentChart.timeScale().fitContent();
+    
+    console.log('Chart data generated successfully');
 }
 
 // Draw technical analysis indicators
-function drawTechnicalAnalysis() {
-    if (!chartInitialized || candlesData.length < 10) return;
+function drawTechnicalAnalysis(candlesData) {
+    if (!currentChart || candlesData.length < 10) return;
     
-    console.log('Drawing technical analysis...');
+    // Calculate support and resistance levels
+    const highs = candlesData.map(c => c.high);
+    const lows = candlesData.map(c => c.low);
+    const maxHigh = Math.max(...highs);
+    const minLow = Math.min(...lows);
+    const range = maxHigh - minLow;
     
-    try {
-        // Remove existing indicators
-        currentChart.removeSeries(currentChart._series?.filter(s => s !== candlestickSeries) || []);
-        
-        // Calculate support and resistance levels
-        const highs = candlesData.map(c => c.high);
-        const lows = candlesData.map(c => c.low);
-        const maxHigh = Math.max(...highs);
-        const minLow = Math.min(...lows);
-        const range = maxHigh - minLow;
-        
-        // Draw Fibonacci levels
-        const fibLevels = [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1];
-        fibLevels.forEach(level => {
-            const price = maxHigh - (range * level);
-            const lineSeries = currentChart.addLineSeries({
-                color: level === 0.5 ? '#ffaa00' : '#5d6d97',
-                lineWidth: level === 0.5 ? 2 : 1,
-                lineStyle: level === 0.618 || level === 0.382 ? 2 : 0, // 0 = solid, 2 = dotted
-            });
-            
-            lineSeries.setData([
-                { time: candlesData[0].time, value: price },
-                { time: candlesData[candlesData.length - 1].time, value: price }
-            ]);
+    // Draw Fibonacci levels
+    const fibLevels = [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1];
+    fibLevels.forEach(level => {
+        const price = maxHigh - (range * level);
+        const lineSeries = currentChart.addLineSeries({
+            color: level === 0.5 ? '#ffaa00' : '#5d6d97',
+            lineWidth: level === 0.5 ? 2 : 1,
+            lineStyle: level === 0.618 || level === 0.382 ? 2 : 0,
         });
         
-        // Draw support line (blue)
-        const supportLevel = minLow + (range * 0.382);
-        const supportSeries = currentChart.addLineSeries({
-            color: '#0066ff',
-            lineWidth: 2,
-            lineStyle: 0,
-        });
-        supportSeries.setData([
-            { time: candlesData[0].time, value: supportLevel },
-            { time: candlesData[candlesData.length - 1].time, value: supportLevel }
+        lineSeries.setData([
+            { time: candlesData[0].time, value: price },
+            { time: candlesData[candlesData.length - 1].time, value: price }
         ]);
-        
-        // Draw resistance line (red)
-        const resistanceLevel = maxHigh - (range * 0.382);
-        const resistanceSeries = currentChart.addLineSeries({
-            color: '#ff4444',
-            lineWidth: 2,
-            lineStyle: 0,
-        });
-        resistanceSeries.setData([
-            { time: candlesData[0].time, value: resistanceLevel },
-            { time: candlesData[candlesData.length - 1].time, value: resistanceLevel }
-        ]);
-        
-        // Draw trend line (green diagonal)
-        const trendStart = candlesData[0].close;
-        const trendEnd = candlesData[candlesData.length - 1].close;
-        const trendStep = (trendEnd - trendStart) / (candlesData.length - 1);
-        
-        const trendSeries = currentChart.addLineSeries({
-            color: '#22ff55',
-            lineWidth: 2,
-            lineStyle: 0,
-        });
-        
-        const trendData = candlesData.map((candle, index) => ({
-            time: candle.time,
-            value: trendStart + (trendStep * index)
-        }));
-        
-        trendSeries.setData(trendData);
-        
-        // Draw order blocks
-        drawOrderBlocks();
-        
-        console.log('Technical analysis drawn');
-    } catch (error) {
-        console.error('Error drawing technical analysis:', error);
-    }
+    });
+    
+    // Draw support line (blue)
+    const supportLevel = minLow + (range * 0.382);
+    const supportSeries = currentChart.addLineSeries({
+        color: '#0066ff',
+        lineWidth: 2,
+        lineStyle: 0,
+    });
+    supportSeries.setData([
+        { time: candlesData[0].time, value: supportLevel },
+        { time: candlesData[candlesData.length - 1].time, value: supportLevel }
+    ]);
+    
+    // Draw resistance line (red)
+    const resistanceLevel = maxHigh - (range * 0.382);
+    const resistanceSeries = currentChart.addLineSeries({
+        color: '#ff4444',
+        lineWidth: 2,
+        lineStyle: 0,
+    });
+    resistanceSeries.setData([
+        { time: candlesData[0].time, value: resistanceLevel },
+        { time: candlesData[candlesData.length - 1].time, value: resistanceLevel }
+    ]);
+    
+    // Draw trend line (green diagonal)
+    const trendStart = candlesData[0].close;
+    const trendEnd = candlesData[candlesData.length - 1].close;
+    const trendStep = (trendEnd - trendStart) / (candlesData.length - 1);
+    
+    const trendSeries = currentChart.addLineSeries({
+        color: '#22ff55',
+        lineWidth: 2,
+        lineStyle: 0,
+    });
+    
+    const trendData = candlesData.map((candle, index) => ({
+        time: candle.time,
+        value: trendStart + (trendStep * index)
+    }));
+    
+    trendSeries.setData(trendData);
+    
+    // Draw order blocks
+    drawOrderBlocks(candlesData);
 }
 
 // Draw order blocks
-function drawOrderBlocks() {
-    if (!chartInitialized) return;
+function drawOrderBlocks(candlesData) {
+    if (!currentChart) return;
     
     // Find significant candles for order blocks
     for (let i = 1; i < candlesData.length - 1; i++) {
@@ -331,8 +510,8 @@ function drawOrderBlocks() {
             
             const areaData = [
                 { time: candle.time, value: candle.high, color: 'rgba(0, 255, 136, 0.1)' },
-                { time: candle.time + currentTimeframe * 10, value: candle.high, color: 'rgba(0, 255, 136, 0.1)' },
-                { time: candle.time + currentTimeframe * 10, value: candle.low, color: 'rgba(0, 255, 136, 0.1)' },
+                { time: candle.time + 600, value: candle.high, color: 'rgba(0, 255, 136, 0.1)' },
+                { time: candle.time + 600, value: candle.low, color: 'rgba(0, 255, 136, 0.1)' },
                 { time: candle.time, value: candle.low, color: 'rgba(0, 255, 136, 0.1)' }
             ];
             
@@ -350,87 +529,12 @@ function drawOrderBlocks() {
             
             const areaData = [
                 { time: candle.time, value: candle.high, color: 'rgba(255, 68, 68, 0.1)' },
-                { time: candle.time + currentTimeframe * 10, value: candle.high, color: 'rgba(255, 68, 68, 0.1)' },
-                { time: candle.time + currentTimeframe * 10, value: candle.low, color: 'rgba(255, 68, 68, 0.1)' },
+                { time: candle.time + 600, value: candle.high, color: 'rgba(255, 68, 68, 0.1)' },
+                { time: candle.time + 600, value: candle.low, color: 'rgba(255, 68, 68, 0.1)' },
                 { time: candle.time, value: candle.low, color: 'rgba(255, 68, 68, 0.1)' }
             ];
             
             areaSeries.setData(areaData);
-        }
-    }
-}
-
-// Initialize event listeners
-function initializeEventListeners() {
-    console.log('Initializing event listeners...');
-    
-    // Asset selection
-    const assetSelect = document.getElementById('asset-select');
-    if (assetSelect) {
-        assetSelect.addEventListener('change', function() {
-            currentAsset = this.value;
-            console.log('Asset changed to:', currentAsset);
-            updateAssetInfo();
-            if (chartInitialized) {
-                generateCandles();
-            }
-        });
-    }
-    
-    // Timeframe buttons
-    document.querySelectorAll('.time-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            // Remove active class from all buttons
-            document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
-            
-            // Add active class to clicked button
-            this.classList.add('active');
-            
-            // Update current timeframe
-            currentTimeframe = parseInt(this.dataset.time);
-            console.log('Timeframe changed to:', currentTimeframe);
-            
-            // Update display
-            document.getElementById('current-tf').textContent = TRADING_CONFIG.timeframes[currentTimeframe];
-            
-            // Regenerate candles with new timeframe
-            if (chartInitialized) {
-                generateCandles();
-            }
-        });
-    });
-    
-    // Generate signal button
-    const generateBtn = document.getElementById('generate-signal');
-    if (generateBtn) {
-        generateBtn.addEventListener('click', generateSignal);
-        console.log('Signal button listener added');
-    }
-    
-    // Language switcher
-    document.querySelectorAll('.lang-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-            this.classList.add('active');
-            console.log('Language changed to:', this.dataset.lang);
-        });
-    });
-    
-    // Handle window resize
-    window.addEventListener('resize', handleResize);
-    
-    console.log('Event listeners initialized');
-}
-
-// Handle window resize
-function handleResize() {
-    if (currentChart) {
-        const chartContainer = document.getElementById('trading-chart');
-        if (chartContainer) {
-            currentChart.resize(
-                chartContainer.clientWidth,
-                chartContainer.clientHeight
-            );
         }
     }
 }
@@ -464,10 +568,23 @@ function generateSignal() {
     
     console.log('Generating new signal...');
     
+    // Show chart if this is the first signal
+    if (!currentChart) {
+        document.getElementById('no-chart-message').style.display = 'none';
+        document.getElementById('chart-container').style.display = 'flex';
+        initializeChart();
+    }
+    
     const signalBtn = document.getElementById('generate-signal');
+    const firstSignalBtn = document.getElementById('generate-first-signal');
+    
     if (signalBtn) {
         signalBtn.disabled = true;
         signalBtn.classList.add('signal-active');
+    }
+    
+    if (firstSignalBtn) {
+        firstSignalBtn.disabled = true;
     }
     
     isSignalActive = true;
@@ -487,7 +604,7 @@ function generateSignal() {
     }
     
     // Update signal status
-    updateSignalStatus('Анализ', '#ffaa00');
+    updateSignalStatus(translations[currentLanguage].analyzing || 'Анализ', '#ffaa00');
     
     // Simulate analysis delay
     setTimeout(() => {
@@ -553,7 +670,8 @@ function createSignal() {
         expiration: currentTimeframe,
         confidence: confidence,
         timestamp: Date.now(),
-        result: null
+        result: null,
+        priceHistory: []
     };
     
     console.log('Signal created:', currentSignal);
@@ -575,16 +693,18 @@ function displaySignal() {
     document.getElementById('signal-details').style.display = 'block';
     document.getElementById('expiration-timer').style.display = 'block';
     
+    const dict = translations[currentLanguage];
+    
     // Update signal details
     document.getElementById('signal-pair').textContent = signal.pair;
     
     const directionElement = document.getElementById('signal-direction');
-    directionElement.textContent = signal.direction === 'BUY' ? 'ПОКУПКА' : 'ПРОДАЖА';
+    directionElement.textContent = signal.direction === 'BUY' ? dict.buy : dict.sell;
     directionElement.setAttribute('data-direction', signal.direction);
     
     document.getElementById('signal-entry').textContent = signal.entryPrice.toFixed(4);
     document.getElementById('signal-accuracy').textContent = signal.confidence + '%';
-    document.getElementById('signal-expiration').textContent = TRADING_CONFIG.timeframes[signal.expiration];
+    document.getElementById('signal-expiration').textContent = TRADING_CONFIG.timeframes[signal.expiration].name;
     
     const time = new Date(signal.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
     document.getElementById('signal-time').textContent = time;
@@ -592,13 +712,55 @@ function displaySignal() {
     // Update signal status
     const statusColor = signal.direction === 'BUY' ? '#00ff88' : '#ff4444';
     updateSignalStatus('АКТИВЕН', statusColor);
+    
+    // Start recording price history for this signal
+    startPriceRecording();
+}
+
+// Start recording price history
+function startPriceRecording() {
+    if (!currentSignal) return;
+    
+    // Clear previous history
+    currentSignal.priceHistory = [];
+    
+    // Record initial price
+    const asset = TRADING_CONFIG.assets[currentAsset];
+    if (asset) {
+        currentSignal.priceHistory.push({
+            time: Date.now(),
+            price: asset.price
+        });
+    }
+    
+    // Record price every second during expiration
+    const priceInterval = setInterval(() => {
+        if (!currentSignal || currentSignal.result) {
+            clearInterval(priceInterval);
+            return;
+        }
+        
+        const asset = TRADING_CONFIG.assets[currentAsset];
+        if (asset) {
+            // Simulate price movement
+            const volatility = asset.volatility;
+            const lastPrice = currentSignal.priceHistory[currentSignal.priceHistory.length - 1].price;
+            const change = (Math.random() - 0.5) * volatility * 0.0001;
+            const newPrice = lastPrice * (1 + change);
+            
+            currentSignal.priceHistory.push({
+                time: Date.now(),
+                price: newPrice
+            });
+        }
+    }, 1000);
 }
 
 // Start expiration timer
 function startExpirationTimer() {
     if (!currentSignal) return;
     
-    const expirationTime = currentSignal.expiration;
+    const expirationTime = TRADING_CONFIG.timeframes[currentSignal.expiration].seconds;
     let timeLeft = expirationTime;
     
     const timerBar = document.getElementById('timer-bar');
@@ -653,10 +815,16 @@ function calculateSignalResult() {
     const asset = TRADING_CONFIG.assets[signal.asset];
     if (!asset) return;
     
-    // Simulate price movement during expiration
-    const volatility = asset.volatility;
-    const randomMove = (Math.random() - 0.5) * volatility * 0.01;
-    const finalPrice = signal.entryPrice * (1 + randomMove);
+    // Get final price from price history or simulate
+    let finalPrice;
+    if (signal.priceHistory && signal.priceHistory.length > 0) {
+        finalPrice = signal.priceHistory[signal.priceHistory.length - 1].price;
+    } else {
+        // Fallback: simulate price movement
+        const volatility = asset.volatility;
+        const randomMove = (Math.random() - 0.5) * volatility * 0.01;
+        finalPrice = signal.entryPrice * (1 + randomMove);
+    }
     
     // Determine result based on direction and price movement
     let result;
@@ -671,9 +839,9 @@ function calculateSignalResult() {
     
     // Update signal with result
     signal.result = result;
-    signal.finalPrice = finalPrice;
+    signal.exitPrice = finalPrice;
     
-    console.log('Signal result:', result, 'Final price:', finalPrice);
+    console.log('Signal result:', result, 'Entry:', signal.entryPrice, 'Exit:', finalPrice);
     
     // Display result
     displayResult(result, finalPrice);
@@ -687,8 +855,9 @@ function calculateSignalResult() {
 
 // Display signal result
 function displayResult(result, finalPrice) {
-    const resultText = result === 'WIN' ? 'ВЫИГРЫШ' : 
-                     result === 'LOSS' ? 'ПРОИГРЫШ' : 'ВОЗВРАТ';
+    const dict = translations[currentLanguage];
+    const resultText = result === 'WIN' ? dict.win : 
+                     result === 'LOSS' ? dict.loss : dict.refund;
     const resultColor = result === 'WIN' ? '#00ff88' : 
                        result === 'LOSS' ? '#ff4444' : '#8b9dc3';
     
@@ -697,13 +866,13 @@ function displayResult(result, finalPrice) {
     if (detailsElement) {
         detailsElement.innerHTML += `
             <div class="detail-row" style="margin-top: 15px; padding-top: 15px; border-top: 2px solid ${resultColor}30;">
-                <span class="detail-label">Результат:</span>
+                <span class="detail-label">${dict.result}:</span>
                 <span class="detail-value" style="color: ${resultColor}; font-weight: 800; font-size: 16px;">
                     ${resultText}
                 </span>
             </div>
             <div class="detail-row">
-                <span class="detail-label">Цена выхода:</span>
+                <span class="detail-label">${dict.exitPrice}:</span>
                 <span class="detail-value">${finalPrice.toFixed(4)}</span>
             </div>
         `;
@@ -715,13 +884,21 @@ function displayResult(result, finalPrice) {
 
 // Add signal to history
 function addToHistory(signal) {
+    const dict = translations[currentLanguage];
+    
     const resultItem = {
+        id: Date.now(),
         pair: signal.pair,
         direction: signal.direction,
+        entryPrice: signal.entryPrice,
+        exitPrice: signal.exitPrice,
         accuracy: signal.confidence,
         result: signal.result,
+        timeframe: TRADING_CONFIG.timeframes[signal.expiration].name,
+        priceHistory: signal.priceHistory || [],
         time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        expanded: false
     };
     
     resultsHistory.unshift(resultItem);
@@ -748,27 +925,121 @@ function updateHistoryDisplay() {
     
     resultsList.innerHTML = '';
     
+    const dict = translations[currentLanguage];
+    
     resultsHistory.forEach(item => {
         const resultItem = document.createElement('div');
-        resultItem.className = `result-item ${item.result.toLowerCase()}`;
+        resultItem.className = `result-item ${item.result.toLowerCase()} ${item.expanded ? 'expanded' : ''}`;
+        resultItem.dataset.id = item.id;
         
-        const directionText = item.direction === 'BUY' ? 'ПОКУПКА' : 'ПРОДАЖА';
+        const directionText = item.direction === 'BUY' ? dict.buy : dict.sell;
         const directionColor = item.direction === 'BUY' ? '#00ff88' : '#ff4444';
         const resultColor = item.result === 'WIN' ? '#00ff88' : 
                            item.result === 'LOSS' ? '#ff4444' : '#8b9dc3';
-        const resultText = item.result === 'WIN' ? 'ВЫИГРЫШ' : 
-                          item.result === 'LOSS' ? 'ПРОИГРЫШ' : 'ВОЗВРАТ';
+        const resultText = item.result === 'WIN' ? dict.win : 
+                          item.result === 'LOSS' ? dict.loss : dict.refund;
+        
+        // Create mini-chart SVG
+        const chartSVG = createMiniChart(item.priceHistory, item.result);
         
         resultItem.innerHTML = `
-            <div class="result-pair">${item.pair}</div>
-            <div class="result-direction" style="color: ${directionColor}">${directionText}</div>
-            <div class="result-accuracy" style="color: ${item.accuracy > 80 ? '#00ff88' : '#ffaa00'}">${item.accuracy}%</div>
-            <div class="result-result ${item.result.toLowerCase()}" style="color: ${resultColor}">${resultText}</div>
-            <div class="result-time">${item.time}</div>
+            <div class="result-header">
+                <div class="result-main-info">
+                    <div class="result-pair">${item.pair}</div>
+                    <div class="result-direction ${item.direction.toLowerCase()}" style="color: ${directionColor}">
+                        ${directionText}
+                    </div>
+                    <div class="result-accuracy" style="color: ${item.accuracy > 80 ? '#00ff88' : '#ffaa00'}">
+                        ${item.accuracy}%
+                    </div>
+                </div>
+                <div class="result-price-info">
+                    <div class="price-entry">
+                        <div class="price-label">${dict.entryPrice}</div>
+                        <div class="price-value">${item.entryPrice.toFixed(4)}</div>
+                    </div>
+                    <div class="price-exit">
+                        <div class="price-label">${dict.exitPrice}</div>
+                        <div class="price-value">${item.exitPrice.toFixed(4)}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="result-details">
+                <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 5px;">
+                    ${dict.priceChart}
+                </div>
+                <div class="price-chart-mini">
+                    ${chartSVG}
+                </div>
+            </div>
+            <div class="result-footer">
+                <div class="result-time">
+                    <i class="far fa-clock"></i>
+                    ${item.time} • ${item.timeframe}
+                </div>
+                <button class="result-expand" onclick="toggleResultExpand(${item.id})">
+                    <i class="fas fa-${item.expanded ? 'chevron-up' : 'chevron-down'}"></i>
+                    ${item.expanded ? dict.collapse : dict.expand}
+                </button>
+            </div>
         `;
         
         resultsList.appendChild(resultItem);
     });
+}
+
+// Create mini-chart SVG
+function createMiniChart(priceHistory, result) {
+    if (!priceHistory || priceHistory.length < 2) {
+        return '<div style="color: var(--text-muted); font-size: 10px; padding: 10px;">Нет данных</div>';
+    }
+    
+    const prices = priceHistory.map(p => p.price);
+    const minPrice = Math.min(...prices);
+    const maxPrice = Math.max(...prices);
+    const priceRange = maxPrice - minPrice || 1;
+    
+    const width = 200;
+    const height = 40;
+    const padding = 5;
+    
+    // Normalize prices to fit in the chart
+    const normalizedPrices = prices.map(price => {
+        return ((price - minPrice) / priceRange) * (height - 2 * padding) + padding;
+    });
+    
+    // Create SVG path
+    let path = `M ${padding} ${height - normalizedPrices[0]}`;
+    const step = (width - 2 * padding) / (normalizedPrices.length - 1);
+    
+    for (let i = 1; i < normalizedPrices.length; i++) {
+        const x = padding + (i * step);
+        const y = height - normalizedPrices[i];
+        path += ` L ${x} ${y}`;
+    }
+    
+    const color = result === 'WIN' ? '#00ff88' : 
+                 result === 'LOSS' ? '#ff4444' : '#8b9dc3';
+    
+    return `
+        <svg width="100%" height="100%" viewBox="0 0 ${width} ${height}">
+            <path d="${path}" 
+                  stroke="${color}" 
+                  stroke-width="2" 
+                  fill="none" 
+                  class="price-line ${result.toLowerCase()}" />
+        </svg>
+    `;
+}
+
+// Toggle result expand/collapse
+function toggleResultExpand(id) {
+    const item = resultsHistory.find(r => r.id === id);
+    if (item) {
+        item.expanded = !item.expanded;
+        updateHistoryDisplay();
+        localStorage.setItem('scalpingRobotResults', JSON.stringify(resultsHistory));
+    }
 }
 
 // Update statistics display
@@ -821,10 +1092,18 @@ function resetSignal() {
     currentSignal = null;
     
     const signalBtn = document.getElementById('generate-signal');
+    const firstSignalBtn = document.getElementById('generate-first-signal');
+    
     if (signalBtn) {
         signalBtn.disabled = false;
         signalBtn.classList.remove('signal-active');
     }
+    
+    if (firstSignalBtn) {
+        firstSignalBtn.disabled = false;
+    }
+    
+    const dict = translations[currentLanguage];
     
     // Show placeholder, hide details and timer
     document.getElementById('signal-content').style.display = 'flex';
@@ -837,13 +1116,13 @@ function resetSignal() {
         signalContent.innerHTML = `
             <div class="signal-placeholder">
                 <i class="fas fa-chart-line"></i>
-                <p>Нажмите "Получить сигнал" для анализа</p>
+                <p>${dict.clickGenerate}</p>
             </div>
         `;
     }
     
     // Reset signal status
-    updateSignalStatus('Ожидание', '#00ff88');
+    updateSignalStatus(dict.waiting, '#00ff88');
     
     // Reset timer
     const timerBar = document.getElementById('timer-bar');
@@ -866,7 +1145,13 @@ function loadResultsHistory() {
     try {
         const saved = localStorage.getItem('scalpingRobotResults');
         if (saved) {
-            resultsHistory = JSON.parse(saved);
+            const parsed = JSON.parse(saved);
+            // Ensure all items have required fields
+            resultsHistory = parsed.map(item => ({
+                ...item,
+                expanded: item.expanded || false,
+                priceHistory: item.priceHistory || []
+            }));
             updateHistoryDisplay();
             console.log('Loaded history:', resultsHistory.length, 'items');
         }
@@ -885,6 +1170,9 @@ function updateTimeDisplay() {
         timeText.textContent = timeString + ' UTC';
     }
 }
+
+// Make toggleResultExpand globally available
+window.toggleResultExpand = toggleResultExpand;
 
 // Initialize with default values
 updateAssetInfo();
