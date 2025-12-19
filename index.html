@@ -15,8 +15,12 @@
                 <img src="https://image2url.com/images/1766001097047-30fbff9b-a368-4dbf-965a-4f3ce2de2e5e.png" alt="PocketOption" class="broker-logo">
                 <div class="title-group">
                     <h1 class="main-title">SCALPING ROBOT PRO</h1>
-                    <p class="subtitle">AI-Powered Binary Options Trading</p>
+                    <p class="subtitle">Real-Time Binary Options Trading</p>
                 </div>
+            </div>
+            <div class="server-status">
+                <span class="status-dot online"></span>
+                <span>Режим: Демо</span>
             </div>
         </div>
 
@@ -31,6 +35,9 @@
                             <option value="GBPUSD">GBP/USD</option>
                             <option value="AUDUSD">AUD/USD</option>
                             <option value="USDCAD">USD/CAD</option>
+                            <option value="USDCHF">USD/CHF</option>
+                            <option value="EURJPY">EUR/JPY</option>
+                            <option value="GBPJPY">GBP/JPY</option>
                         </select>
                     </div>
                 </div>
@@ -46,30 +53,48 @@
                 </div>
 
                 <div class="panel-section">
+                    <h3 class="section-title">РЕАЛЬНЫЕ КОТИРОВКИ</h3>
+                    <div class="price-feed">
+                        <div class="price-item">
+                            <span>EUR/USD:</span>
+                            <span class="live-price" id="price-EURUSD">1.08345</span>
+                        </div>
+                        <div class="price-item">
+                            <span>USD/JPY:</span>
+                            <span class="live-price" id="price-USDJPY">148.250</span>
+                        </div>
+                        <div class="price-item">
+                            <span>GBP/USD:</span>
+                            <span class="live-price" id="price-GBPUSD">1.26580</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
                     <h3 class="section-title">СИГНАЛ</h3>
                     <div class="signal-control">
                         <button id="generate-signal" class="signal-btn">
                             <i class="fas fa-bolt"></i> ПОЛУЧИТЬ СИГНАЛ
                         </button>
                         <div class="cooldown-info" id="cooldown-timer">
-                            <i class="fas fa-clock"></i>
-                            <span>Готов к работе</span>
+                            <i class="fas fa-sync-alt"></i>
+                            <span>Обновление цен...</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="stats-panel">
                     <div class="stat-item">
-                        <span class="stat-label">Точность:</span>
-                        <span class="stat-value" id="accuracy">87.4%</span>
+                        <span class="stat-label">Текущая цена:</span>
+                        <span class="stat-value" id="current-price-display">1.08345</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-label">Винрейт:</span>
-                        <span class="stat-value" id="win-rate">76.3%</span>
+                        <span class="stat-label">Изменение:</span>
+                        <span class="stat-value" id="price-change-display">+0.12%</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-label">Сделок:</span>
-                        <span class="stat-value" id="total-trades">0</span>
+                        <span class="stat-label">Время:</span>
+                        <span class="stat-value" id="price-time">12:38:32</span>
                     </div>
                 </div>
             </div>
@@ -80,8 +105,8 @@
                         <div class="chart-info">
                             <h2 id="current-pair">EUR/USD</h2>
                             <div class="price-info">
-                                <span id="current-price">1.0830</span>
-                                <span id="price-change" class="negative">-0.02%</span>
+                                <span id="current-price">1.08345</span>
+                                <span id="price-change" class="positive">+0.12%</span>
                             </div>
                         </div>
                         <div class="timeframe-display">
@@ -93,8 +118,13 @@
                         <canvas id="trading-chart"></canvas>
                     </div>
                     <div class="chart-footer">
-                        <div class="time-display" id="current-time">
-                            <i class="far fa-clock"></i> <span id="time-text">12:38:32 UTC</span>
+                        <div class="time-display">
+                            <i class="far fa-clock"></i> 
+                            <span id="chart-time">Обновлено: 12:38:32 UTC</span>
+                        </div>
+                        <div class="chart-source">
+                            <i class="fas fa-database"></i>
+                            <span>Источник: Twelve Data API</span>
                         </div>
                     </div>
                 </div>
@@ -116,7 +146,7 @@
                     </div>
                     
                     <div class="signal-details" id="signal-details" style="display: none;">
-                        <!-- Детали сигнала будут здесь -->
+                        <!-- Детали сигнала -->
                     </div>
                     
                     <div class="expiration-timer" id="expiration-timer" style="display: none;">
@@ -140,6 +170,10 @@
         </div>
 
         <div class="footer">
+            <div class="api-info">
+                <i class="fas fa-info-circle"></i>
+                <span>Используются реальные котировки Forex. Обновление каждые 5 секунд.</span>
+            </div>
             <p class="disclaimer">
                 Торговля бинарными опционами связана с высокими рисками.
             </p>
