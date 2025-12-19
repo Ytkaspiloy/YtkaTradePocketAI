@@ -15,19 +15,17 @@
                 <img src="https://image2url.com/images/1766001097047-30fbff9b-a368-4dbf-965a-4f3ce2de2e5e.png" alt="PocketOption" class="broker-logo">
                 <div class="title-group">
                     <h1 class="main-title">SCALPING ROBOT PRO</h1>
-                    <p class="subtitle" id="subtitle">Real-Time Binary Options Trading</p>
+                    <p class="subtitle">Real-Time Binary Options Trading</p>
                 </div>
             </div>
-            
-            <div class="header-right">
-                <div class="language-switcher">
-                    <button class="lang-btn active" data-lang="ru">RU</button>
-                    <button class="lang-btn" data-lang="en">EN</button>
-                </div>
-                
+            <div class="header-controls">
                 <div class="server-status">
                     <span class="status-dot online"></span>
                     <span id="mode-text">Режим: Демо</span>
+                </div>
+                <div class="language-switch">
+                    <button class="lang-btn active" data-lang="ru">RU</button>
+                    <button class="lang-btn" data-lang="en">EN</button>
                 </div>
             </div>
         </div>
@@ -53,28 +51,18 @@
                 <div class="panel-section">
                     <h3 class="section-title" data-i18n="expiration">ЭКСПИРАЦИЯ</h3>
                     <div class="timeframe-grid">
-                        <button class="time-btn active" data-time="60" data-i18n="1min">1 мин</button>
-                        <button class="time-btn" data-time="120" data-i18n="2min">2 мин</button>
-                        <button class="time-btn" data-time="180" data-i18n="3min">3 мин</button>
-                        <button class="time-btn" data-time="300" data-i18n="5min">5 мин</button>
+                        <button class="time-btn active" data-time="60">1 мин</button>
+                        <button class="time-btn" data-time="120">2 мин</button>
+                        <button class="time-btn" data-time="180">3 мин</button>
+                        <button class="time-btn" data-time="300">5 мин</button>
                     </div>
                 </div>
 
                 <div class="panel-section">
                     <h3 class="section-title" data-i18n="signalType">ТИП СИГНАЛА</h3>
                     <div class="signal-type-selector">
-                        <button class="signal-type-btn active" data-type="smart">
-                            <i class="fas fa-brain"></i>
-                            <span data-i18n="smartMoney">Smart Money</span>
-                        </button>
-                        <button class="signal-type-btn" data-type="indicators">
-                            <i class="fas fa-chart-line"></i>
-                            <span data-i18n="indicators">Индикаторы</span>
-                        </button>
-                        <button class="signal-type-btn" data-type="combined">
-                            <i class="fas fa-robot"></i>
-                            <span data-i18n="combined">Комбинированный</span>
-                        </button>
+                        <button class="signal-type-btn active" data-type="smart">Смарт-Мани</button>
+                        <button class="signal-type-btn" data-type="indicators">Индикаторы</button>
                     </div>
                 </div>
 
@@ -100,8 +88,7 @@
                     <h3 class="section-title" data-i18n="signal">СИГНАЛ</h3>
                     <div class="signal-control">
                         <button id="generate-signal" class="signal-btn">
-                            <i class="fas fa-bolt"></i> 
-                            <span data-i18n="getSignal">ПОЛУЧИТЬ СИГНАЛ</span>
+                            <i class="fas fa-bolt"></i> <span data-i18n="getSignal">ПОЛУЧИТЬ СИГНАЛ</span>
                         </button>
                         <div class="cooldown-info" id="cooldown-timer">
                             <i class="fas fa-sync-alt"></i>
@@ -136,8 +123,11 @@
                                 <span id="price-change" class="positive">+0.12%</span>
                             </div>
                         </div>
-                        
                         <div class="chart-controls">
+                            <div class="timeframe-display">
+                                <span class="tf-label" data-i18n="timeframe">Таймфрейм:</span>
+                                <span class="tf-value" id="current-tf">1 мин</span>
+                            </div>
                             <div class="chart-type-selector">
                                 <button class="chart-type-btn active" data-type="candlestick">
                                     <i class="fas fa-chart-candlestick"></i>
@@ -146,29 +136,11 @@
                                     <i class="fas fa-chart-line"></i>
                                 </button>
                             </div>
-                            
-                            <div class="timeframe-display">
-                                <span class="tf-label" data-i18n="timeframe">Таймфрейм:</span>
-                                <span class="tf-value" id="current-tf">1 мин</span>
-                            </div>
                         </div>
                     </div>
-                    
                     <div class="chart-wrapper">
-                        <div class="chart-tools">
-                            <button class="tool-btn" id="draw-line" title="Линия">
-                                <i class="fas fa-slash"></i>
-                            </button>
-                            <button class="tool-btn" id="draw-horizontal" title="Горизонтальный уровень">
-                                <i class="fas fa-arrows-alt-h"></i>
-                            </button>
-                            <button class="tool-btn" id="clear-drawings" title="Очистить">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
                         <canvas id="trading-chart"></canvas>
                     </div>
-                    
                     <div class="chart-footer">
                         <div class="time-display">
                             <i class="far fa-clock"></i> 
@@ -177,6 +149,17 @@
                         <div class="chart-source">
                             <i class="fas fa-database"></i>
                             <span data-i18n="dataSource">Источник: Twelve Data API</span>
+                        </div>
+                        <div class="drawing-tools">
+                            <button class="draw-btn" data-tool="line" title="Линия">
+                                <i class="fas fa-slash"></i>
+                            </button>
+                            <button class="draw-btn" data-tool="horizontal" title="Горизонтальная линия">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                            <button class="draw-btn active" data-tool="clear" title="Очистить рисунки">
+                                <i class="fas fa-eraser"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -198,11 +181,11 @@
                     </div>
                     
                     <div class="signal-details" id="signal-details" style="display: none;">
-                        <!-- Детали сигнала будут здесь -->
+                        <!-- Детали сигнала -->
                     </div>
                     
-                    <div class="indicators-panel" id="indicators-panel" style="display: none;">
-                        <h4><i class="fas fa-chart-bar"></i> <span data-i18n="indicatorsAnalysis">АНАЛИЗ ИНДИКАТОРОВ</span></h4>
+                    <div class="signal-indicators" id="signal-indicators" style="display: none;">
+                        <h4><i class="fas fa-chart-bar"></i> <span data-i18n="indicators">ИНДИКАТОРЫ</span></h4>
                         <div class="indicators-grid" id="indicators-grid">
                             <!-- Индикаторы будут здесь -->
                         </div>
@@ -219,7 +202,7 @@
                     </div>
                     
                     <div class="result-history">
-                        <h4><i class="fas fa-history"></i> <span data-i18n="recentResults">ПОСЛЕДНИЕ РЕЗУЛЬТАТЫ</span></h4>
+                        <h4><i class="fas fa-history"></i> <span data-i18n="lastResults">ПОСЛЕДНИЕ РЕЗУЛЬТАТЫ</span></h4>
                         <div class="results-list" id="results-list">
                             <!-- Результаты будут здесь -->
                         </div>
@@ -242,63 +225,3 @@
     <script src="script.js"></script>
 </body>
 </html>
-
-<!-- Добавьте эти элементы для улучшенного UI -->
-<div class="background-effects">
-    <div class="bg-gradient-1"></div>
-    <div class="bg-gradient-2"></div>
-    <div class="bg-gradient-3"></div>
-</div>
-
-<style>
-    .background-effects {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: -1;
-        overflow: hidden;
-    }
-    
-    .bg-gradient-1 {
-        position: absolute;
-        top: 20%;
-        left: 10%;
-        width: 500px;
-        height: 500px;
-        background: radial-gradient(circle, rgba(0, 255, 136, 0.1) 0%, transparent 70%);
-        filter: blur(80px);
-        animation: float 20s infinite linear;
-    }
-    
-    .bg-gradient-2 {
-        position: absolute;
-        bottom: 20%;
-        right: 10%;
-        width: 400px;
-        height: 400px;
-        background: radial-gradient(circle, rgba(0, 102, 255, 0.1) 0%, transparent 70%);
-        filter: blur(60px);
-        animation: float 25s infinite linear reverse;
-    }
-    
-    .bg-gradient-3 {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        width: 600px;
-        height: 600px;
-        background: radial-gradient(circle, rgba(170, 0, 255, 0.05) 0%, transparent 70%);
-        filter: blur(100px);
-        animation: float 30s infinite linear;
-    }
-    
-    @keyframes float {
-        0% { transform: translate(0, 0) rotate(0deg); }
-        25% { transform: translate(50px, -50px) rotate(90deg); }
-        50% { transform: translate(0, -100px) rotate(180deg); }
-        75% { transform: translate(-50px, -50px) rotate(270deg); }
-        100% { transform: translate(0, 0) rotate(360deg); }
-    }
-</style>
