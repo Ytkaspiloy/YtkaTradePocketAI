@@ -6,7 +6,7 @@
     <title>Scalping Robot Pro</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://s3.tradingview.com/tv.js"></script>
 </head>
 <body>
     <div class="container">
@@ -54,6 +54,8 @@
                             <option value="USDCHF">USD/CHF</option>
                             <option value="EURJPY">EUR/JPY</option>
                             <option value="GBPJPY">GBP/JPY</option>
+                            <option value="BTCUSD">BTC/USD</option>
+                            <option value="ETHUSD">ETH/USD</option>
                         </select>
                     </div>
                 </div>
@@ -139,22 +141,23 @@
                                 <span class="tf-label" data-i18n="timeframe">Таймфрейм:</span>
                                 <span class="tf-value" id="current-tf">1 мин</span>
                             </div>
-                            <div class="chart-tools">
-                                <button class="chart-tool-btn" id="draw-line" title="Линия">
-                                    <i class="fas fa-slash"></i>
-                                </button>
-                                <button class="chart-tool-btn" id="draw-horizontal" title="Горизонтальный уровень">
-                                    <i class="fas fa-minus"></i>
-                                </button>
-                                <button class="chart-tool-btn" id="clear-drawings" title="Очистить рисунки">
-                                    <i class="fas fa-trash"></i>
-                                </button>
+                            <div class="chart-type-selector">
+                                <select id="chart-type-select">
+                                    <option value="TradingView">TradingView График</option>
+                                    <option value="simple">Упрощенный график</option>
+                                </select>
                             </div>
                         </div>
                     </div>
-                    <div class="chart-wrapper">
-                        <canvas id="trading-chart"></canvas>
+                    
+                    <div class="chart-wrapper" id="tradingview-chart" style="display: block;">
+                        <!-- TradingView Widget будет здесь -->
                     </div>
+                    
+                    <div class="simple-chart-wrapper" id="simple-chart" style="display: none;">
+                        <canvas id="simple-chart-canvas"></canvas>
+                    </div>
+                    
                     <div class="chart-footer">
                         <div class="time-display">
                             <i class="far fa-clock"></i> 
@@ -162,7 +165,7 @@
                         </div>
                         <div class="chart-source">
                             <i class="fas fa-database"></i>
-                            <span data-i18n="data_source">Источник: Twelve Data API</span>
+                            <span data-i18n="data_source">Источник: TradingView API</span>
                         </div>
                     </div>
                 </div>
@@ -231,7 +234,7 @@
         <div class="footer">
             <div class="api-info">
                 <i class="fas fa-info-circle"></i>
-                <span data-i18n="api_info">Используются реальные котировки Forex. Обновление каждые 5 секунд.</span>
+                <span data-i18n="api_info">Используются реальные котировки TradingView. Обновление в реальном времени.</span>
             </div>
             <p class="disclaimer" data-i18n="disclaimer">
                 Торговля бинарными опционами связана с высокими рисками.
