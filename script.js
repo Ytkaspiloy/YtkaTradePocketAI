@@ -1,80 +1,87 @@
-// Конфигурация API для реальных котировок
-const API_CONFIG = {
-    baseUrl: 'https://api.twelvedata.com',
-    apiKey: 'demo',
-    
-    alternativeApis: [
-        {
-            name: 'frankfurter',
-            url: 'https://api.frankfurter.app/latest',
-            pairs: ['EURUSD', 'USDJPY', 'GBPUSD', 'AUDUSD', 'USDCAD', 'USDCHF']
-        },
-        {
-            name: 'exchangerate',
-            url: 'https://api.exchangerate-api.com/v4/latest/',
-            pairs: ['USD', 'EUR', 'GBP', 'AUD', 'CAD', 'CHF', 'JPY']
-        }
-    ]
-};
-
-// Конфигурация активов
-const ASSETS = {
+// Конфигурация активов для TradingView
+const ASSETS_CONFIG = {
     'EURUSD': { 
         name: 'EUR/USD', 
-        base: 'EUR',
-        quote: 'USD',
-        price: 1.0830,
-        lastUpdate: null
+        symbol: 'FX:EURUSD',
+        exchange: 'FX',
+        type: 'forex'
     },
     'USDJPY': { 
         name: 'USD/JPY', 
-        base: 'USD',
-        quote: 'JPY',
-        price: 148.35,
-        lastUpdate: null
+        symbol: 'FX:USDJPY',
+        exchange: 'FX',
+        type: 'forex'
     },
     'GBPUSD': { 
         name: 'GBP/USD', 
-        base: 'GBP',
-        quote: 'USD',
-        price: 1.2650,
-        lastUpdate: null
+        symbol: 'FX:GBPUSD',
+        exchange: 'FX',
+        type: 'forex'
     },
     'AUDUSD': { 
         name: 'AUD/USD', 
-        base: 'AUD',
-        quote: 'USD',
-        price: 0.6590,
-        lastUpdate: null
+        symbol: 'FX:AUDUSD',
+        exchange: 'FX',
+        type: 'forex'
     },
     'USDCAD': { 
         name: 'USD/CAD', 
-        base: 'USD',
-        quote: 'CAD',
-        price: 1.3520,
-        lastUpdate: null
+        symbol: 'FX:USDCAD',
+        exchange: 'FX',
+        type: 'forex'
     },
     'USDCHF': { 
         name: 'USD/CHF', 
-        base: 'USD',
-        quote: 'CHF',
-        price: 0.9025,
-        lastUpdate: null
+        symbol: 'FX:USDCHF',
+        exchange: 'FX',
+        type: 'forex'
     },
     'EURJPY': { 
         name: 'EUR/JPY', 
-        base: 'EUR',
-        quote: 'JPY',
-        price: 160.42,
-        lastUpdate: null
+        symbol: 'FX:EURJPY',
+        exchange: 'FX',
+        type: 'forex'
     },
     'GBPJPY': { 
         name: 'GBP/JPY', 
-        base: 'GBP',
-        quote: 'JPY',
-        price: 187.65,
-        lastUpdate: null
+        symbol: 'FX:GBPJPY',
+        exchange: 'FX',
+        type: 'forex'
+    },
+    'BTCUSD': { 
+        name: 'BTC/USD', 
+        symbol: 'BITSTAMP:BTCUSD',
+        exchange: 'BITSTAMP',
+        type: 'crypto'
+    },
+    'ETHUSD': { 
+        name: 'ETH/USD', 
+        symbol: 'BITSTAMP:ETHUSD',
+        exchange: 'BITSTAMP',
+        type: 'crypto'
     }
+};
+
+// Демо цены для быстрого отображения
+const DEMO_PRICES = {
+    'EURUSD': 1.0830,
+    'USDJPY': 148.35,
+    'GBPUSD': 1.2650,
+    'AUDUSD': 0.6590,
+    'USDCAD': 1.3520,
+    'USDCHF': 0.9025,
+    'EURJPY': 160.42,
+    'GBPJPY': 187.65,
+    'BTCUSD': 42000,
+    'ETHUSD': 2200
+};
+
+// Таймфреймы для TradingView
+const TIMEFRAMES = {
+    60: "1",
+    120: "2",
+    180: "3",
+    300: "5"
 };
 
 // Многоязычная поддержка
@@ -93,10 +100,10 @@ const TRANSLATIONS = {
         timeframe: 'Таймфрейм:',
         current_signal: 'ТЕКУЩИЙ СИГНАЛ',
         click_for_analysis: 'Нажмите "Получить сигнал" для анализа',
-        data_source: 'Источник: Twelve Data API',
+        data_source: 'Источник: TradingView API',
         expires_in: 'Истекает через:',
         recent_results: 'ПОСЛЕДНИЕ РЕЗУЛЬТАТЫ',
-        api_info: 'Используются реальные котировки Forex. Обновление каждые 5 секунд.',
+        api_info: 'Используются реальные котировки TradingView. Обновление в реальном времени.',
         disclaimer: 'Торговля бинарными опционами связана с высокими рисками.',
         status_demo: 'Режим: Демо',
         status_analysis: 'Анализ рынка...',
@@ -122,10 +129,10 @@ const TRANSLATIONS = {
         timeframe: 'Timeframe:',
         current_signal: 'CURRENT SIGNAL',
         click_for_analysis: 'Click "Get Signal" for analysis',
-        data_source: 'Source: Twelve Data API',
+        data_source: 'Source: TradingView API',
         expires_in: 'Expires in:',
         recent_results: 'RECENT RESULTS',
-        api_info: 'Real Forex quotes are used. Updated every 5 seconds.',
+        api_info: 'Real TradingView quotes are used. Real-time updates.',
         disclaimer: 'Binary options trading involves high risks.',
         status_demo: 'Mode: Demo',
         status_analysis: 'Market analysis...',
@@ -151,10 +158,10 @@ const TRANSLATIONS = {
         timeframe: 'Marco temporal:',
         current_signal: 'SEÑAL ACTUAL',
         click_for_analysis: 'Haga clic en "Obtener señal" para el análisis',
-        data_source: 'Fuente: Twelve Data API',
+        data_source: 'Fuente: TradingView API',
         expires_in: 'Expira en:',
         recent_results: 'RESULTADOS RECIENTES',
-        api_info: 'Se utilizan cotizaciones reales de Forex. Actualización cada 5 segundos.',
+        api_info: 'Se utilizan cotizaciones reales de TradingView. Actualización en tiempo real.',
         disclaimer: 'El comercio de opciones binarias conlleva altos riesgos.',
         status_demo: 'Modo: Demo',
         status_analysis: 'Análisis de mercado...',
@@ -180,10 +187,10 @@ const TRANSLATIONS = {
         timeframe: 'Zeitrahmen:',
         current_signal: 'AKTUELLES SIGNAL',
         click_for_analysis: 'Klicken Sie "Signal erhalten" für die Analyse',
-        data_source: 'Quelle: Twelve Data API',
+        data_source: 'Quelle: TradingView API',
         expires_in: 'Läuft ab in:',
         recent_results: 'LETZTE ERGEBNISSE',
-        api_info: 'Echtzeit-Forex-Kurse werden verwendet. Aktualisierung alle 5 Sekunden.',
+        api_info: 'Echtzeit-TradingView-Kurse werden verwendet. Echtzeit-Aktualisierung.',
         disclaimer: 'Der Handel mit binären Optionen birgt hohe Risiken.',
         status_demo: 'Modus: Demo',
         status_analysis: 'Marktanalyse...',
@@ -209,10 +216,10 @@ const TRANSLATIONS = {
         timeframe: 'Cadre temporel:',
         current_signal: 'SIGNAL ACTUEL',
         click_for_analysis: 'Cliquez sur "Obtenir un signal" pour l\'analyse',
-        data_source: 'Source: Twelve Data API',
+        data_source: 'Source: TradingView API',
         expires_in: 'Expire dans:',
         recent_results: 'RÉSULTATS RÉCENTS',
-        api_info: 'Des cotations Forex réelles sont utilisées. Mise à jour toutes les 5 secondes.',
+        api_info: 'Des cotations TradingView réelles sont utilisées. Mise à jour en temps réel.',
         disclaimer: 'Le trading d\'options binaires comporte des risques élevés.',
         status_demo: 'Mode: Démo',
         status_analysis: 'Analyse du marché...',
@@ -238,10 +245,10 @@ const TRANSLATIONS = {
         timeframe: 'Período:',
         current_signal: 'SINAL ATUAL',
         click_for_analysis: 'Clique em "Obter sinal" para análise',
-        data_source: 'Fonte: Twelve Data API',
+        data_source: 'Fonte: TradingView API',
         expires_in: 'Expira em:',
-        recent_results: 'RESULTADOS RECENTES',
-        api_info: 'Cotações Forex reais são usadas. Atualização a cada 5 segundos.',
+        recent_results: 'RESULTADOS RECIENTES',
+        api_info: 'Cotações TradingView reais são usadas. Atualização em tempo real.',
         disclaimer: 'A negociação de opções binárias envolve altos riscos.',
         status_demo: 'Modo: Demo',
         status_analysis: 'Análise de mercado...',
@@ -267,10 +274,10 @@ const TRANSLATIONS = {
         timeframe: 'الإطار الزمني:',
         current_signal: 'الإشارة الحالية',
         click_for_analysis: 'انقر "الحصول على إشارة" للتحليل',
-        data_source: 'المصدر: Twelve Data API',
+        data_source: 'المصدر: TradingView API',
         expires_in: 'تنتهي في:',
         recent_results: 'النتائج الأخيرة',
-        api_info: 'يتم استخدام أسعار فوركس حقيقية. يتم التحديث كل 5 ثوانٍ.',
+        api_info: 'يتم استخدام أسعار TradingView حقيقية. تحديث في الوقت الحقيقي.',
         disclaimer: 'تداول الخيارات الثنائية ينطوي على مخاطر عالية.',
         status_demo: 'الوضع: تجريبي',
         status_analysis: 'تحليل السوق...',
@@ -296,10 +303,10 @@ const TRANSLATIONS = {
         timeframe: 'Zaman dilimi:',
         current_signal: 'MEVCUT SİNYAL',
         click_for_analysis: 'Analiz için "Sinyal Al"ı tıklayın',
-        data_source: 'Kaynak: Twelve Data API',
+        data_source: 'Kaynak: TradingView API',
         expires_in: 'Sona erme:',
         recent_results: 'SONUÇLAR',
-        api_info: 'Gerçek Forex kotasyonları kullanılıyor. Her 5 saniyede bir güncellenir.',
+        api_info: 'Gerçek TradingView kotasyonları kullanılıyor. Gerçek zamanlı güncelleme.',
         disclaimer: 'İkili opsiyon ticareti yüksek risk içerir.',
         status_demo: 'Mod: Demo',
         status_analysis: 'Piyasa analizi...',
@@ -314,23 +321,17 @@ const TRANSLATIONS = {
 };
 
 // Глобальные переменные
-let currentChart = null;
-let currentSignal = null;
-let isSignalActive = false;
-let expirationTimer = null;
-let resultsHistory = [];
 let currentAsset = 'EURUSD';
 let currentTimeframe = 60;
 let currentSignalType = 'smart';
-let priceUpdateInterval = null;
-let chartData = [];
-let priceHistory = [];
-let drawings = [];
-let isDrawingMode = false;
-let currentDrawingType = null;
-let startX = 0;
-let startY = 0;
 let currentLanguage = 'ru';
+let currentSignal = null;
+let isSignalActive = false;
+let expirationTimer = null;
+let priceUpdateInterval = null;
+let currentChart = null;
+let tradingViewWidget = null;
+let currentChartType = 'TradingView';
 
 // Инициализация при загрузке
 document.addEventListener('DOMContentLoaded', function() {
@@ -341,14 +342,11 @@ document.addEventListener('DOMContentLoaded', function() {
     currentLanguage = savedLang;
     document.getElementById('language-select').value = currentLanguage;
     
-    // Инициализация графика
-    initChart();
-    
     // Инициализация событий
     initEvents();
     
     // Загрузка начальных данных
-    loadInitialPrices();
+    loadInitialData();
     
     // Запуск обновления цен
     startPriceUpdates();
@@ -383,20 +381,212 @@ function applyTranslations() {
     }
 }
 
-// Инициализация графика
-function initChart() {
-    const ctx = document.getElementById('trading-chart').getContext('2d');
+// Инициализация событий
+function initEvents() {
+    console.log('🎯 Инициализация обработчиков событий...');
     
-    // Генерация тестовых данных
-    generateTestChartData();
+    // Выбор языка
+    const languageSelect = document.getElementById('language-select');
+    if (languageSelect) {
+        languageSelect.addEventListener('change', function() {
+            currentLanguage = this.value;
+            localStorage.setItem('tradingLanguage', currentLanguage);
+            applyTranslations();
+            console.log('🌐 Язык изменен на:', currentLanguage);
+        });
+    }
+    
+    // Выбор актива
+    const assetSelect = document.getElementById('asset-select');
+    if (assetSelect) {
+        assetSelect.addEventListener('change', function() {
+            currentAsset = this.value;
+            console.log('📊 Актив изменен на:', currentAsset);
+            
+            updateAssetDisplay();
+            updateTradingViewChart();
+        });
+    }
+    
+    // Кнопки таймфреймов
+    document.querySelectorAll('.time-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.time-btn').forEach(b => {
+                b.classList.remove('active');
+            });
+            
+            this.classList.add('active');
+            currentTimeframe = parseInt(this.dataset.time);
+            
+            const timeText = getTimeframeText(currentTimeframe);
+            document.getElementById('current-tf').textContent = timeText;
+            
+            updateTradingViewChart();
+            console.log('⏱️ Таймфрейм изменен на:', timeText);
+        });
+    });
+    
+    // Кнопки типа сигнала
+    document.querySelectorAll('.signal-type-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.signal-type-btn').forEach(b => {
+                b.classList.remove('active');
+            });
+            
+            this.classList.add('active');
+            currentSignalType = this.dataset.type;
+            
+            console.log('🎯 Тип сигнала изменен на:', currentSignalType);
+        });
+    });
+    
+    // Выбор типа графика
+    const chartTypeSelect = document.getElementById('chart-type-select');
+    if (chartTypeSelect) {
+        chartTypeSelect.addEventListener('change', function() {
+            currentChartType = this.value;
+            toggleChartType();
+        });
+    }
+    
+    // Кнопка генерации сигнала
+    const generateBtn = document.getElementById('generate-signal');
+    if (generateBtn) {
+        generateBtn.addEventListener('click', generateSignal);
+    }
+    
+    console.log('✅ Обработчики событий инициализированы');
+}
+
+// Загрузка начальных данных
+function loadInitialData() {
+    console.log('📡 Загрузка начальных данных...');
+    
+    updateAssetDisplay();
+    updatePriceFeed();
+    updateIndicators();
+    updateTradingViewChart();
+}
+
+// Получение текста таймфрейма
+function getTimeframeText(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    return `${minutes} мин`;
+}
+
+// Переключение типа графика
+function toggleChartType() {
+    const tradingViewChart = document.getElementById('tradingview-chart');
+    const simpleChart = document.getElementById('simple-chart');
+    
+    if (currentChartType === 'TradingView') {
+        tradingViewChart.style.display = 'block';
+        simpleChart.style.display = 'none';
+        updateTradingViewChart();
+    } else {
+        tradingViewChart.style.display = 'none';
+        simpleChart.style.display = 'block';
+        initSimpleChart();
+    }
+}
+
+// Инициализация TradingView графика
+function updateTradingViewChart() {
+    const asset = ASSETS_CONFIG[currentAsset];
+    if (!asset) return;
+    
+    const chartContainer = document.getElementById('tradingview-chart');
+    if (!chartContainer) return;
+    
+    // Очищаем предыдущий виджет
+    chartContainer.innerHTML = '';
+    
+    // Создаем контейнер для TradingView
+    const widgetContainer = document.createElement('div');
+    widgetContainer.className = 'tradingview-widget-container';
+    widgetContainer.id = 'tradingview-widget';
+    
+    const widgetScript = document.createElement('script');
+    widgetScript.type = 'text/javascript';
+    widgetScript.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
+    widgetScript.async = true;
+    
+    const timeframe = TIMEFRAMES[currentTimeframe] || "1";
+    
+    widgetScript.textContent = JSON.stringify({
+        "autosize": true,
+        "symbol": asset.symbol,
+        "interval": timeframe,
+        "timezone": "Etc/UTC",
+        "theme": "dark",
+        "style": "1",
+        "locale": currentLanguage,
+        "enable_publishing": false,
+        "hide_volume": true,
+        "hide_legend": true,
+        "withdateranges": true,
+        "allow_symbol_change": false,
+        "save_image": false,
+        "calendar": false,
+        "studies": [
+            "RSI@tv-basicstudies",
+            "MACD@tv-basicstudies"
+        ],
+        "support_host": "https://www.tradingview.com",
+        "backgroundColor": "rgba(19, 26, 45, 1)",
+        "gridColor": "rgba(42, 54, 85, 0.5)",
+        "textColor": "#8b9dc3",
+        "timeHoursFormat": "24-hours"
+    });
+    
+    chartContainer.appendChild(widgetContainer);
+    widgetContainer.appendChild(widgetScript);
+    
+    // Добавляем стили для TradingView
+    const style = document.createElement('style');
+    style.textContent = `
+        .tradingview-widget-copyright {
+            display: none !important;
+        }
+        .tradingview-widget-container {
+            width: 100%;
+            height: 100%;
+        }
+        .tradingview-widget-container > div {
+            width: 100%;
+            height: 100%;
+        }
+        .tradingview-widget-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+// Инициализация простого графика (альтернатива)
+function initSimpleChart() {
+    const canvas = document.getElementById('simple-chart-canvas');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    
+    // Очищаем предыдущий график
+    if (currentChart) {
+        currentChart.destroy();
+    }
+    
+    // Генерируем демо данные
+    const data = generateDemoChartData();
     
     currentChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: chartData.labels,
+            labels: data.labels,
             datasets: [{
                 label: 'Цена',
-                data: chartData.prices,
+                data: data.prices,
                 borderColor: '#00ff88',
                 backgroundColor: 'rgba(0, 255, 136, 0.1)',
                 borderWidth: 2,
@@ -444,20 +634,17 @@ function initChart() {
                         }
                     }
                 }
-            },
-            interaction: {
-                intersect: false,
-                mode: 'index'
             }
         }
     });
 }
 
-// Генерация тестовых данных для графика
-function generateTestChartData() {
+// Генерация демо данных для простого графика
+function generateDemoChartData() {
     const labels = [];
     const prices = [];
     const now = new Date();
+    const basePrice = DEMO_PRICES[currentAsset] || 1.0;
     
     // 24 часа данных
     for (let i = 23; i >= 0; i--) {
@@ -465,398 +652,20 @@ function generateTestChartData() {
         time.setHours(time.getHours() - i);
         labels.push(time.getHours().toString().padStart(2, '0') + ':00');
         
-        const basePrice = ASSETS[currentAsset].price;
         const lastPrice = prices.length > 0 ? prices[prices.length - 1] : basePrice;
         
+        // Реалистичное движение цены
         const volatility = 0.0002;
         const change = (Math.random() - 0.5) * volatility;
         prices.push(lastPrice * (1 + change));
     }
     
-    chartData = { labels, prices };
-    priceHistory = prices;
-}
-
-// Обновление графика реальными данными
-function updateChartWithRealData() {
-    if (!currentChart || chartData.prices.length === 0) return;
-    
-    const currentPrice = ASSETS[currentAsset].price;
-    chartData.prices.push(currentPrice);
-    chartData.prices.shift();
-    
-    const now = new Date();
-    chartData.labels.push(now.getHours().toString().padStart(2, '0') + ':' + 
-                         now.getMinutes().toString().padStart(2, '0'));
-    chartData.labels.shift();
-    
-    currentChart.data.labels = chartData.labels;
-    currentChart.data.datasets[0].data = chartData.prices;
-    currentChart.update('none');
-    
-    priceHistory = [...chartData.prices];
-}
-
-// Инициализация событий
-function initEvents() {
-    console.log('🎯 Инициализация обработчиков событий...');
-    
-    // Выбор языка
-    const languageSelect = document.getElementById('language-select');
-    if (languageSelect) {
-        languageSelect.addEventListener('change', function() {
-            currentLanguage = this.value;
-            localStorage.setItem('tradingLanguage', currentLanguage);
-            applyTranslations();
-            console.log('🌐 Язык изменен на:', currentLanguage);
-        });
-    }
-    
-    // Выбор актива
-    const assetSelect = document.getElementById('asset-select');
-    if (assetSelect) {
-        assetSelect.addEventListener('change', function() {
-            currentAsset = this.value;
-            console.log('📊 Актив изменен на:', currentAsset);
-            
-            updateAssetDisplay();
-            generateTestChartData();
-            
-            if (currentChart) {
-                currentChart.data.datasets[0].data = chartData.prices;
-                currentChart.update();
-            }
-        });
-    }
-    
-    // Кнопки таймфреймов
-    document.querySelectorAll('.time-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            document.querySelectorAll('.time-btn').forEach(b => {
-                b.classList.remove('active');
-            });
-            
-            this.classList.add('active');
-            currentTimeframe = parseInt(this.dataset.time);
-            
-            const timeText = getTimeframeText(currentTimeframe);
-            document.getElementById('current-tf').textContent = timeText;
-            
-            console.log('⏱️ Таймфрейм изменен на:', timeText);
-        });
-    });
-    
-    // Кнопки типа сигнала
-    document.querySelectorAll('.signal-type-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-            document.querySelectorAll('.signal-type-btn').forEach(b => {
-                b.classList.remove('active');
-            });
-            
-            this.classList.add('active');
-            currentSignalType = this.dataset.type;
-            
-            console.log('🎯 Тип сигнала изменен на:', currentSignalType);
-        });
-    });
-    
-    // Кнопка генерации сигнала
-    const generateBtn = document.getElementById('generate-signal');
-    if (generateBtn) {
-        generateBtn.addEventListener('click', generateSignal);
-    }
-    
-    // Инструменты рисования
-    const drawLineBtn = document.getElementById('draw-line');
-    const drawHorizontalBtn = document.getElementById('draw-horizontal');
-    const clearDrawingsBtn = document.getElementById('clear-drawings');
-    
-    if (drawLineBtn) {
-        drawLineBtn.addEventListener('click', function() {
-            toggleDrawingMode('line');
-        });
-    }
-    
-    if (drawHorizontalBtn) {
-        drawHorizontalBtn.addEventListener('click', function() {
-            toggleDrawingMode('horizontal');
-        });
-    }
-    
-    if (clearDrawingsBtn) {
-        clearDrawingsBtn.addEventListener('click', clearDrawings);
-    }
-    
-    // Обработчики для рисования на графике
-    const chartCanvas = document.getElementById('trading-chart');
-    if (chartCanvas) {
-        chartCanvas.addEventListener('mousedown', startDrawing);
-        chartCanvas.addEventListener('mousemove', draw);
-        chartCanvas.addEventListener('mouseup', stopDrawing);
-        chartCanvas.addEventListener('mouseleave', stopDrawing);
-    }
-    
-    console.log('✅ Обработчики событий инициализированы');
-}
-
-// Инструменты рисования на графике
-function toggleDrawingMode(type) {
-    const chartCanvas = document.getElementById('trading-chart');
-    
-    document.querySelectorAll('.chart-tool-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    
-    if (currentDrawingType === type) {
-        currentDrawingType = null;
-        isDrawingMode = false;
-    } else {
-        currentDrawingType = type;
-        isDrawingMode = true;
-        document.querySelector(`[id="draw-${type}"]`).classList.add('active');
-    }
-    
-    chartCanvas.style.cursor = isDrawingMode ? 'crosshair' : 'default';
-}
-
-function startDrawing(e) {
-    if (!isDrawingMode) return;
-    
-    const rect = e.target.getBoundingClientRect();
-    startX = e.clientX - rect.left;
-    startY = e.clientY - rect.top;
-    
-    // Сохраняем начальную точку
-    drawings.push({
-        type: currentDrawingType,
-        startX: startX,
-        startY: startY,
-        endX: startX,
-        endY: startY,
-        color: currentDrawingType === 'line' ? '#ff4444' : '#0066ff'
-    });
-}
-
-function draw(e) {
-    if (!isDrawingMode || drawings.length === 0) return;
-    
-    const rect = e.target.getBoundingClientRect();
-    const currentX = e.clientX - rect.left;
-    const currentY = e.clientY - rect.top;
-    
-    // Обновляем последний рисунок
-    const lastDrawing = drawings[drawings.length - 1];
-    lastDrawing.endX = currentX;
-    lastDrawing.endY = currentY;
-    
-    // Перерисовываем график с рисунками
-    redrawChartWithDrawings();
-}
-
-function stopDrawing() {
-    if (!isDrawingMode) return;
-    
-    // Сохраняем рисунок
-    saveDrawings();
-}
-
-function redrawChartWithDrawings() {
-    if (!currentChart) return;
-    
-    // Создаем временный canvas для рисунков
-    const ctx = currentChart.ctx;
-    
-    // Очищаем область рисунков
-    const chartArea = currentChart.chartArea;
-    ctx.save();
-    ctx.beginPath();
-    ctx.rect(chartArea.left, chartArea.top, chartArea.right - chartArea.left, chartArea.bottom - chartArea.top);
-    ctx.clip();
-    
-    // Рисуем все сохраненные линии
-    drawings.forEach(drawing => {
-        ctx.beginPath();
-        ctx.strokeStyle = drawing.color;
-        ctx.lineWidth = 2;
-        ctx.setLineDash(drawing.type === 'horizontal' ? [5, 5] : []);
-        
-        if (drawing.type === 'line') {
-            ctx.moveTo(drawing.startX, drawing.startY);
-            ctx.lineTo(drawing.endX, drawing.endY);
-        } else if (drawing.type === 'horizontal') {
-            ctx.moveTo(chartArea.left, drawing.startY);
-            ctx.lineTo(chartArea.right, drawing.startY);
-        }
-        
-        ctx.stroke();
-        ctx.setLineDash([]);
-    });
-    
-    ctx.restore();
-}
-
-function saveDrawings() {
-    try {
-        localStorage.setItem('chartDrawings', JSON.stringify(drawings));
-    } catch (error) {
-        console.error('Ошибка сохранения рисунков:', error);
-    }
-}
-
-function loadDrawings() {
-    try {
-        const savedDrawings = localStorage.getItem('chartDrawings');
-        if (savedDrawings) {
-            drawings = JSON.parse(savedDrawings);
-        }
-    } catch (error) {
-        console.error('Ошибка загрузки рисунков:', error);
-    }
-}
-
-function clearDrawings() {
-    drawings = [];
-    localStorage.removeItem('chartDrawings');
-    
-    if (currentChart) {
-        currentChart.update();
-    }
-    
-    document.querySelectorAll('.chart-tool-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    
-    isDrawingMode = false;
-    currentDrawingType = null;
-}
-
-// Получение текста таймфрейма
-function getTimeframeText(seconds) {
-    const minutes = Math.floor(seconds / 60);
-    return `${minutes} мин`;
-}
-
-// Загрузка начальных цен
-async function loadInitialPrices() {
-    console.log('📡 Загрузка начальных цен...');
-    
-    try {
-        await fetchRealPrices();
-    } catch (error) {
-        console.warn('⚠️ Не удалось загрузить реальные цены, используем демо-данные');
-        useDemoPrices();
-    }
-    
-    updateAssetDisplay();
-    updatePriceFeed();
-    updateIndicators();
-}
-
-// Получение реальных цен с API
-async function fetchRealPrices() {
-    try {
-        const response = await fetch('https://api.frankfurter.app/latest?from=USD');
-        
-        if (!response.ok) throw new Error('API error');
-        
-        const data = await response.json();
-        
-        if (data.rates) {
-            // EUR/USD
-            if (data.rates.EUR) {
-                ASSETS.EURUSD.price = 1 / data.rates.EUR;
-            }
-            
-            // USD/JPY
-            if (data.rates.JPY) {
-                ASSETS.USDJPY.price = data.rates.JPY;
-            }
-            
-            // GBP/USD
-            if (data.rates.GBP) {
-                ASSETS.GBPUSD.price = 1 / data.rates.GBP;
-            }
-            
-            // AUD/USD
-            if (data.rates.AUD) {
-                ASSETS.AUDUSD.price = 1 / data.rates.AUD;
-            }
-            
-            // USD/CAD
-            if (data.rates.CAD) {
-                ASSETS.USDCAD.price = data.rates.CAD;
-            }
-            
-            // USD/CHF
-            if (data.rates.CHF) {
-                ASSETS.USDCHF.price = data.rates.CHF;
-            }
-            
-            // EUR/JPY (расчетный)
-            if (data.rates.EUR && data.rates.JPY) {
-                ASSETS.EURJPY.price = (1 / data.rates.EUR) * data.rates.JPY;
-            }
-            
-            // GBP/JPY (расчетный)
-            if (data.rates.GBP && data.rates.JPY) {
-                ASSETS.GBPJPY.price = (1 / data.rates.GBP) * data.rates.JPY;
-            }
-            
-            console.log('✅ Реальные цены загружены');
-            return true;
-        }
-    } catch (error) {
-        console.error('❌ Ошибка загрузки реальных цен:', error);
-        throw error;
-    }
-}
-
-// Использование демо-цен
-function useDemoPrices() {
-    Object.keys(ASSETS).forEach(asset => {
-        const change = (Math.random() - 0.5) * 0.001;
-        ASSETS[asset].price *= (1 + change);
-        ASSETS[asset].lastUpdate = new Date();
-    });
-}
-
-// Запуск обновления цен
-function startPriceUpdates() {
-    priceUpdateInterval = setInterval(async () => {
-        try {
-            await updatePrices();
-            updateAssetDisplay();
-            updatePriceFeed();
-            updateIndicators();
-            
-            if (currentChart) {
-                updateChartWithRealData();
-            }
-        } catch (error) {
-            console.warn('⚠️ Ошибка обновления цен:', error);
-            useDemoPrices();
-            updateAssetDisplay();
-            updatePriceFeed();
-            updateIndicators();
-        }
-    }, 5000);
-}
-
-// Обновление цен
-async function updatePrices() {
-    try {
-        const success = await fetchRealPrices();
-        if (!success) {
-            throw new Error('Failed to fetch real prices');
-        }
-    } catch (error) {
-        useDemoPrices();
-    }
+    return { labels, prices };
 }
 
 // Обновление отображения актива
 function updateAssetDisplay() {
-    const asset = ASSETS[currentAsset];
+    const asset = ASSETS_CONFIG[currentAsset];
     if (!asset) return;
     
     const priceElement = document.getElementById('current-price');
@@ -864,7 +673,8 @@ function updateAssetDisplay() {
     const changeElement = document.getElementById('price-change');
     
     if (priceElement) {
-        priceElement.textContent = asset.price.toFixed(5);
+        const currentPrice = DEMO_PRICES[currentAsset] || 1.0;
+        priceElement.textContent = currentPrice.toFixed(5);
     }
     
     if (pairElement) {
@@ -872,13 +682,15 @@ function updateAssetDisplay() {
     }
     
     if (changeElement) {
+        // Демо изменение
         const changePercent = (Math.random() - 0.5) * 0.1;
-        const changeValue = asset.price * changePercent;
+        const changeValue = (DEMO_PRICES[currentAsset] || 1.0) * changePercent;
         
         changeElement.textContent = `${changePercent >= 0 ? '+' : ''}${changePercent.toFixed(2)}%`;
         changeElement.className = changePercent >= 0 ? 'positive' : 'negative';
         
-        document.getElementById('current-price-display').textContent = asset.price.toFixed(5);
+        // Обновляем статистику
+        document.getElementById('current-price-display').textContent = (DEMO_PRICES[currentAsset] || 1.0).toFixed(5);
         document.getElementById('price-change-display').textContent = `${changePercent >= 0 ? '+' : ''}${changePercent.toFixed(2)}%`;
         document.getElementById('price-time').textContent = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
     }
@@ -892,55 +704,56 @@ function updatePriceFeed() {
     
     feedPairs.forEach(pair => {
         const element = document.getElementById(`price-${pair}`);
-        if (element && ASSETS[pair]) {
-            element.textContent = ASSETS[pair].price.toFixed(5);
+        if (element && DEMO_PRICES[pair]) {
+            // Добавляем реалистичное изменение
+            const change = (Math.random() - 0.5) * 0.0001;
+            const newPrice = DEMO_PRICES[pair] * (1 + change);
+            element.textContent = newPrice.toFixed(5);
+            
+            // Обновляем демо цену
+            DEMO_PRICES[pair] = newPrice;
         }
     });
 }
 
+// Запуск обновления цен
+function startPriceUpdates() {
+    priceUpdateInterval = setInterval(() => {
+        updateAssetDisplay();
+        updatePriceFeed();
+        updateIndicators();
+    }, 5000); // Обновляем каждые 5 секунд
+}
+
 // Обновление индикаторов
 function updateIndicators() {
-    const prices = priceHistory.length > 0 ? priceHistory : chartData.prices;
+    // Демо значения индикаторов
+    const rsi = 50 + (Math.random() - 0.5) * 20;
+    const macd = (Math.random() - 0.5) * 0.01;
+    const stochastic = 50 + (Math.random() - 0.5) * 40;
     
-    if (prices.length >= 14) {
-        // RSI
-        const rsi = calculateRSI(prices);
-        document.getElementById('indicator-rsi').textContent = rsi.toFixed(1);
-        document.getElementById('indicator-rsi').style.color = 
-            rsi > 70 ? '#ff4444' : rsi < 30 ? '#00ff88' : '#8b9dc3';
-        
-        // MACD
-        const macd = calculateMACD(prices);
-        document.getElementById('indicator-macd').textContent = macd.toFixed(3);
-        document.getElementById('indicator-macd').style.color = 
-            macd > 0 ? '#00ff88' : '#ff4444';
-        
-        // Bollinger Bands
-        const bollinger = calculateBollingerBands(prices);
-        const currentPrice = prices[prices.length - 1];
-        let bollingerStatus = '-';
-        let bollingerColor = '#8b9dc3';
-        
-        if (currentPrice > bollinger.upper) {
-            bollingerStatus = '↑';
-            bollingerColor = '#ff4444';
-        } else if (currentPrice < bollinger.lower) {
-            bollingerStatus = '↓';
-            bollingerColor = '#00ff88';
-        } else {
-            bollingerStatus = '•';
-            bollingerColor = '#8b9dc3';
-        }
-        
-        document.getElementById('indicator-bollinger').textContent = bollingerStatus;
-        document.getElementById('indicator-bollinger').style.color = bollingerColor;
-        
-        // Stochastic
-        const stochastic = calculateStochastic(prices);
-        document.getElementById('indicator-stochastic').textContent = stochastic.toFixed(1);
-        document.getElementById('indicator-stochastic').style.color = 
-            stochastic > 80 ? '#ff4444' : stochastic < 20 ? '#00ff88' : '#8b9dc3';
-    }
+    // RSI
+    document.getElementById('indicator-rsi').textContent = rsi.toFixed(1);
+    document.getElementById('indicator-rsi').style.color = 
+        rsi > 70 ? '#ff4444' : rsi < 30 ? '#00ff88' : '#8b9dc3';
+    
+    // MACD
+    document.getElementById('indicator-macd').textContent = macd.toFixed(3);
+    document.getElementById('indicator-macd').style.color = 
+        macd > 0 ? '#00ff88' : '#ff4444';
+    
+    // Stochastic
+    document.getElementById('indicator-stochastic').textContent = stochastic.toFixed(1);
+    document.getElementById('indicator-stochastic').style.color = 
+        stochastic > 80 ? '#ff4444' : stochastic < 20 ? '#00ff88' : '#8b9dc3';
+    
+    // Bollinger Bands (симуляция)
+    const bollingerStatus = Math.random() > 0.6 ? '↑' : Math.random() > 0.3 ? '↓' : '•';
+    const bollingerColor = bollingerStatus === '↑' ? '#ff4444' : 
+                          bollingerStatus === '↓' ? '#00ff88' : '#8b9dc3';
+    
+    document.getElementById('indicator-bollinger').textContent = bollingerStatus;
+    document.getElementById('indicator-bollinger').style.color = bollingerColor;
 }
 
 // Генерация сигнала
@@ -959,6 +772,7 @@ async function generateSignal() {
     updateSignalStatus(TRANSLATIONS[currentLanguage].status_analysis, '#ffaa00');
     showAnalysisAnimation();
     
+    // Имитация анализа (3 секунды)
     setTimeout(() => {
         createSignal();
     }, 3000);
@@ -976,7 +790,7 @@ function showAnalysisAnimation() {
                     ${TRANSLATIONS[currentLanguage].status_analysis}
                 </p>
                 <div style="margin-top: 10px; font-size: 12px; color: #5d6d97;">
-                    Тип: ${currentSignalType === 'smart' ? 'Смарт-Мани' : currentSignalType === 'indicators' ? 'Индикаторы' : 'Комбинированный'}
+                    Анализ по ${currentSignalType === 'smart' ? 'Смарт-Мани' : currentSignalType === 'indicators' ? 'индикаторам' : 'комбинированному методу'}
                 </div>
             </div>
         `;
@@ -985,7 +799,7 @@ function showAnalysisAnimation() {
 
 // Создание сигнала
 function createSignal() {
-    const asset = ASSETS[currentAsset];
+    const asset = ASSETS_CONFIG[currentAsset];
     if (!asset) return;
     
     let analysis;
@@ -1007,7 +821,7 @@ function createSignal() {
         asset: currentAsset,
         pair: asset.name,
         direction: analysis.direction,
-        entryPrice: asset.price,
+        entryPrice: DEMO_PRICES[currentAsset] || 1.0,
         confidence: analysis.confidence,
         analysis: analysis,
         signalType: currentSignalType,
@@ -1023,43 +837,12 @@ function createSignal() {
 
 // Анализ Смарт-Мани
 function performSmartMoneyAnalysis() {
-    const prices = priceHistory.length > 0 ? priceHistory : chartData.prices;
+    const currentPrice = DEMO_PRICES[currentAsset] || 1.0;
     
-    if (prices.length < 20) {
-        return {
-            direction: Math.random() > 0.5 ? 'BUY' : 'SELL',
-            confidence: Math.floor(75 + Math.random() * 20),
-            volume: 'высокий',
-            orderFlow: 'позитивный',
-            marketSentiment: 'бычий',
-            supportLevel: prices[prices.length - 1] * 0.998,
-            resistanceLevel: prices[prices.length - 1] * 1.002
-        };
-    }
+    let direction = Math.random() > 0.5 ? 'BUY' : 'SELL';
+    let confidence = 75 + Math.random() * 20;
     
-    // Простой анализ смарт-мани
-    const lastPrice = prices[prices.length - 1];
-    const sma20 = calculateSMA(prices, 20);
-    const sma50 = calculateSMA(prices, 50);
-    
-    let direction = 'BUY';
-    let confidence = 80;
-    
-    // Анализ объема и тренда
-    if (lastPrice > sma20 && lastPrice > sma50) {
-        direction = 'BUY';
-        confidence = 85 + Math.random() * 10;
-    } else if (lastPrice < sma20 && lastPrice < sma50) {
-        direction = 'SELL';
-        confidence = 85 + Math.random() * 10;
-    } else if (Math.random() > 0.5) {
-        direction = 'BUY';
-        confidence = 75 + Math.random() * 15;
-    } else {
-        direction = 'SELL';
-        confidence = 75 + Math.random() * 15;
-    }
-    
+    // Симуляция анализа
     confidence = Math.min(95, Math.round(confidence));
     
     return {
@@ -1068,57 +851,24 @@ function performSmartMoneyAnalysis() {
         volume: Math.random() > 0.5 ? 'высокий' : 'средний',
         orderFlow: direction === 'BUY' ? 'позитивный' : 'негативный',
         marketSentiment: direction === 'BUY' ? 'бычий' : 'медвежий',
-        supportLevel: lastPrice * (direction === 'BUY' ? 0.997 : 0.999),
-        resistanceLevel: lastPrice * (direction === 'BUY' ? 1.003 : 1.001)
+        supportLevel: currentPrice * (direction === 'BUY' ? 0.997 : 0.999),
+        resistanceLevel: currentPrice * (direction === 'BUY' ? 1.003 : 1.001)
     };
 }
 
 // Анализ по индикаторам
 function performIndicatorsAnalysis() {
-    const prices = priceHistory.length > 0 ? priceHistory : chartData.prices;
+    const currentPrice = DEMO_PRICES[currentAsset] || 1.0;
     
-    if (prices.length < 14) {
-        return {
-            direction: Math.random() > 0.5 ? 'BUY' : 'SELL',
-            confidence: Math.floor(70 + Math.random() * 25),
-            rsi: 50 + (Math.random() - 0.5) * 20,
-            macd: (Math.random() - 0.5) * 0.01,
-            stochastic: 50 + (Math.random() - 0.5) * 40,
-            bollinger: 'внутри полос'
-        };
-    }
+    let direction = Math.random() > 0.5 ? 'BUY' : 'SELL';
+    let confidence = 70 + Math.random() * 25;
     
-    // Множественный индикаторный анализ
-    const rsi = calculateRSI(prices);
-    const macd = calculateMACD(prices);
-    const stochastic = calculateStochastic(prices);
-    const bollinger = calculateBollingerBands(prices);
-    const currentPrice = prices[prices.length - 1];
+    // Симуляция индикаторов
+    const rsi = 50 + (Math.random() - 0.5) * 20;
+    const macd = (Math.random() - 0.5) * 0.01;
+    const stochastic = 50 + (Math.random() - 0.5) * 40;
     
-    let buySignals = 0;
-    let sellSignals = 0;
-    
-    // RSI анализ
-    if (rsi < 30) buySignals++;
-    if (rsi > 70) sellSignals++;
-    if (rsi > 50) buySignals++;
-    if (rsi < 50) sellSignals++;
-    
-    // MACD анализ
-    if (macd > 0) buySignals++;
-    if (macd < 0) sellSignals++;
-    
-    // Stochastic анализ
-    if (stochastic < 20) buySignals++;
-    if (stochastic > 80) sellSignals++;
-    
-    // Bollinger Bands анализ
-    if (currentPrice < bollinger.lower) buySignals++;
-    if (currentPrice > bollinger.upper) sellSignals++;
-    
-    let direction = buySignals > sellSignals ? 'BUY' : 'SELL';
-    let confidence = Math.round((Math.max(buySignals, sellSignals) / 8) * 100);
-    confidence = Math.min(90, Math.max(65, confidence));
+    confidence = Math.min(90, Math.round(confidence));
     
     return {
         direction,
@@ -1126,8 +876,8 @@ function performIndicatorsAnalysis() {
         rsi: rsi,
         macd: macd,
         stochastic: stochastic,
-        bollinger: currentPrice < bollinger.lower ? 'нижняя полоса' : 
-                  currentPrice > bollinger.upper ? 'верхняя полоса' : 'внутри полос'
+        bollinger: Math.random() > 0.66 ? 'верхняя полоса' : 
+                  Math.random() > 0.33 ? 'нижняя полоса' : 'внутри полос'
     };
 }
 
@@ -1151,106 +901,6 @@ function performCombinedAnalysis() {
         indicators: indicatorsAnalysis,
         combinedScore: Math.round((smartAnalysis.confidence + indicatorsAnalysis.confidence) / 2)
     };
-}
-
-// Расчет SMA
-function calculateSMA(prices, period) {
-    if (prices.length < period) return prices[prices.length - 1];
-    
-    const slice = prices.slice(-period);
-    const sum = slice.reduce((a, b) => a + b, 0);
-    return sum / period;
-}
-
-// Расчет EMA
-function calculateEMA(prices, period) {
-    if (prices.length < period) return prices[prices.length - 1];
-    
-    const k = 2 / (period + 1);
-    let ema = prices.slice(-period)[0];
-    
-    for (let i = 1; i < period; i++) {
-        ema = prices.slice(-period)[i] * k + ema * (1 - k);
-    }
-    
-    return ema;
-}
-
-// Расчет RSI
-function calculateRSI(prices) {
-    if (prices.length < 14) return 50;
-    
-    let gains = 0;
-    let losses = 0;
-    
-    for (let i = 1; i < 14; i++) {
-        const change = prices[prices.length - i] - prices[prices.length - i - 1];
-        if (change > 0) {
-            gains += change;
-        } else {
-            losses -= change;
-        }
-    }
-    
-    const avgGain = gains / 14;
-    const avgLoss = losses / 14;
-    
-    if (avgLoss === 0) return 100;
-    
-    const rs = avgGain / avgLoss;
-    return 100 - (100 / (1 + rs));
-}
-
-// Расчет MACD
-function calculateMACD(prices) {
-    if (prices.length < 26) return 0;
-    
-    const ema12 = calculateEMA(prices, 12);
-    const ema26 = calculateEMA(prices, 26);
-    
-    return ema12 - ema26;
-}
-
-// Расчет Bollinger Bands
-function calculateBollingerBands(prices) {
-    if (prices.length < 20) {
-        const currentPrice = prices[prices.length - 1];
-        return {
-            upper: currentPrice * 1.02,
-            middle: currentPrice,
-            lower: currentPrice * 0.98
-        };
-    }
-    
-    const slice = prices.slice(-20);
-    const sma = calculateSMA(slice, 20);
-    
-    let sumSquaredDiff = 0;
-    for (let price of slice) {
-        sumSquaredDiff += Math.pow(price - sma, 2);
-    }
-    
-    const stdDev = Math.sqrt(sumSquaredDiff / 20);
-    
-    return {
-        upper: sma + (stdDev * 2),
-        middle: sma,
-        lower: sma - (stdDev * 2)
-    };
-}
-
-// Расчет Stochastic
-function calculateStochastic(prices) {
-    if (prices.length < 14) return 50;
-    
-    const slice = prices.slice(-14);
-    const lowest = Math.min(...slice);
-    const highest = Math.max(...slice);
-    const currentClose = slice[slice.length - 1];
-    
-    if (highest === lowest) return 50;
-    
-    return ((currentClose - lowest) / (highest - lowest)) * 100;
 }
 
 // Отображение сигнала
@@ -1532,7 +1182,7 @@ function startExpirationTimer() {
 function finishSignal() {
     if (!currentSignal) return;
     
-    const currentPrice = ASSETS[currentAsset].price;
+    const currentPrice = DEMO_PRICES[currentAsset] || 1.0;
     const entryPrice = currentSignal.entryPrice;
     
     let result, resultColor, resultText;
@@ -1760,7 +1410,6 @@ function updateStats() {
         
         const winRate = totalCount > 0 ? Math.round((winCount / totalCount) * 100) : 0;
         
-        // Можно добавить отображение винрейта на панели
         console.log(`📊 Статистика: ${winRate}% побед (${winCount}/${totalCount})`);
     } catch (error) {
         console.error('Ошибка обновления статистики:', error);
@@ -1816,11 +1465,10 @@ window.addEventListener('beforeunload', function() {
 
 // Экспортируем функции для отладки
 window.debug = {
-    getCurrentPrice: () => ASSETS[currentAsset].price,
-    getAssetInfo: () => ASSETS[currentAsset],
-    getAllPrices: () => ASSETS,
-    forcePriceUpdate: updatePrices,
-    simulateSignal: generateSignal,
+    getCurrentAsset: () => currentAsset,
+    getCurrentTimeframe: () => currentTimeframe,
     getCurrentSignal: () => currentSignal,
-    getLanguage: () => currentLanguage
+    getLanguage: () => currentLanguage,
+    forceSignal: generateSignal,
+    toggleChart: toggleChartType
 };
