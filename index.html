@@ -10,42 +10,38 @@
 </head>
 <body>
     <div class="container">
-        <!-- Языковой переключатель -->
-        <div class="language-switcher">
-            <button class="lang-btn active" data-lang="ru">Русский</button>
-            <button class="lang-btn" data-lang="en">English</button>
-            <button class="lang-btn" data-lang="es">Español</button>
-        </div>
-
         <div class="header">
             <div class="logo-container">
                 <img src="https://image2url.com/images/1766001097047-30fbff9b-a368-4dbf-965a-4f3ce2de2e5e.png" alt="PocketOption" class="broker-logo">
                 <div class="title-group">
-                    <h1 class="main-title" data-i18n="title">SCALPING ROBOT PRO</h1>
-                    <p class="subtitle" data-i18n="subtitle">Real-Time Binary Options Trading</p>
+                    <h1 class="main-title">SCALPING ROBOT PRO</h1>
+                    <p class="subtitle">Real-Time Binary Options Trading</p>
                 </div>
             </div>
-            <div class="server-status">
-                <span class="status-dot online"></span>
-                <span data-i18n="mode">Режим: Демо</span>
+            
+            <div class="header-controls">
+                <div class="language-selector">
+                    <select id="language-select">
+                        <option value="ru">🇷🇺 Русский</option>
+                        <option value="en">🇬🇧 English</option>
+                        <option value="es">🇪🇸 Español</option>
+                        <option value="de">🇩🇪 Deutsch</option>
+                        <option value="fr">🇫🇷 Français</option>
+                        <option value="pt">🇵🇹 Português</option>
+                        <option value="ar">🇸🇦 العربية</option>
+                        <option value="tr">🇹🇷 Türkçe</option>
+                    </select>
+                </div>
+                
+                <div class="server-status">
+                    <span class="status-dot online"></span>
+                    <span id="status-text">Режим: Демо</span>
+                </div>
             </div>
         </div>
 
         <div class="main-wrapper">
             <div class="control-panel">
-                <!-- Режим торговли -->
-                <div class="panel-section">
-                    <h3 class="section-title" data-i18n="trading_mode">РЕЖИМ ТОРГОВЛИ</h3>
-                    <div class="trading-mode-grid">
-                        <button class="mode-btn active" data-mode="indicators" data-i18n="mode_indicators">
-                            <i class="fas fa-chart-line"></i> Индикаторы
-                        </button>
-                        <button class="mode-btn" data-mode="smart" data-i18n="mode_smart">
-                            <i class="fas fa-brain"></i> Smart Money
-                        </button>
-                    </div>
-                </div>
-
                 <div class="panel-section">
                     <h3 class="section-title" data-i18n="instrument">ИНСТРУМЕНТ</h3>
                     <div class="asset-selector">
@@ -69,31 +65,15 @@
                         <button class="time-btn" data-time="120">2 мин</button>
                         <button class="time-btn" data-time="180">3 мин</button>
                         <button class="time-btn" data-time="300">5 мин</button>
-                        <button class="time-btn" data-time="600">10 мин</button>
-                        <button class="time-btn" data-time="900">15 мин</button>
                     </div>
                 </div>
 
-                <!-- Индикаторы -->
                 <div class="panel-section">
-                    <h3 class="section-title" data-i18n="indicators">ИНДИКАТОРЫ</h3>
-                    <div class="indicators-grid">
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="rsi-indicator" checked>
-                            <span>RSI (14)</span>
-                        </label>
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="macd-indicator" checked>
-                            <span>MACD</span>
-                        </label>
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="ma-indicator" checked>
-                            <span>MA (20)</span>
-                        </label>
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="bb-indicator">
-                            <span>Bollinger Bands</span>
-                        </label>
+                    <h3 class="section-title" data-i18n="signal_type">ТИП СИГНАЛА</h3>
+                    <div class="signal-type-grid">
+                        <button class="signal-type-btn active" data-type="smart">Смарт-Мани</button>
+                        <button class="signal-type-btn" data-type="indicators">Индикаторы</button>
+                        <button class="signal-type-btn" data-type="combined">Комбинированный</button>
                     </div>
                 </div>
 
@@ -101,7 +81,7 @@
                     <h3 class="section-title" data-i18n="real_quotes">РЕАЛЬНЫЕ КОТИРОВКИ</h3>
                     <div class="price-feed">
                         <div class="price-item">
-                            <span data-i18n="eur_usd">EUR/USD:</span>
+                            <span>EUR/USD:</span>
                             <span class="live-price" id="price-EURUSD">1.08345</span>
                         </div>
                         <div class="price-item">
@@ -145,7 +125,6 @@
             </div>
 
             <div class="chart-area">
-                <!-- График -->
                 <div class="chart-container">
                     <div class="chart-header">
                         <div class="chart-info">
@@ -156,17 +135,20 @@
                             </div>
                         </div>
                         <div class="chart-controls">
-                            <div class="chart-type-buttons">
-                                <button class="chart-type-btn active" data-type="candlestick">
-                                    <i class="fas fa-chart-candlestick"></i> Свечи
-                                </button>
-                                <button class="chart-type-btn" data-type="line">
-                                    <i class="fas fa-chart-line"></i> Линия
-                                </button>
-                            </div>
                             <div class="timeframe-display">
                                 <span class="tf-label" data-i18n="timeframe">Таймфрейм:</span>
                                 <span class="tf-value" id="current-tf">1 мин</span>
+                            </div>
+                            <div class="chart-tools">
+                                <button class="chart-tool-btn" id="draw-line" title="Линия">
+                                    <i class="fas fa-slash"></i>
+                                </button>
+                                <button class="chart-tool-btn" id="draw-horizontal" title="Горизонтальный уровень">
+                                    <i class="fas fa-minus"></i>
+                                </button>
+                                <button class="chart-tool-btn" id="clear-drawings" title="Очистить рисунки">
+                                    <i class="fas fa-trash"></i>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -174,34 +156,17 @@
                         <canvas id="trading-chart"></canvas>
                     </div>
                     <div class="chart-footer">
-                        <div class="drawing-tools">
-                            <button class="draw-btn" data-tool="line" title="Линия">
-                                <i class="fas fa-slash"></i>
-                            </button>
-                            <button class="draw-btn" data-tool="horizontal" title="Горизонтальная линия">
-                                <i class="fas fa-minus"></i>
-                            </button>
-                            <button class="draw-btn" data-tool="vertical" title="Вертикальная линия">
-                                <i class="fas fa-grip-lines-vertical"></i>
-                            </button>
-                            <button class="draw-btn" data-tool="clear" title="Очистить">
-                                <i class="fas fa-trash"></i>
-                            </button>
+                        <div class="time-display">
+                            <i class="far fa-clock"></i> 
+                            <span id="chart-time">Обновлено: 12:38:32 UTC</span>
                         </div>
-                        <div class="chart-info-footer">
-                            <div class="time-display">
-                                <i class="far fa-clock"></i> 
-                                <span id="chart-time">Обновлено: 12:38:32 UTC</span>
-                            </div>
-                            <div class="chart-source">
-                                <i class="fas fa-database"></i>
-                                <span>Источник: Twelve Data API</span>
-                            </div>
+                        <div class="chart-source">
+                            <i class="fas fa-database"></i>
+                            <span data-i18n="data_source">Источник: Twelve Data API</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Сигналы -->
                 <div class="signal-display">
                     <div class="signal-header">
                         <h3><i class="fas fa-bell"></i> <span data-i18n="current_signal">ТЕКУЩИЙ СИГНАЛ</span></h3>
@@ -222,11 +187,24 @@
                         <!-- Детали сигнала -->
                     </div>
                     
-                    <!-- Подтверждения индикаторов -->
-                    <div class="confirmations-panel" id="confirmations-panel" style="display: none;">
-                        <h4><i class="fas fa-check-circle"></i> <span data-i18n="confirmations">ПОДТВЕРЖДЕНИЯ</span></h4>
-                        <div class="confirmations-grid" id="confirmations-grid">
-                            <!-- Будет заполнено динамически -->
+                    <div class="indicators-panel" id="indicators-panel">
+                        <div class="indicators-grid">
+                            <div class="indicator-item">
+                                <span class="indicator-name">RSI</span>
+                                <span class="indicator-value" id="indicator-rsi">-</span>
+                            </div>
+                            <div class="indicator-item">
+                                <span class="indicator-name">MACD</span>
+                                <span class="indicator-value" id="indicator-macd">-</span>
+                            </div>
+                            <div class="indicator-item">
+                                <span class="indicator-name">Bollinger</span>
+                                <span class="indicator-value" id="indicator-bollinger">-</span>
+                            </div>
+                            <div class="indicator-item">
+                                <span class="indicator-name">Stochastic</span>
+                                <span class="indicator-value" id="indicator-stochastic">-</span>
+                            </div>
                         </div>
                     </div>
                     
@@ -241,7 +219,7 @@
                     </div>
                     
                     <div class="result-history">
-                        <h4><i class="fas fa-history"></i> <span data-i18n="last_results">ПОСЛЕДНИЕ РЕЗУЛЬТАТЫ</span></h4>
+                        <h4><i class="fas fa-history"></i> <span data-i18n="recent_results">ПОСЛЕДНИЕ РЕЗУЛЬТАТЫ</span></h4>
                         <div class="results-list" id="results-list">
                             <!-- Результаты будут здесь -->
                         </div>
