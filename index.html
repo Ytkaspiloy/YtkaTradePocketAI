@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Scalping Robot Pro</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -14,8 +14,8 @@
             <div class="logo-container">
                 <img src="https://image2url.com/images/1766001097047-30fbff9b-a368-4dbf-965a-4f3ce2de2e5e.png" alt="PocketOption" class="broker-logo">
                 <div class="title-group">
-                    <h1 class="main-title">SCALPING ROBOT PRO</h1>
-                    <p class="subtitle">Real-Time Binary Options Trading</p>
+                    <h1 class="main-title" data-i18n="main_title">SCALPING ROBOT PRO</h1>
+                    <p class="subtitle" data-i18n="subtitle">Real-Time Binary Options Trading</p>
                 </div>
             </div>
             
@@ -35,7 +35,7 @@
                 
                 <div class="server-status">
                     <span class="status-dot online"></span>
-                    <span id="status-text">Режим: Демо</span>
+                    <span id="status-text" data-i18n="status_demo">Режим: Демо</span>
                 </div>
             </div>
         </div>
@@ -54,8 +54,18 @@
                             <option value="USDCHF">USD/CHF</option>
                             <option value="EURJPY">EUR/JPY</option>
                             <option value="GBPJPY">GBP/JPY</option>
-                            <option value="BTCUSD">BTC/USD</option>
-                            <option value="ETHUSD">ETH/USD</option>
+                            <option value="EURCAD">EUR/CAD</option>
+                            <option value="GBPCAD">GBP/CAD</option>
+                            <option value="AUDCAD">AUD/CAD</option>
+                            <option value="CHFJPY">CHF/JPY</option>
+                            <option value="GBPAUD">GBP/AUD</option>
+                            <option value="EURAUD">EUR/AUD</option>
+                            <option value="CADJPY">CAD/JPY</option>
+                            <option value="AUDJPY">AUD/JPY</option>
+                            <option value="EURGBP">EUR/GBP</option>
+                            <option value="GBPCHF">GBP/CHF</option>
+                            <option value="CADCHF">CAD/CHF</option>
+                            <option value="AUDCHF">AUD/CHF</option>
                         </select>
                     </div>
                 </div>
@@ -64,18 +74,18 @@
                     <h3 class="section-title" data-i18n="expiration">ЭКСПИРАЦИЯ</h3>
                     <div class="timeframe-grid">
                         <button class="time-btn active" data-time="60">1 мин</button>
-                        <button class="time-btn" data-time="120">2 мин</button>
                         <button class="time-btn" data-time="180">3 мин</button>
                         <button class="time-btn" data-time="300">5 мин</button>
+                        <button class="time-btn" data-time="900">15 мин</button>
                     </div>
                 </div>
 
                 <div class="panel-section">
                     <h3 class="section-title" data-i18n="signal_type">ТИП СИГНАЛА</h3>
                     <div class="signal-type-grid">
-                        <button class="signal-type-btn active" data-type="smart">Смарт-Мани</button>
-                        <button class="signal-type-btn" data-type="indicators">Индикаторы</button>
-                        <button class="signal-type-btn" data-type="combined">Комбинированный</button>
+                        <button class="signal-type-btn active" data-type="smart" data-i18n="smart_money">Смарт-Мани</button>
+                        <button class="signal-type-btn" data-type="indicators" data-i18n="indicators">Индикаторы</button>
+                        <button class="signal-type-btn" data-type="combined" data-i18n="combined">Комбинированный</button>
                     </div>
                 </div>
 
@@ -83,15 +93,15 @@
                     <h3 class="section-title" data-i18n="real_quotes">РЕАЛЬНЫЕ КОТИРОВКИ</h3>
                     <div class="price-feed">
                         <div class="price-item">
-                            <span>EUR/USD:</span>
+                            <span data-i18n="eurusd">EUR/USD:</span>
                             <span class="live-price" id="price-EURUSD">1.08345</span>
                         </div>
                         <div class="price-item">
-                            <span>USD/JPY:</span>
+                            <span data-i18n="usdjpy">USD/JPY:</span>
                             <span class="live-price" id="price-USDJPY">148.250</span>
                         </div>
                         <div class="price-item">
-                            <span>GBP/USD:</span>
+                            <span data-i18n="gbpusd">GBP/USD:</span>
                             <span class="live-price" id="price-GBPUSD">1.26580</span>
                         </div>
                     </div>
@@ -143,8 +153,8 @@
                             </div>
                             <div class="chart-type-selector">
                                 <select id="chart-type-select">
-                                    <option value="TradingView">TradingView График</option>
-                                    <option value="simple">Упрощенный график</option>
+                                    <option value="TradingView" data-i18n="pocketoption_chart">График PocketOption</option>
+                                    <option value="simple" data-i18n="simple_chart">Упрощенный график</option>
                                 </select>
                             </div>
                         </div>
@@ -175,7 +185,7 @@
                         <h3><i class="fas fa-bell"></i> <span data-i18n="current_signal">ТЕКУЩИЙ СИГНАЛ</span></h3>
                         <div class="signal-status" id="signal-status">
                             <span class="status-dot"></span>
-                            <span id="status-text">Ожидание</span>
+                            <span id="status-text" data-i18n="status_waiting">Ожидание</span>
                         </div>
                     </div>
                     
@@ -193,19 +203,19 @@
                     <div class="indicators-panel" id="indicators-panel">
                         <div class="indicators-grid">
                             <div class="indicator-item">
-                                <span class="indicator-name">RSI</span>
+                                <span class="indicator-name" data-i18n="rsi">RSI</span>
                                 <span class="indicator-value" id="indicator-rsi">-</span>
                             </div>
                             <div class="indicator-item">
-                                <span class="indicator-name">MACD</span>
+                                <span class="indicator-name" data-i18n="macd">MACD</span>
                                 <span class="indicator-value" id="indicator-macd">-</span>
                             </div>
                             <div class="indicator-item">
-                                <span class="indicator-name">Bollinger</span>
+                                <span class="indicator-name" data-i18n="bollinger">Bollinger</span>
                                 <span class="indicator-value" id="indicator-bollinger">-</span>
                             </div>
                             <div class="indicator-item">
-                                <span class="indicator-name">Stochastic</span>
+                                <span class="indicator-name" data-i18n="stochastic">Stochastic</span>
                                 <span class="indicator-value" id="indicator-stochastic">-</span>
                             </div>
                         </div>
