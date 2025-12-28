@@ -901,3 +901,88 @@ a[href*="tradingview.com"] {
     width: 0 !important;
     overflow: hidden !important;
 }
+
+/* Стили для снимка графика */
+.chart-snapshot {
+    width: 100%;
+    height: 250px;
+    background: rgba(19, 26, 45, 0.9);
+    border-radius: 10px;
+    padding: 15px;
+    margin-top: 15px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(42, 54, 85, 0.5);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.chart-snapshot canvas {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    width: 100%;
+    height: 180px;
+    background: rgba(26, 34, 56, 0.5);
+    border-radius: 6px;
+}
+
+.chart-snapshot-container {
+    margin-top: 15px;
+    padding: 15px;
+    background: rgba(19, 26, 45, 0.5);
+    border-radius: 10px;
+    border: 1px solid rgba(42, 54, 85, 0.3);
+}
+
+.chart-snapshot-title {
+    text-align: center;
+    margin-bottom: 10px;
+    color: #8b9dc3;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.snapshot-legend {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+    font-size: 10px;
+    color: #8b9dc3;
+}
+
+.snapshot-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.snapshot-legend-line {
+    width: 15px;
+    height: 2px;
+}
+
+.snapshot-legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+@media (max-width: 767px) {
+    .chart-snapshot {
+        height: 200px !important;
+        padding: 10px !important;
+    }
+    
+    .chart-snapshot canvas {
+        height: 140px !important;
+    }
+    
+    .snapshot-legend {
+        font-size: 9px;
+        gap: 6px;
+    }
+}
