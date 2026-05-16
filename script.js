@@ -1,4 +1,4 @@
-// TradeSignal Premium Bot v5 - Без блокировки графика и сигнала
+// BinarySignal Pro - Бот для бинарных опционов
 
 document.addEventListener('DOMContentLoaded', function() {
     
@@ -17,15 +17,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let currentAsset = "EUR/USD";
     let currentTab = 'forex';
-    let currentTimeframe = 5;
+    let currentTimeframe = 1; // По умолчанию 1 минута
     let isLocked = false;
     let isAnalyzing = false;
     let lockTimerInterval = null;
     let lockSeconds = 0;
     let tvWidget = null;
-    let canvasAnimId = null;
 
-    // DOM элементы
+    // DOM
     const assetSearch = document.getElementById('assetSearch');
     const assetsList = document.getElementById('assetsList');
     const otcCategories = document.getElementById('otcCategories');
@@ -36,23 +35,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const heroArrow = document.getElementById('heroArrow');
     const heroAction = document.getElementById('heroAction');
     const heroAsset = document.getElementById('heroAsset');
-    const heroTimeframe = document.getElementById('heroTimeframe');
+    const heroTimeframeBadge = document.getElementById('heroTimeframeBadge');
     const heroProbability = document.getElementById('heroProbability');
     const heroExpiry = document.getElementById('heroExpiry');
     const heroVolatility = document.getElementById('heroVolatility');
-    const heroTrend = document.getElementById('heroTrend');
     const heroAdvice = document.getElementById('heroAdvice');
     const analysisOverlay = document.getElementById('analysisOverlay');
     const progressFill = document.getElementById('progressFill');
     const progressPercent = document.getElementById('progressPercent');
     const analysisLive = document.getElementById('analysisLive');
-    const timerMini = document.getElementById('timerMini');
-    const timerMiniValue = document.getElementById('timerMiniValue');
+    const timerBox = document.getElementById('timerBox');
+    const timerValue = document.getElementById('timerValue');
     const tradingviewChart = document.getElementById('tradingviewChart');
     const chartPlaceholder = document.getElementById('chartPlaceholder');
-    const otcAnalytics = document.getElementById('otcAnalytics');
-    const analyticsCanvas = document.getElementById('analyticsCanvas');
-    const otcAssetName = document.getElementById('otcAssetName');
+    const otcSimple = document.getElementById('otcSimple');
+    const otcSimpleAsset = document.getElementById('otcSimpleAsset');
     const historyList = document.getElementById('historyList');
     const clearHistoryBtn = document.getElementById('clearHistory');
     const tabBtns = document.querySelectorAll('.tab-btn');
@@ -66,10 +63,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const otcCrypto = document.getElementById('otcCrypto');
     const otcStocks = document.getElementById('otcStocks');
     const otcIndices = document.getElementById('otcIndices');
-    const otcVolatility = document.getElementById('otcVolatility');
-    const otcSentiment = document.getElementById('otcSentiment');
-    const otcStrength = document.getElementById('otcStrength');
-    const otcVolume = document.getElementById('otcVolume');
 
     function init() {
         renderForexList(forexAssets);
@@ -79,6 +72,8 @@ document.addEventListener('DOMContentLoaded', function() {
         loadHistory();
         updateStats();
         resetSignalHero();
+        setActiveTimeframe(1);
+        updateExpiryDisplay();
     }
 
     function renderForexList(assets) {
@@ -122,15 +117,13 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (tab === 'forex') {
             tradingviewChart.style.display = 'block';
-            otcAnalytics.style.display = 'none';
-            if (canvasAnimId) cancelAnimationFrame(canvasAnimId);
+            otcSimple.style.display = 'none';
             loadTradingViewChart(asset);
         } else {
             tradingviewChart.style.display = 'none';
-            otcAnalytics.style.display = 'block';
+            otcSimple.style.display = 'flex';
+            otcSimpleAsset.textContent = asset;
             if (tvWidget) { tvWidget.remove(); tvWidget = null; }
-            otcAssetName.textContent = asset;
-            startOTCAnalytics();
         }
     }
 
@@ -162,7 +155,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 "allow_symbol_change": false,
                 "save_image": false,
                 "details": false,
-                "studies": ["MASimple@tv-basicstudies", "RSI@tv-basicstudies"],
+                "studies": ["MASimple@tv-basicstudies"],
                 "width": "100%",
                 "height": "100%"
             });
@@ -176,104 +169,25 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function getTVInterval(min) {
-        const map = {1:"1",2:"2",3:"3",5:"5",10:"10",15:"15",30:"30",60:"60",240:"240"};
-        return map[min] || "5";
+        const map = {1:"1",2:"2",3:"3",5:"5",10:"10",15:"15"};
+        return map[min] || "1";
     }
 
-    // OTC Аналитика (красивый canvas)
-    function startOTCAnalytics() {
-        const canvas = analyticsCanvas;
-        const ctx = canvas.getContext('2d');
-        const container = otcAnalytics;
-        
-        function resize() {
-            canvas.width = container.clientWidth;
-            canvas.height = container.clientHeight;
-        }
-        resize();
-        window.addEventListener('resize', resize);
-        
-        const particles = [];
-        for (let i = 0; i < 60; i++) {
-            particles.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                vx: (Math.random() - 0.5) * 0.8,
-                vy: (Math.random() - 0.5) * 0.8,
-                r: Math.random() * 2.5 + 1,
-                alpha: Math.random() * 0.6 + 0.2
-            });
-        }
-        
-        const lines = [];
-        for (let i = 0; i < 8; i++) {
-            lines.push({
-                points: [],
-                color: `hsl(${210 + Math.random() * 40}, 70%, ${50 + Math.random() * 20}%)`,
-                offset: Math.random() * 100
-            });
-            for (let x = 0; x < canvas.width + 20; x += 30) {
-                lines[i].points.push({ x, y: canvas.height / 2 });
-            }
-        }
-        
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-            grad.addColorStop(0, '#0a0e17');
-            grad.addColorStop(0.5, '#111827');
-            grad.addColorStop(1, '#0a0e17');
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            ctx.strokeStyle = 'rgba(30,41,59,0.4)';
-            ctx.lineWidth = 0.5;
-            for (let x = 0; x < canvas.width; x += 50) {
-                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
-            }
-            for (let y = 0; y < canvas.height; y += 50) {
-                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
-            }
-            
-            const t = Date.now() / 3000;
-            lines.forEach(line => {
-                ctx.beginPath();
-                ctx.strokeStyle = line.color;
-                ctx.lineWidth = 2;
-                for (let i = 0; i < line.points.length; i++) {
-                    const p = line.points[i];
-                    p.y = canvas.height / 2 + Math.sin(p.x / 80 + t + line.offset) * 60 + Math.cos(p.x / 40 + t * 1.5) * 25;
-                    if (i === 0) ctx.moveTo(p.x, p.y);
-                    else ctx.lineTo(p.x, p.y);
-                }
-                ctx.stroke();
-            });
-            
-            particles.forEach(p => {
-                p.x += p.vx;
-                p.y += p.vy;
-                if (p.x < 0) p.x = canvas.width;
-                if (p.x > canvas.width) p.x = 0;
-                if (p.y < 0) p.y = canvas.height;
-                if (p.y > canvas.height) p.y = 0;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(96,165,250,${p.alpha})`;
-                ctx.fill();
-            });
-            
-            otcVolatility.textContent = `${(30 + Math.random() * 50).toFixed(1)}%`;
-            otcSentiment.textContent = Math.random() > 0.5 ? 'Бычий 🟢' : 'Медвежий 🔴';
-            otcStrength.textContent = `${(40 + Math.random() * 55).toFixed(1)}%`;
-            otcVolume.textContent = Math.random() > 0.6 ? 'Высокий' : 'Средний';
-            
-            canvasAnimId = requestAnimationFrame(animate);
-        }
-        animate();
+    function setActiveTimeframe(tf) {
+        currentTimeframe = tf;
+        tfPills.forEach(p => {
+            p.classList.remove('active');
+            if (parseInt(p.dataset.tf) === tf) p.classList.add('active');
+        });
+        updateExpiryDisplay();
     }
 
-    // Анализ (оверлей без размытия)
+    function updateExpiryDisplay() {
+        heroTimeframeBadge.textContent = `${currentTimeframe} мин`;
+        heroExpiry.textContent = `${currentTimeframe} мин`;
+    }
+
+    // Анализ
     function startAnalysis(callback) {
         if (isAnalyzing || isLocked) return;
         isAnalyzing = true;
@@ -289,18 +203,18 @@ document.addEventListener('DOMContentLoaded', function() {
             if (step) { step.classList.remove('done'); step.querySelector('.step-dot').style.background = '#334155'; }
         }
         
-        const totalDuration = 3000 + Math.random() * 3000;
+        const totalDuration = 2500 + Math.random() * 2500;
         const startTime = performance.now();
         const segments = generateSegments(totalDuration);
         let currentSeg = 0;
         
         const stepsList = [
             { id: 'step1', text: 'Сбор рыночных данных...', progress: 0.15 },
-            { id: 'step2', text: 'Поиск паттернов Price Action...', progress: 0.30 },
-            { id: 'step3', text: 'Расчёт уровней поддержки/сопротивления...', progress: 0.50 },
-            { id: 'step4', text: 'Анализ RSI, MACD, Moving Average...', progress: 0.70 },
-            { id: 'step5', text: 'Оценка волатильности и объёмов...', progress: 0.88 },
-            { id: 'step6', text: 'Формирование торгового сигнала...', progress: 0.98 }
+            { id: 'step2', text: 'Поиск паттернов Price Action...', progress: 0.32 },
+            { id: 'step3', text: 'Расчёт уровней поддержки...', progress: 0.52 },
+            { id: 'step4', text: 'Анализ RSI, MACD, MA...', progress: 0.72 },
+            { id: 'step5', text: 'Оценка волатильности...', progress: 0.88 },
+            { id: 'step6', text: 'Формирование сигнала...', progress: 0.98 }
         ];
         
         function animate(timestamp) {
@@ -363,16 +277,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function easeInOutCubic(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2; }
 
-    // Генерация сигнала
+    // Сигнал
     function generateSignal() {
         const isUp = Math.random() >= 0.5;
         const probability = Math.floor(Math.random() * 16) + 75;
-        const volatilities = ['Низкая', 'Умеренная', 'Средняя', 'Повышенная', 'Высокая', 'Очень высокая'];
+        const volatilities = ['Низкая', 'Умеренная', 'Средняя', 'Повышенная', 'Высокая'];
         const volatility = volatilities[Math.floor(Math.random() * volatilities.length)];
-        const trends = ['Восходящий 📈', 'Нисходящий 📉', 'Боковой ➡️'];
-        const trend = isUp ? trends[0] : (Math.random() > 0.5 ? trends[1] : trends[0]);
-        const expiryMins = currentTimeframe * (Math.floor(Math.random() * 3) + 1);
-        const expiryText = expiryMins >= 60 ? `${Math.floor(expiryMins/60)}ч ${expiryMins%60}м` : `${expiryMins} мин`;
         
         signalHero.classList.add('active');
         signalHero.classList.remove('up', 'down');
@@ -381,26 +291,25 @@ document.addEventListener('DOMContentLoaded', function() {
         heroArrow.textContent = isUp ? '▲' : '▼';
         heroAction.textContent = isUp ? 'КУПИТЬ / CALL' : 'ПРОДАТЬ / PUT';
         heroAsset.textContent = currentAsset;
-        heroTimeframe.textContent = `${currentTimeframe} мин`;
+        heroTimeframeBadge.textContent = `${currentTimeframe} мин`;
         heroProbability.textContent = `${probability}%`;
-        heroExpiry.textContent = expiryText;
+        heroExpiry.textContent = `${currentTimeframe} мин`;
         heroVolatility.textContent = volatility;
-        heroTrend.textContent = trend;
         
         const advices = [
-            'Рекомендуемый риск: не более 2% от депозита.',
-            'Учитывайте новостной фон. Проверьте экономический календарь.',
-            'Подтвердите сигнал на старшем таймфрейме для надёжности.',
-            'Отличная точка входа! Можно рассмотреть увеличение объёма.',
-            'Дождитесь подтверждающей свечи перед открытием сделки.',
-            'Установите stop-loss на уровне ближайшей поддержки/сопротивления.',
-            'Рынок показывает сильный тренд — следуйте за ним.'
+            'Риск не более 2% от депозита.',
+            'Идеальное время для входа!',
+            'Подтвердите сигнал на старшем ТФ.',
+            'Отличная точка входа в рынок.',
+            'Следуйте за трендом.',
+            'Установите stop-loss.',
+            'Рынок даёт чёткий сигнал.'
         ];
         heroAdvice.textContent = `💡 ${advices[Math.floor(Math.random() * advices.length)]}`;
         
-        addToHistory(isUp, probability, expiryText);
+        addToHistory(isUp, probability);
         updateStats();
-        if (navigator.vibrate) navigator.vibrate([100, 60, 100, 60, 200]);
+        if (navigator.vibrate) navigator.vibrate([100, 60, 200]);
     }
 
     function resetSignalHero() {
@@ -408,19 +317,18 @@ document.addEventListener('DOMContentLoaded', function() {
         heroArrow.textContent = '—';
         heroAction.textContent = 'ОЖИДАНИЕ СИГНАЛА';
         heroAsset.textContent = currentAsset;
-        heroTimeframe.textContent = `${currentTimeframe} мин`;
+        heroTimeframeBadge.textContent = `${currentTimeframe} мин`;
         heroProbability.textContent = '--%';
-        heroExpiry.textContent = '--';
+        heroExpiry.textContent = `${currentTimeframe} мин`;
         heroVolatility.textContent = '--';
-        heroTrend.textContent = '--';
-        heroAdvice.textContent = '💡 Нажмите кнопку «ПОЛУЧИТЬ СИГНАЛ» для анализа рынка';
+        heroAdvice.textContent = '💡 Нажмите кнопку для получения сигнала';
     }
 
-    // Таймер (только в нижней панели, без блокировки экрана)
+    // Таймер
     function startLockTimer() {
         isLocked = true;
         lockSeconds = currentTimeframe * 60;
-        timerMini.classList.add('visible');
+        timerBox.classList.add('active');
         updateLockTimerDisplay();
         disableControls();
         
@@ -431,7 +339,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 clearInterval(lockTimerInterval);
                 lockTimerInterval = null;
                 isLocked = false;
-                timerMini.classList.remove('visible');
+                timerBox.classList.remove('active');
                 enableControls();
             }
         }, 1000);
@@ -440,7 +348,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateLockTimerDisplay() {
         const m = Math.floor(lockSeconds / 60);
         const s = lockSeconds % 60;
-        timerMiniValue.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        timerValue.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
     }
 
     function disableControls() {
@@ -465,8 +373,8 @@ document.addEventListener('DOMContentLoaded', function() {
         otcCategories.style.opacity = '1';
     }
 
-    // История и статистика
-    function addToHistory(isUp, probability, expiry) {
+    // История
+    function addToHistory(isUp, probability) {
         const now = new Date();
         const timeStr = now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
         const historyItem = document.createElement('div');
@@ -475,6 +383,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <span class="hi-asset">${currentAsset}</span>
             <span class="hi-dir">${isUp ? '▲ CALL' : '▼ PUT'}</span>
             <span class="hi-prob">${probability}%</span>
+            <span class="hi-exp">${currentTimeframe}м</span>
             <span class="hi-time">${timeStr}</span>
         `;
         if (historyList.querySelector('.empty-history')) historyList.innerHTML = '';
@@ -490,15 +399,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 asset: item.querySelector('.hi-asset').textContent,
                 dir: item.querySelector('.hi-dir').textContent,
                 prob: item.querySelector('.hi-prob').textContent,
+                exp: item.querySelector('.hi-exp').textContent,
                 time: item.querySelector('.hi-time').textContent,
                 isUp: item.classList.contains('up')
             });
         });
-        localStorage.setItem('tradeSignalHistory', JSON.stringify(items));
+        localStorage.setItem('binarySignalHistory', JSON.stringify(items));
     }
 
     function loadHistory() {
-        const saved = localStorage.getItem('tradeSignalHistory');
+        const saved = localStorage.getItem('binarySignalHistory');
         if (saved) {
             const items = JSON.parse(saved);
             historyList.innerHTML = '';
@@ -509,6 +419,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <span class="hi-asset">${item.asset}</span>
                     <span class="hi-dir">${item.dir}</span>
                     <span class="hi-prob">${item.prob}</span>
+                    <span class="hi-exp">${item.exp}</span>
                     <span class="hi-time">${item.time}</span>
                 `;
                 historyList.appendChild(div);
@@ -542,7 +453,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function clearHistory() {
         historyList.innerHTML = '<div class="empty-history">Нет сигналов</div>';
-        localStorage.removeItem('tradeSignalHistory');
+        localStorage.removeItem('binarySignalHistory');
         updateStats();
     }
 
@@ -585,7 +496,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     assetsList.style.display = 'none';
                     otcCategories.style.display = 'block';
                     tradingviewChart.style.display = 'none';
-                    otcAnalytics.style.display = 'block';
+                    otcSimple.style.display = 'flex';
                     if (tvWidget) { tvWidget.remove(); tvWidget = null; }
                     selectAsset('BTC/USD', 'otc');
                 }
@@ -597,13 +508,11 @@ document.addEventListener('DOMContentLoaded', function() {
         tfPills.forEach(pill => {
             pill.addEventListener('click', function() {
                 if (isLocked || isAnalyzing) return;
-                tfPills.forEach(p => p.classList.remove('active'));
-                this.classList.add('active');
-                currentTimeframe = parseInt(this.dataset.tf);
-                heroTimeframe.textContent = `${currentTimeframe} мин`;
+                const tf = parseInt(this.dataset.tf);
+                setActiveTimeframe(tf);
                 resetSignalHero();
                 if (currentTab === 'forex' && tvWidget) {
-                    try { tvWidget.chart().setResolution(getTVInterval(currentTimeframe)); } catch(e) {}
+                    try { tvWidget.chart().setResolution(getTVInterval(tf)); } catch(e) {}
                 }
             });
         });
