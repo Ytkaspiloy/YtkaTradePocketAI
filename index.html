@@ -16,22 +16,45 @@
                 <img src="https://image2url.com/images/1766001097047-30fbff9b-a368-4dbf-965a-4f3ce2de2e5e.png" alt="Logo" class="logo-img">
                 <span class="logo-text">TradeSignal <span class="pro-badge">PREMIUM</span></span>
             </div>
-            <div class="header-status">
-                <span class="status-dot"></span> Онлайн
+            <div class="header-stats">
+                <span class="stat-badge">📊 Сигналов: <strong id="totalSignals">0</strong></span>
+                <span class="stat-badge">🎯 Средняя точность: <strong id="avgAccuracy">--</strong></span>
+                <span class="header-status"><span class="status-dot"></span> Онлайн</span>
             </div>
         </header>
 
         <main class="dashboard">
-            <!-- Левая панель: Активы + Поиск -->
+            <!-- Левая панель -->
             <aside class="assets-panel">
                 <div class="search-box">
                     <input type="text" id="assetSearch" placeholder="🔍 Поиск актива...">
                 </div>
-                <div class="panel-label">FOREX</div>
+                <div class="tabs">
+                    <button class="tab-btn active" data-tab="forex">FOREX</button>
+                    <button class="tab-btn" data-tab="otc">OTC</button>
+                </div>
                 <div class="assets-list" id="assetsList"></div>
+                <div class="otc-categories" id="otcCategories" style="display: none;">
+                    <div class="otc-group">
+                        <div class="otc-group-header">💱 ВАЛЮТЫ</div>
+                        <div class="otc-items" id="otcCurrencies"></div>
+                    </div>
+                    <div class="otc-group">
+                        <div class="otc-group-header">₿ КРИПТОВАЛЮТЫ</div>
+                        <div class="otc-items" id="otcCrypto"></div>
+                    </div>
+                    <div class="otc-group">
+                        <div class="otc-group-header">📊 АКЦИИ</div>
+                        <div class="otc-items" id="otcStocks"></div>
+                    </div>
+                    <div class="otc-group">
+                        <div class="otc-group-header">🌐 ИНДЕКСЫ</div>
+                        <div class="otc-items" id="otcIndices"></div>
+                    </div>
+                </div>
             </aside>
 
-            <!-- Центр: График + Управление -->
+            <!-- Центр -->
             <section class="main-content">
                 <!-- Верхняя панель -->
                 <div class="control-bar">
@@ -39,101 +62,155 @@
                         <h2 id="currentAsset">EUR/USD</h2>
                         <span class="live-badge">● LIVE</span>
                     </div>
-                    
-                    <!-- Таймфрейм пилсы -->
                     <div class="timeframe-pills" id="timeframePills">
-                        <button class="tf-pill" data-tf="1">1 мин</button>
-                        <button class="tf-pill" data-tf="2">2 мин</button>
-                        <button class="tf-pill" data-tf="3">3 мин</button>
-                        <button class="tf-pill active" data-tf="5">5 мин</button>
-                        <button class="tf-pill" data-tf="10">10 мин</button>
-                        <button class="tf-pill" data-tf="15">15 мин</button>
-                        <button class="tf-pill" data-tf="30">30 мин</button>
-                        <button class="tf-pill" data-tf="60">1 час</button>
-                        <button class="tf-pill" data-tf="240">4 часа</button>
+                        <button class="tf-pill" data-tf="1">1м</button>
+                        <button class="tf-pill" data-tf="2">2м</button>
+                        <button class="tf-pill" data-tf="3">3м</button>
+                        <button class="tf-pill active" data-tf="5">5м</button>
+                        <button class="tf-pill" data-tf="10">10м</button>
+                        <button class="tf-pill" data-tf="15">15м</button>
+                        <button class="tf-pill" data-tf="30">30м</button>
+                        <button class="tf-pill" data-tf="60">1Ч</button>
+                        <button class="tf-pill" data-tf="240">4Ч</button>
                     </div>
                 </div>
 
-                <!-- График -->
-                <div class="chart-wrapper" id="chartWrapper">
-                    <div class="chart-container" id="tradingviewChart">
-                        <div class="chart-placeholder" id="chartPlaceholder">
-                            <div class="loading-spinner"></div>
+                <!-- Сигнал + График -->
+                <div class="content-area" id="contentArea">
+                    <!-- Сигнал (верхняя половина, показывается когда есть сигнал) -->
+                    <div class="signal-hero" id="signalHero">
+                        <div class="signal-hero-inner">
+                            <div class="hero-direction">
+                                <div class="hero-arrow" id="heroArrow">—</div>
+                                <div class="hero-action" id="heroAction">ОЖИДАНИЕ</div>
+                            </div>
+                            <div class="hero-asset-info">
+                                <span class="hero-asset" id="heroAsset">EUR/USD</span>
+                                <span class="hero-timeframe" id="heroTimeframe">5 мин</span>
+                            </div>
+                            <div class="hero-stats">
+                                <div class="hero-stat">
+                                    <span class="hero-stat-value gold" id="heroProbability">--%</span>
+                                    <span class="hero-stat-label">Вероятность</span>
+                                </div>
+                                <div class="hero-stat">
+                                    <span class="hero-stat-value" id="heroExpiry">--</span>
+                                    <span class="hero-stat-label">Экспирация</span>
+                                </div>
+                                <div class="hero-stat">
+                                    <span class="hero-stat-value" id="heroVolatility">--</span>
+                                    <span class="hero-stat-label">Волатильность</span>
+                                </div>
+                                <div class="hero-stat">
+                                    <span class="hero-stat-value" id="heroTrend">--</span>
+                                    <span class="hero-stat-label">Тренд</span>
+                                </div>
+                            </div>
+                            <div class="hero-advice" id="heroAdvice"></div>
                         </div>
                     </div>
-                    
-                    <!-- Оверлей анализа (поверх графика) -->
+
+                    <!-- График / OTC (нижняя половина) -->
+                    <div class="chart-section" id="chartSection">
+                        <div class="chart-container" id="tradingviewChart">
+                            <div class="chart-placeholder" id="chartPlaceholder">
+                                <div class="loading-spinner"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- OTC аналитика -->
+                        <div class="otc-analytics" id="otcAnalytics" style="display: none;">
+                            <canvas id="analyticsCanvas"></canvas>
+                            <div class="otc-info-overlay">
+                                <div class="otc-header-row">
+                                    <span class="otc-asset-name" id="otcAssetName">Выберите актив</span>
+                                    <span class="otc-badge">OTC</span>
+                                </div>
+                                <div class="otc-metrics-grid">
+                                    <div class="otc-metric-card">
+                                        <span class="otc-metric-value" id="otcVolatility">--</span>
+                                        <span class="otc-metric-label">Волатильность</span>
+                                    </div>
+                                    <div class="otc-metric-card">
+                                        <span class="otc-metric-value" id="otcSentiment">--</span>
+                                        <span class="otc-metric-label">Сентимент</span>
+                                    </div>
+                                    <div class="otc-metric-card">
+                                        <span class="otc-metric-value" id="otcStrength">--</span>
+                                        <span class="otc-metric-label">Сила тренда</span>
+                                    </div>
+                                    <div class="otc-metric-card">
+                                        <span class="otc-metric-value" id="otcVolume">--</span>
+                                        <span class="otc-metric-label">Объём</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Оверлей анализа -->
                     <div class="analysis-overlay" id="analysisOverlay">
                         <div class="analysis-card">
                             <div class="analysis-icon">🔬</div>
-                            <div class="analysis-title">АНАЛИЗ РЫНКА</div>
-                            <div class="analysis-detail" id="analysisDetail">Инициализация...</div>
+                            <div class="analysis-title">ГЛУБОКИЙ АНАЛИЗ РЫНКА</div>
+                            <div class="analysis-steps" id="analysisSteps">
+                                <div class="step" id="step1"><span class="step-icon">📊</span><span>Сбор данных</span><span class="step-dot"></span></div>
+                                <div class="step" id="step2"><span class="step-icon">📈</span><span>Паттерны</span><span class="step-dot"></span></div>
+                                <div class="step" id="step3"><span class="step-icon">🎯</span><span>Уровни</span><span class="step-dot"></span></div>
+                                <div class="step" id="step4"><span class="step-icon">🧠</span><span>Индикаторы</span><span class="step-dot"></span></div>
+                                <div class="step" id="step5"><span class="step-icon">⚡</span><span>Волатильность</span><span class="step-dot"></span></div>
+                                <div class="step" id="step6"><span class="step-icon">💡</span><span>Сигнал</span><span class="step-dot"></span></div>
+                            </div>
                             <div class="progress-container">
                                 <div class="progress-track">
                                     <div class="progress-fill" id="progressFill"></div>
                                 </div>
                                 <span class="progress-percent" id="progressPercent">0%</span>
                             </div>
-                            <div class="analysis-indicators">
-                                <span id="indicator1">● RSI</span>
-                                <span id="indicator2">● MACD</span>
-                                <span id="indicator3">● MA</span>
-                            </div>
+                            <div class="analysis-live" id="analysisLive"></div>
                         </div>
                     </div>
-                    
-                    <!-- Оверлей блокировки (во время таймера) -->
+
+                    <!-- Блокировка таймера -->
                     <div class="lock-overlay" id="lockOverlay">
                         <div class="lock-content">
                             <div class="lock-icon">🔒</div>
                             <div class="lock-title">ОЖИДАНИЕ</div>
                             <div class="lock-timer" id="lockTimerValue">05:00</div>
-                            <div class="lock-subtitle">Таймер истекает. Дождитесь окончания.</div>
+                            <div class="lock-subtitle">Сигнал уже получен. Дождитесь истечения таймера.</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Нижняя панель: Кнопка + Сигнал -->
-                <div class="action-panel">
+                <!-- Кнопка -->
+                <div class="action-bar">
                     <button class="generate-btn" id="generateBtn">
                         <span class="btn-icon">⚡</span>
                         <span class="btn-text">ПОЛУЧИТЬ СИГНАЛ</span>
                     </button>
-
-                    <!-- Карточка сигнала -->
-                    <div class="signal-card" id="signalCard">
-                        <div class="signal-header">
-                            <span class="signal-badge" id="signalBadge">СИГНАЛ</span>
-                            <span class="signal-timeframe" id="signalTimeframe">5 мин</span>
-                        </div>
-                        <div class="signal-body">
-                            <div class="signal-direction" id="signalDirection">
-                                <span class="signal-arrow" id="signalArrow">—</span>
-                                <span class="signal-type" id="signalType">Ожидание</span>
-                            </div>
-                            <div class="signal-stats">
-                                <div class="stat">
-                                    <span class="stat-label">Вероятность</span>
-                                    <span class="stat-value probability" id="signalProbability">--</span>
-                                </div>
-                                <div class="stat">
-                                    <span class="stat-label">Экспирация</span>
-                                    <span class="stat-value" id="signalExpiry">--</span>
-                                </div>
-                                <div class="stat">
-                                    <span class="stat-label">Волатильность</span>
-                                    <span class="stat-value" id="signalVolatility">--</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="signal-advice" id="signalAdvice"></div>
+                    <div class="timer-mini" id="timerMini">
+                        <span>⏱ Следующий через: <strong id="timerMiniValue">--:--</strong></span>
                     </div>
                 </div>
             </section>
 
-            <!-- Правая панель: История -->
+            <!-- Правая панель: История + Статистика -->
             <aside class="history-panel">
                 <h3>📋 История</h3>
+                <div class="mini-stats">
+                    <div class="mini-stat">
+                        <span class="mini-stat-val" id="miniTotalSignals">0</span>
+                        <span class="mini-stat-lbl">Сигналов</span>
+                    </div>
+                    <div class="mini-stat">
+                        <span class="mini-stat-val green" id="miniWinRate">--%</span>
+                        <span class="mini-stat-lbl">Точность</span>
+                    </div>
+                    <div class="mini-stat">
+                        <span class="mini-stat-val gold" id="miniAvgProb">--%</span>
+                        <span class="mini-stat-lbl">Сред. вероятность</span>
+                    </div>
+                </div>
                 <div class="history-list" id="historyList">
                     <div class="empty-history">Нет сигналов</div>
                 </div>
@@ -142,7 +219,7 @@
         </main>
 
         <footer class="footer">
-            <span>© 2026 TradeSignal Premium</span>
+            <span>© 2026 TradeSignal Premium. ИИ-анализ в реальном времени.</span>
         </footer>
     </div>
 
