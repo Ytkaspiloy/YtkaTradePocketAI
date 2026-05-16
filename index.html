@@ -55,6 +55,10 @@
                         <div class="otc-items" id="otcCrypto"></div>
                     </div>
                     <div class="otc-group">
+                        <div class="otc-group-header" data-i18n="commodities">🛢 COMMODITIES</div>
+                        <div class="otc-items" id="otcCommodities"></div>
+                    </div>
+                    <div class="otc-group">
                         <div class="otc-group-header" data-i18n="stocks">📊 STOCKS</div>
                         <div class="otc-items" id="otcStocks"></div>
                     </div>
@@ -85,11 +89,8 @@
                                 <div class="loading-spinner"></div>
                             </div>
                         </div>
-                        <!-- OTC placeholder -->
-                        <div class="otc-bg" id="otcBg" style="display: none;">
-                            <span class="otc-bg-label">OTC</span>
-                            <span class="otc-bg-asset" id="otcBgAsset">EUR/USD OTC</span>
-                        </div>
+                        <!-- OTC background - чисто тёмный/светлый фон без надписей -->
+                        <div class="otc-bg" id="otcBg" style="display: none;"></div>
                     </div>
 
                     <!-- Signal (overlay on top) -->
@@ -151,13 +152,18 @@
                 <div class="action-bar">
                     <div class="timeframe-row">
                         <span class="tf-label" data-i18n="timeframe_expiry">⏱ Timeframe / Expiry:</span>
-                        <div class="timeframe-pills" id="timeframePills">
+                        <div class="timeframe-pills forex-tf" id="forexTimeframes">
                             <button class="tf-pill active" data-tf="1">1m</button>
                             <button class="tf-pill" data-tf="2">2m</button>
                             <button class="tf-pill" data-tf="3">3m</button>
                             <button class="tf-pill" data-tf="5">5m</button>
                             <button class="tf-pill" data-tf="10">10m</button>
                             <button class="tf-pill" data-tf="15">15m</button>
+                        </div>
+                        <div class="timeframe-pills otc-tf" id="otcTimeframes" style="display: none;">
+                            <button class="tf-pill active" data-tf="5">5s</button>
+                            <button class="tf-pill" data-tf="15">15s</button>
+                            <button class="tf-pill" data-tf="30">30s</button>
                         </div>
                     </div>
                     <div class="action-row">
