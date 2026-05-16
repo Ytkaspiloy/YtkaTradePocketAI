@@ -1,4 +1,4 @@
-// TradeSignal Premium Bot v4
+// TradeSignal Premium Bot v5 - Без блокировки графика и сигнала
 
 document.addEventListener('DOMContentLoaded', function() {
     
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let tvWidget = null;
     let canvasAnimId = null;
 
-    // DOM
+    // DOM элементы
     const assetSearch = document.getElementById('assetSearch');
     const assetsList = document.getElementById('assetsList');
     const otcCategories = document.getElementById('otcCategories');
@@ -46,11 +46,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const progressFill = document.getElementById('progressFill');
     const progressPercent = document.getElementById('progressPercent');
     const analysisLive = document.getElementById('analysisLive');
-    const lockOverlay = document.getElementById('lockOverlay');
-    const lockTimerValue = document.getElementById('lockTimerValue');
     const timerMini = document.getElementById('timerMini');
     const timerMiniValue = document.getElementById('timerMiniValue');
-    const chartSection = document.getElementById('chartSection');
     const tradingviewChart = document.getElementById('tradingviewChart');
     const chartPlaceholder = document.getElementById('chartPlaceholder');
     const otcAnalytics = document.getElementById('otcAnalytics');
@@ -65,12 +62,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const miniTotalSignals = document.getElementById('miniTotalSignals');
     const miniWinRate = document.getElementById('miniWinRate');
     const miniAvgProb = document.getElementById('miniAvgProb');
-
     const otcCurrencies = document.getElementById('otcCurrencies');
     const otcCrypto = document.getElementById('otcCrypto');
     const otcStocks = document.getElementById('otcStocks');
     const otcIndices = document.getElementById('otcIndices');
-
     const otcVolatility = document.getElementById('otcVolatility');
     const otcSentiment = document.getElementById('otcSentiment');
     const otcStrength = document.getElementById('otcStrength');
@@ -185,7 +180,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return map[min] || "5";
     }
 
-    // OTC Аналитика
+    // OTC Аналитика (красивый canvas)
     function startOTCAnalytics() {
         const canvas = analyticsCanvas;
         const ctx = canvas.getContext('2d');
@@ -225,7 +220,6 @@ document.addEventListener('DOMContentLoaded', function() {
         function animate() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             
-            // Фон
             const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
             grad.addColorStop(0, '#0a0e17');
             grad.addColorStop(0.5, '#111827');
@@ -233,7 +227,6 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.fillStyle = grad;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            // Сетка
             ctx.strokeStyle = 'rgba(30,41,59,0.4)';
             ctx.lineWidth = 0.5;
             for (let x = 0; x < canvas.width; x += 50) {
@@ -243,7 +236,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
             }
             
-            // Линии
             const t = Date.now() / 3000;
             lines.forEach(line => {
                 ctx.beginPath();
@@ -258,7 +250,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 ctx.stroke();
             });
             
-            // Частицы
             particles.forEach(p => {
                 p.x += p.vx;
                 p.y += p.vy;
@@ -266,14 +257,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (p.x > canvas.width) p.x = 0;
                 if (p.y < 0) p.y = canvas.height;
                 if (p.y > canvas.height) p.y = 0;
-                
                 ctx.beginPath();
                 ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
                 ctx.fillStyle = `rgba(96,165,250,${p.alpha})`;
                 ctx.fill();
             });
             
-            // Обновить метрики OTC
             otcVolatility.textContent = `${(30 + Math.random() * 50).toFixed(1)}%`;
             otcSentiment.textContent = Math.random() > 0.5 ? 'Бычий 🟢' : 'Медвежий 🔴';
             otcStrength.textContent = `${(40 + Math.random() * 55).toFixed(1)}%`;
@@ -284,7 +273,7 @@ document.addEventListener('DOMContentLoaded', function() {
         animate();
     }
 
-    // Анализ
+    // Анализ (оверлей без размытия)
     function startAnalysis(callback) {
         if (isAnalyzing || isLocked) return;
         isAnalyzing = true;
@@ -295,7 +284,6 @@ document.addEventListener('DOMContentLoaded', function() {
         progressPercent.textContent = '0%';
         analysisLive.textContent = 'Инициализация нейросети...';
         
-        // Сброс шагов
         for (let i = 1; i <= 6; i++) {
             const step = document.getElementById(`step${i}`);
             if (step) { step.classList.remove('done'); step.querySelector('.step-dot').style.background = '#334155'; }
@@ -375,19 +363,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function easeInOutCubic(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2; }
 
-    // Сигнал
+    // Генерация сигнала
     function generateSignal() {
         const isUp = Math.random() >= 0.5;
-        const probability = Math.floor(Math.random() * 16) + 75; // 75-90%
+        const probability = Math.floor(Math.random() * 16) + 75;
         const volatilities = ['Низкая', 'Умеренная', 'Средняя', 'Повышенная', 'Высокая', 'Очень высокая'];
         const volatility = volatilities[Math.floor(Math.random() * volatilities.length)];
         const trends = ['Восходящий 📈', 'Нисходящий 📉', 'Боковой ➡️'];
         const trend = isUp ? trends[0] : (Math.random() > 0.5 ? trends[1] : trends[0]);
-        
         const expiryMins = currentTimeframe * (Math.floor(Math.random() * 3) + 1);
         const expiryText = expiryMins >= 60 ? `${Math.floor(expiryMins/60)}ч ${expiryMins%60}м` : `${expiryMins} мин`;
         
-        // Hero signal
         signalHero.classList.add('active');
         signalHero.classList.remove('up', 'down');
         signalHero.classList.add(isUp ? 'up' : 'down');
@@ -414,7 +400,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         addToHistory(isUp, probability, expiryText);
         updateStats();
-        
         if (navigator.vibrate) navigator.vibrate([100, 60, 100, 60, 200]);
     }
 
@@ -431,11 +416,10 @@ document.addEventListener('DOMContentLoaded', function() {
         heroAdvice.textContent = '💡 Нажмите кнопку «ПОЛУЧИТЬ СИГНАЛ» для анализа рынка';
     }
 
-    // Таймер
+    // Таймер (только в нижней панели, без блокировки экрана)
     function startLockTimer() {
         isLocked = true;
         lockSeconds = currentTimeframe * 60;
-        lockOverlay.classList.add('active');
         timerMini.classList.add('visible');
         updateLockTimerDisplay();
         disableControls();
@@ -447,7 +431,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 clearInterval(lockTimerInterval);
                 lockTimerInterval = null;
                 isLocked = false;
-                lockOverlay.classList.remove('active');
                 timerMini.classList.remove('visible');
                 enableControls();
             }
@@ -457,9 +440,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateLockTimerDisplay() {
         const m = Math.floor(lockSeconds / 60);
         const s = lockSeconds % 60;
-        const str = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
-        lockTimerValue.textContent = str;
-        timerMiniValue.textContent = str;
+        timerMiniValue.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
     }
 
     function disableControls() {
@@ -595,7 +576,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.classList.add('active');
                 const tab = this.dataset.tab;
                 currentTab = tab;
-                
                 if (tab === 'forex') {
                     assetsList.style.display = 'flex';
                     otcCategories.style.display = 'none';
