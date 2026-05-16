@@ -1,14 +1,1 @@
-{
-  "name": "quantumtrade-proxy",
-  "version": "1.0.0",
-  "description": "CORS Proxy for QuantumTrade Pro",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js"
-  },
-  "dependencies": {
-    "express": "^4.18.2",
-    "http-proxy-middleware": "^2.0.6",
-    "ws": "^8.14.2"
-  }
-}
+
