@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
-    <title>BinarySignal Pro • Бот для бинарных опционов</title>
+    <title>BinarySignal Pro • Binary Options Bot</title>
     <link rel="icon" type="image/png" href="https://image2url.com/images/1766001097047-30fbff9b-a368-4dbf-965a-4f3ce2de2e5e.png">
     <link rel="stylesheet" href="style.css">
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 </head>
-<body>
+<body class="dark">
     <div class="app-container">
         <!-- Header -->
         <header class="header">
@@ -16,18 +16,29 @@
                 <img src="https://image2url.com/images/1766001097047-30fbff9b-a368-4dbf-965a-4f3ce2de2e5e.png" alt="Logo" class="logo-img">
                 <span class="logo-text">BinarySignal <span class="pro-badge">PRO</span></span>
             </div>
+            <div class="header-controls">
+                <div class="lang-switch">
+                    <button class="lang-btn active" data-lang="ru">🇷🇺 RU</button>
+                    <button class="lang-btn" data-lang="en">🇬🇧 EN</button>
+                </div>
+                <div class="theme-switch">
+                    <button class="theme-btn" id="themeToggle">
+                        <span class="theme-icon">🌙</span>
+                    </button>
+                </div>
+            </div>
             <div class="header-stats">
-                <span class="stat-badge">📊 Сигналов: <strong id="totalSignals">0</strong></span>
-                <span class="stat-badge">🎯 Точность: <strong id="avgAccuracy">--</strong></span>
-                <span class="header-status"><span class="status-dot"></span> Онлайн</span>
+                <span class="stat-badge">📊 <span data-i18n="signals">Signals</span>: <strong id="totalSignals">0</strong></span>
+                <span class="stat-badge">🎯 <span data-i18n="accuracy">Accuracy</span>: <strong id="avgAccuracy">--</strong></span>
+                <span class="header-status"><span class="status-dot"></span> <span data-i18n="online">Online</span></span>
             </div>
         </header>
 
         <main class="dashboard">
-            <!-- Левая панель: Активы -->
+            <!-- Left Panel: Assets -->
             <aside class="assets-panel">
                 <div class="search-box">
-                    <input type="text" id="assetSearch" placeholder="🔍 Поиск актива...">
+                    <input type="text" id="assetSearch" data-i18n-placeholder="search_placeholder" placeholder="🔍 Search asset...">
                 </div>
                 <div class="tabs">
                     <button class="tab-btn active" data-tab="forex">FOREX</button>
@@ -36,92 +47,94 @@
                 <div class="assets-list" id="assetsList"></div>
                 <div class="otc-categories" id="otcCategories" style="display: none;">
                     <div class="otc-group">
-                        <div class="otc-group-header">💱 ВАЛЮТЫ</div>
+                        <div class="otc-group-header" data-i18n="currencies">💱 CURRENCIES</div>
                         <div class="otc-items" id="otcCurrencies"></div>
                     </div>
                     <div class="otc-group">
-                        <div class="otc-group-header">₿ КРИПТОВАЛЮТЫ</div>
+                        <div class="otc-group-header" data-i18n="crypto">₿ CRYPTO</div>
                         <div class="otc-items" id="otcCrypto"></div>
                     </div>
                     <div class="otc-group">
-                        <div class="otc-group-header">📊 АКЦИИ</div>
+                        <div class="otc-group-header" data-i18n="stocks">📊 STOCKS</div>
                         <div class="otc-items" id="otcStocks"></div>
                     </div>
                     <div class="otc-group">
-                        <div class="otc-group-header">🌐 ИНДЕКСЫ</div>
+                        <div class="otc-group-header" data-i18n="indices">🌐 INDICES</div>
                         <div class="otc-items" id="otcIndices"></div>
                     </div>
                 </div>
             </aside>
 
-            <!-- Центр -->
+            <!-- Center -->
             <section class="main-content">
-                <!-- Верхняя панель -->
+                <!-- Top bar -->
                 <div class="control-bar">
                     <div class="asset-display">
                         <h2 id="currentAsset">EUR/USD</h2>
                         <span class="live-badge">● LIVE</span>
                     </div>
-                    <span class="mode-badge">Бинарные опционы</span>
+                    <span class="mode-badge" data-i18n="binary_options">Binary Options</span>
                 </div>
 
-                <!-- Контент: Сигнал + Маленький график -->
+                <!-- Content: Signal OVER Chart -->
                 <div class="content-area" id="contentArea">
-                    <!-- Сигнал (почти весь экран) -->
-                    <div class="signal-hero" id="signalHero">
-                        <div class="signal-hero-inner">
-                            <div class="hero-direction">
-                                <div class="hero-arrow" id="heroArrow">—</div>
-                                <div class="hero-action" id="heroAction">ОЖИДАНИЕ СИГНАЛА</div>
-                            </div>
-                            <div class="hero-asset-info">
-                                <span class="hero-asset" id="heroAsset">EUR/USD</span>
-                                <span class="hero-timeframe-badge" id="heroTimeframeBadge">1 мин</span>
-                            </div>
-                            <div class="hero-stats">
-                                <div class="hero-stat">
-                                    <span class="hero-stat-value gold" id="heroProbability">--%</span>
-                                    <span class="hero-stat-label">Вероятность</span>
-                                </div>
-                                <div class="hero-stat">
-                                    <span class="hero-stat-value" id="heroExpiry">1 мин</span>
-                                    <span class="hero-stat-label">Экспирация</span>
-                                </div>
-                                <div class="hero-stat">
-                                    <span class="hero-stat-value" id="heroVolatility">--</span>
-                                    <span class="hero-stat-label">Волатильность</span>
-                                </div>
-                            </div>
-                            <div class="hero-advice" id="heroAdvice">💡 Нажмите кнопку для получения сигнала</div>
-                        </div>
-                    </div>
-
-                    <!-- Маленький график / OTC -->
-                    <div class="chart-mini" id="chartMini">
-                        <div class="chart-container-mini" id="tradingviewChart">
+                    <!-- Chart (background) -->
+                    <div class="chart-full" id="chartFull">
+                        <div class="chart-container-full" id="tradingviewChart">
                             <div class="chart-placeholder" id="chartPlaceholder">
                                 <div class="loading-spinner"></div>
                             </div>
                         </div>
-                        <!-- OTC: только актив -->
-                        <div class="otc-mini" id="otcMini" style="display: none;">
-                            <span class="otc-mini-label">OTC</span>
-                            <span class="otc-mini-asset" id="otcMiniAsset">Выберите актив</span>
+                        <!-- OTC placeholder -->
+                        <div class="otc-bg" id="otcBg" style="display: none;">
+                            <span class="otc-bg-label">OTC</span>
+                            <span class="otc-bg-asset" id="otcBgAsset">EUR/USD OTC</span>
                         </div>
                     </div>
 
-                    <!-- Оверлей анализа -->
+                    <!-- Signal (overlay on top) -->
+                    <div class="signal-overlay" id="signalOverlay">
+                        <div class="signal-hero" id="signalHero">
+                            <div class="signal-hero-inner">
+                                <div class="hero-direction">
+                                    <div class="hero-arrow" id="heroArrow">—</div>
+                                    <div class="hero-action" id="heroAction" data-i18n="waiting_signal">WAITING FOR SIGNAL</div>
+                                </div>
+                                <div class="hero-asset-info">
+                                    <span class="hero-asset" id="heroAsset">EUR/USD</span>
+                                    <span class="hero-timeframe-badge" id="heroTimeframeBadge">1 min</span>
+                                </div>
+                                <div class="hero-stats">
+                                    <div class="hero-stat">
+                                        <span class="hero-stat-value gold" id="heroProbability">--%</span>
+                                        <span class="hero-stat-label" data-i18n="probability">Probability</span>
+                                    </div>
+                                    <div class="hero-stat">
+                                        <span class="hero-stat-value" id="heroExpiry">1 min</span>
+                                        <span class="hero-stat-label" data-i18n="expiry">Expiry</span>
+                                    </div>
+                                    <div class="hero-stat">
+                                        <span class="hero-stat-value" id="heroVolatility">--</span>
+                                        <span class="hero-stat-label" data-i18n="volatility">Volatility</span>
+                                    </div>
+                                </div>
+                                <div class="hero-advice" id="heroAdvice" data-i18n="press_button">💡 Press the button to get a signal</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Analysis overlay -->
                     <div class="analysis-overlay" id="analysisOverlay">
                         <div class="analysis-card">
                             <div class="analysis-icon">🔬</div>
-                            <div class="analysis-title">АНАЛИЗ РЫНКА</div>
+                            <div class="analysis-title" data-i18n="market_analysis">MARKET ANALYSIS</div>
                             <div class="analysis-steps" id="analysisSteps">
-                                <div class="step" id="step1"><span class="step-icon">📊</span><span>Сбор данных</span><span class="step-dot"></span></div>
-                                <div class="step" id="step2"><span class="step-icon">📈</span><span>Паттерны</span><span class="step-dot"></span></div>
-                                <div class="step" id="step3"><span class="step-icon">🎯</span><span>Уровни</span><span class="step-dot"></span></div>
-                                <div class="step" id="step4"><span class="step-icon">🧠</span><span>Индикаторы</span><span class="step-dot"></span></div>
-                                <div class="step" id="step5"><span class="step-icon">⚡</span><span>Волатильность</span><span class="step-dot"></span></div>
-                                <div class="step" id="step6"><span class="step-icon">💡</span><span>Сигнал</span><span class="step-dot"></span></div>
+                                <div class="step" id="step1"><span class="step-icon">📊</span><span data-i18n="step1">Data Collection</span><span class="step-dot"></span></div>
+                                <div class="step" id="step2"><span class="step-icon">📈</span><span data-i18n="step2">Patterns</span><span class="step-dot"></span></div>
+                                <div class="step" id="step3"><span class="step-icon">🎯</span><span data-i18n="step3">Levels</span><span class="step-dot"></span></div>
+                                <div class="step" id="step4"><span class="step-icon">🧠</span><span data-i18n="step4">Indicators</span><span class="step-dot"></span></div>
+                                <div class="step" id="step5"><span class="step-icon">⚡</span><span data-i18n="step5">Volatility</span><span class="step-dot"></span></div>
+                                <div class="step" id="step6"><span class="step-icon">💡</span><span data-i18n="step6">Signal</span><span class="step-dot"></span></div>
                             </div>
                             <div class="progress-container">
                                 <div class="progress-track">
@@ -129,63 +142,63 @@
                                 </div>
                                 <span class="progress-percent" id="progressPercent">0%</span>
                             </div>
-                            <div class="analysis-live" id="analysisLive">Инициализация нейросети...</div>
+                            <div class="analysis-live" id="analysisLive">Initializing neural network...</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Нижняя панель -->
+                <!-- Bottom panel -->
                 <div class="action-bar">
                     <div class="timeframe-row">
-                        <span class="tf-label">⏱ Таймфрейм / Экспирация:</span>
+                        <span class="tf-label" data-i18n="timeframe_expiry">⏱ Timeframe / Expiry:</span>
                         <div class="timeframe-pills" id="timeframePills">
-                            <button class="tf-pill active" data-tf="1">1 мин</button>
-                            <button class="tf-pill" data-tf="2">2 мин</button>
-                            <button class="tf-pill" data-tf="3">3 мин</button>
-                            <button class="tf-pill" data-tf="5">5 мин</button>
-                            <button class="tf-pill" data-tf="10">10 мин</button>
-                            <button class="tf-pill" data-tf="15">15 мин</button>
+                            <button class="tf-pill active" data-tf="1">1m</button>
+                            <button class="tf-pill" data-tf="2">2m</button>
+                            <button class="tf-pill" data-tf="3">3m</button>
+                            <button class="tf-pill" data-tf="5">5m</button>
+                            <button class="tf-pill" data-tf="10">10m</button>
+                            <button class="tf-pill" data-tf="15">15m</button>
                         </div>
                     </div>
                     <div class="action-row">
                         <button class="generate-btn" id="generateBtn">
                             <span class="btn-icon">⚡</span>
-                            <span class="btn-text">ПОЛУЧИТЬ СИГНАЛ</span>
+                            <span class="btn-text" data-i18n="get_signal">GET SIGNAL</span>
                         </button>
                         <div class="timer-box" id="timerBox">
-                            <span class="timer-label">⏱ Таймер:</span>
+                            <span class="timer-label" data-i18n="timer">⏱ Timer:</span>
                             <span class="timer-value" id="timerValue">--:--</span>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- Правая панель: История -->
+            <!-- Right Panel: History -->
             <aside class="history-panel">
-                <h3>📋 История</h3>
+                <h3 data-i18n="history">📋 History</h3>
                 <div class="mini-stats">
                     <div class="mini-stat">
                         <span class="mini-stat-val" id="miniTotalSignals">0</span>
-                        <span class="mini-stat-lbl">Сигналов</span>
+                        <span class="mini-stat-lbl" data-i18n="signals">Signals</span>
                     </div>
                     <div class="mini-stat">
                         <span class="mini-stat-val green" id="miniWinRate">--%</span>
-                        <span class="mini-stat-lbl">Точность</span>
+                        <span class="mini-stat-lbl" data-i18n="accuracy">Accuracy</span>
                     </div>
                     <div class="mini-stat">
                         <span class="mini-stat-val gold" id="miniAvgProb">--%</span>
-                        <span class="mini-stat-lbl">Сред. вер-ть</span>
+                        <span class="mini-stat-lbl" data-i18n="avg_prob">Avg Prob</span>
                     </div>
                 </div>
                 <div class="history-list" id="historyList">
-                    <div class="empty-history">Нет сигналов</div>
+                    <div class="empty-history" data-i18n="no_signals">No signals</div>
                 </div>
-                <button class="clear-btn" id="clearHistory">Очистить</button>
+                <button class="clear-btn" id="clearHistory" data-i18n="clear">Clear</button>
             </aside>
         </main>
 
         <footer class="footer">
-            <span>© 2026 BinarySignal Pro. Бот для бинарных опционов.</span>
+            <span>© 2026 BinarySignal Pro. <span data-i18n="footer_text">AI-powered binary options bot.</span></span>
         </footer>
     </div>
 
