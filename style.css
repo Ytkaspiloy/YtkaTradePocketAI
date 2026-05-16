@@ -1,10 +1,9 @@
-/* BinarySignal Pro - Dark/Light Theme + Signal Over Chart */
+/* BinarySignal Pro - Full OTC + Light/Dark Theme */
 :root {
     --radius: 10px;
     --transition: all 0.25s ease;
 }
 
-/* DARK THEME */
 body.dark {
     --bg-primary: #0a0e17;
     --bg-secondary: #0f1419;
@@ -24,7 +23,6 @@ body.dark {
     --overlay-bg: rgba(10,14,23,0.88);
 }
 
-/* LIGHT THEME */
 body.light {
     --bg-primary: #f8fafc;
     --bg-secondary: #ffffff;
@@ -90,7 +88,7 @@ body.light .logo-text { background: linear-gradient(135deg,#1e293b,#334155); -we
 
 /* ASSETS PANEL */
 .assets-panel {
-    width: 230px; min-width: 230px; background: var(--bg-secondary);
+    width: 240px; min-width: 240px; background: var(--bg-secondary);
     border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden;
 }
 .search-box { padding: 8px; }
@@ -110,7 +108,7 @@ body.light .logo-text { background: linear-gradient(135deg,#1e293b,#334155); -we
 .asset-item {
     display: flex; justify-content: space-between; align-items: center; padding: 7px 9px;
     border-radius: 7px; cursor: pointer; transition: var(--transition); border: 1px solid transparent;
-    font-weight: 600; font-size: 0.76rem;
+    font-weight: 600; font-size: 0.74rem;
 }
 .asset-item:hover { background: var(--bg-card); }
 .asset-item.active { background: var(--bg-card); border-color: var(--accent); box-shadow: 0 0 8px rgba(59,130,246,0.2); }
@@ -142,12 +140,10 @@ body.light .logo-text { background: linear-gradient(135deg,#1e293b,#334155); -we
 .loading-spinner { width: 20px; height: 20px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
 @keyframes spin { to{transform:rotate(360deg)} }
 
-/* OTC BG */
-.otc-bg { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; background: var(--bg-primary); }
-.otc-bg-label { font-size: 0.7rem; background: rgba(245,158,11,0.2); color: var(--gold); padding: 4px 12px; border-radius: 8px; font-weight: 700; }
-.otc-bg-asset { font-size: 1.2rem; font-weight: 700; }
+/* OTC BG - чистый фон */
+.otc-bg { position: absolute; inset: 0; background: var(--bg-primary); }
 
-/* SIGNAL OVERLAY (on top of chart) */
+/* SIGNAL OVERLAY */
 .signal-overlay {
     position: absolute; inset: 0; z-index: 5;
     display: flex; align-items: center; justify-content: center;
@@ -221,6 +217,7 @@ body.light .logo-text { background: linear-gradient(135deg,#1e293b,#334155); -we
 .timeframe-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .tf-label { font-size: 0.72rem; color: var(--text-secondary); white-space: nowrap; }
 .timeframe-pills { display: flex; gap: 4px; background: var(--bg-input); padding: 3px; border-radius: 16px; border: 1px solid var(--border); }
+.forex-tf, .otc-tf { }
 .tf-pill {
     padding: 6px 11px; background: transparent; border: none; color: var(--text-secondary);
     border-radius: 13px; cursor: pointer; font-weight: 700; font-size: 0.72rem;
@@ -290,9 +287,9 @@ body.light .logo-text { background: linear-gradient(135deg,#1e293b,#334155); -we
 /* RESPONSIVE */
 @media (max-width: 900px) {
     .dashboard { flex-direction: column; }
-    .assets-panel { width: 100%; min-width: 100%; max-height: 140px; flex-shrink: 0; }
+    .assets-panel { width: 100%; min-width: 100%; max-height: 150px; flex-shrink: 0; }
     .assets-list { flex-direction: row; flex-wrap: wrap; gap: 2px; }
-    .asset-item { padding: 5px 7px; font-size: 0.68rem; }
+    .asset-item { padding: 5px 7px; font-size: 0.66rem; }
     .otc-items { flex-direction: row; flex-wrap: wrap; gap: 2px; }
     .main-content { flex: 1; }
     .history-panel { width: 100%; min-width: 100%; max-height: 110px; flex-shrink: 0; }
