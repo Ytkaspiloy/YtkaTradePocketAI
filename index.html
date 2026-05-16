@@ -56,7 +56,6 @@
 
             <!-- Центр -->
             <section class="main-content">
-                <!-- Верхняя панель -->
                 <div class="control-bar">
                     <div class="asset-display">
                         <h2 id="currentAsset">EUR/USD</h2>
@@ -75,14 +74,14 @@
                     </div>
                 </div>
 
-                <!-- Сигнал + График -->
+                <!-- Контент: Сигнал сверху + График снизу -->
                 <div class="content-area" id="contentArea">
-                    <!-- Сигнал (верхняя половина, показывается когда есть сигнал) -->
+                    <!-- Сигнал (верхняя половина) -->
                     <div class="signal-hero" id="signalHero">
                         <div class="signal-hero-inner">
                             <div class="hero-direction">
                                 <div class="hero-arrow" id="heroArrow">—</div>
-                                <div class="hero-action" id="heroAction">ОЖИДАНИЕ</div>
+                                <div class="hero-action" id="heroAction">ОЖИДАНИЕ СИГНАЛА</div>
                             </div>
                             <div class="hero-asset-info">
                                 <span class="hero-asset" id="heroAsset">EUR/USD</span>
@@ -106,7 +105,7 @@
                                     <span class="hero-stat-label">Тренд</span>
                                 </div>
                             </div>
-                            <div class="hero-advice" id="heroAdvice"></div>
+                            <div class="hero-advice" id="heroAdvice">💡 Нажмите кнопку для получения сигнала</div>
                         </div>
                     </div>
 
@@ -117,8 +116,6 @@
                                 <div class="loading-spinner"></div>
                             </div>
                         </div>
-                        
-                        <!-- OTC аналитика -->
                         <div class="otc-analytics" id="otcAnalytics" style="display: none;">
                             <canvas id="analyticsCanvas"></canvas>
                             <div class="otc-info-overlay">
@@ -148,7 +145,7 @@
                         </div>
                     </div>
 
-                    <!-- Оверлей анализа -->
+                    <!-- Только оверлей анализа (без размытия графика) -->
                     <div class="analysis-overlay" id="analysisOverlay">
                         <div class="analysis-card">
                             <div class="analysis-icon">🔬</div>
@@ -167,29 +164,19 @@
                                 </div>
                                 <span class="progress-percent" id="progressPercent">0%</span>
                             </div>
-                            <div class="analysis-live" id="analysisLive"></div>
-                        </div>
-                    </div>
-
-                    <!-- Блокировка таймера -->
-                    <div class="lock-overlay" id="lockOverlay">
-                        <div class="lock-content">
-                            <div class="lock-icon">🔒</div>
-                            <div class="lock-title">ОЖИДАНИЕ</div>
-                            <div class="lock-timer" id="lockTimerValue">05:00</div>
-                            <div class="lock-subtitle">Сигнал уже получен. Дождитесь истечения таймера.</div>
+                            <div class="analysis-live" id="analysisLive">Инициализация нейросети...</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Кнопка -->
+                <!-- Панель кнопки + таймер -->
                 <div class="action-bar">
                     <button class="generate-btn" id="generateBtn">
                         <span class="btn-icon">⚡</span>
                         <span class="btn-text">ПОЛУЧИТЬ СИГНАЛ</span>
                     </button>
                     <div class="timer-mini" id="timerMini">
-                        <span>⏱ Следующий через: <strong id="timerMiniValue">--:--</strong></span>
+                        <span>⏱ Следующий сигнал через: <strong id="timerMiniValue">--:--</strong></span>
                     </div>
                 </div>
             </section>
@@ -208,7 +195,7 @@
                     </div>
                     <div class="mini-stat">
                         <span class="mini-stat-val gold" id="miniAvgProb">--%</span>
-                        <span class="mini-stat-lbl">Сред. вероятность</span>
+                        <span class="mini-stat-lbl">Сред. вер-ть</span>
                     </div>
                 </div>
                 <div class="history-list" id="historyList">
