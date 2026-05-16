@@ -1,4 +1,4 @@
-// BinarySignal Pro - Multi-language + Theme + Signal OVER Chart
+// BinarySignal Pro - Full OTC Assets + Seconds Timeframes
 
 document.addEventListener('DOMContentLoaded', function() {
     
@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
             search_placeholder: "🔍 Поиск актива...",
             currencies: "💱 ВАЛЮТЫ",
             crypto: "₿ КРИПТОВАЛЮТЫ",
+            commodities: "🛢 СЫРЬЁ",
             stocks: "📊 АКЦИИ",
             indices: "🌐 ИНДЕКСЫ",
             binary_options: "Бинарные опционы",
@@ -61,6 +62,7 @@ document.addEventListener('DOMContentLoaded', function() {
             search_placeholder: "🔍 Search asset...",
             currencies: "💱 CURRENCIES",
             crypto: "₿ CRYPTO",
+            commodities: "🛢 COMMODITIES",
             stocks: "📊 STOCKS",
             indices: "🌐 INDICES",
             binary_options: "Binary Options",
@@ -118,29 +120,43 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const otcData = {
         currencies: [
-            "EUR/USD OTC", "GBP/USD OTC", "USD/JPY OTC", "AUD/USD OTC", 
-            "USD/CAD OTC", "EUR/GBP OTC", "USD/CHF OTC", "NZD/USD OTC",
-            "EUR/JPY OTC", "GBP/JPY OTC", "EUR/AUD OTC", "AUD/JPY OTC"
+            "AED/CNY OTC", "AUD/CAD OTC", "AUD/CHF OTC", "AUD/JPY OTC", "AUD/NZD OTC", "AUD/USD OTC",
+            "BHD/CNY OTC", "CAD/CHF OTC", "CAD/JPY OTC", "CHF/JPY OTC", "CHF/NOK OTC",
+            "EUR/CHF OTC", "EUR/GBP OTC", "EUR/HUF OTC", "EUR/JPY OTC", "EUR/NZD OTC",
+            "EUR/RUB OTC", "EUR/TRY OTC", "EUR/USD OTC", "GBP/AUD OTC", "GBP/JPY OTC", "GBP/USD OTC",
+            "JOD/CNY OTC", "KES/USD OTC", "LBP/USD OTC", "MAD/USD OTC", "NGN/USD OTC",
+            "NZD/JPY OTC", "NZD/USD OTC", "OMR/CNY OTC", "QAR/CNY OTC", "SAR/CNY OTC",
+            "TND/USD OTC", "UAH/USD OTC", "USD/ARS OTC", "USD/BDT OTC", "USD/BRL OTC",
+            "USD/CAD OTC", "USD/CHF OTC", "USD/CLP OTC", "USD/CNH OTC", "USD/COP OTC",
+            "USD/DZD OTC", "USD/EGP OTC", "USD/IDR OTC", "USD/INR OTC", "USD/JPY OTC",
+            "USD/MXN OTC", "USD/MYR OTC", "USD/PHP OTC", "USD/PKR OTC", "USD/RUB OTC",
+            "USD/SGD OTC", "USD/THB OTC", "USD/VND OTC", "YER/USD OTC", "ZAR/USD OTC"
         ],
         crypto: [
-            "BTC/USD", "ETH/USD", "XRP/USD", "LTC/USD", "BNB/USD", 
-            "SOL/USD", "ADA/USD", "DOT/USD", "DOGE/USD", "AVAX/USD",
-            "MATIC/USD", "LINK/USD"
+            "Avalanche OTC", "Bitcoin OTC", "Bitcoin ETF OTC", "BNB OTC", "Cardano OTC",
+            "Chainlink OTC", "Dogecoin OTC", "Ethereum OTC", "Litecoin OTC", "Polkadot OTC",
+            "Polygon OTC", "Solana OTC", "Toncoin OTC", "TRON OTC"
+        ],
+        commodities: [
+            "Gold OTC", "Natural Gas OTC", "Palladium spot OTC", "Platinum spot OTC"
         ],
         stocks: [
-            "AAPL", "TSLA", "AMZN", "GOOGL", "MSFT", "META", "NFLX", "NVDA",
-            "AMD", "INTC", "BA", "NKE", "DIS", "V", "JPM", "GS"
+            "Advanced Micro Devices OTC", "Alibaba OTC", "American Express OTC", "Apple OTC",
+            "Citigroup Inc OTC", "Cisco OTC", "Coinbase Global OTC", "ExxonMobil OTC",
+            "FACEBOOK INC OTC", "FedEx OTC", "GameStop Corp OTC", "Intel OTC",
+            "Marathon Digital Holdings OTC", "McDonald's OTC", "Microsoft OTC", "Netflix OTC",
+            "Palantir Technologies OTC", "Pfizer Inc OTC", "Tesla OTC", "VISA OTC", "VIX OTC"
         ],
         indices: [
-            "S&P 500", "NASDAQ", "DJIA", "FTSE 100", "DAX 40", 
-            "NIKKEI 225", "HSI", "ASX 200", "CAC 40", "IBEX 35"
+            "AUS 200 OTC", "D30EUR OTC", "DJI30 OTC", "E35EUR OTC", "E50EUR OTC",
+            "F40EUR OTC", "JPN225 OTC", "SP500 OTC", "US100 OTC", "100GBP OTC"
         ]
     };
 
     // ==================== STATE ====================
     let currentAsset = "EUR/USD";
     let currentTab = 'forex';
-    let currentTimeframe = 1;
+    let currentTimeframe = 1; // for forex: minutes, for otc: seconds stored separately is handled
     let isLocked = false;
     let isAnalyzing = false;
     let lockTimerInterval = null;
@@ -152,7 +168,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const assetsList = document.getElementById('assetsList');
     const otcCategories = document.getElementById('otcCategories');
     const currentAssetEl = document.getElementById('currentAsset');
-    const timeframePills = document.getElementById('timeframePills');
+    const forexTimeframes = document.getElementById('forexTimeframes');
+    const otcTimeframes = document.getElementById('otcTimeframes');
     const generateBtn = document.getElementById('generateBtn');
     const signalOverlay = document.getElementById('signalOverlay');
     const signalHero = document.getElementById('signalHero');
@@ -173,11 +190,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const tradingviewChart = document.getElementById('tradingviewChart');
     const chartPlaceholder = document.getElementById('chartPlaceholder');
     const otcBg = document.getElementById('otcBg');
-    const otcBgAsset = document.getElementById('otcBgAsset');
     const historyList = document.getElementById('historyList');
     const clearHistoryBtn = document.getElementById('clearHistory');
     const tabBtns = document.querySelectorAll('.tab-btn');
-    const tfPills = document.querySelectorAll('.tf-pill');
     const totalSignalsEl = document.getElementById('totalSignals');
     const avgAccuracyEl = document.getElementById('avgAccuracy');
     const miniTotalSignals = document.getElementById('miniTotalSignals');
@@ -185,12 +200,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const miniAvgProb = document.getElementById('miniAvgProb');
     const otcCurrencies = document.getElementById('otcCurrencies');
     const otcCrypto = document.getElementById('otcCrypto');
+    const otcCommodities = document.getElementById('otcCommodities');
     const otcStocks = document.getElementById('otcStocks');
     const otcIndices = document.getElementById('otcIndices');
     const themeToggle = document.getElementById('themeToggle');
     const themeIcon = themeToggle.querySelector('.theme-icon');
 
-    // ==================== TRANSLATION FUNCTION ====================
     function t(key) {
         return translations[currentLang][key] || key;
     }
@@ -207,14 +222,12 @@ document.addEventListener('DOMContentLoaded', function() {
         document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
             el.placeholder = t(el.getAttribute('data-i18n-placeholder'));
         });
-        // Update dynamic elements
         if (!signalHero.classList.contains('up') && !signalHero.classList.contains('down')) {
             heroAction.textContent = t('waiting_signal');
         }
         heroAdvice.textContent = t('press_button');
     }
 
-    // ==================== THEME ====================
     function applyTheme() {
         document.body.classList.remove('dark', 'light');
         document.body.classList.add(currentTheme);
@@ -227,17 +240,11 @@ document.addEventListener('DOMContentLoaded', function() {
         applyTheme();
     }
 
-    // ==================== INIT ====================
     function init() {
-        // Load saved settings
         const savedLang = localStorage.getItem('binarySignalLang');
-        if (savedLang && (savedLang === 'ru' || savedLang === 'en')) {
-            currentLang = savedLang;
-        }
+        if (savedLang && (savedLang === 'ru' || savedLang === 'en')) currentLang = savedLang;
         const savedTheme = localStorage.getItem('binarySignalTheme');
-        if (savedTheme && (savedTheme === 'dark' || savedTheme === 'light')) {
-            currentTheme = savedTheme;
-        }
+        if (savedTheme && (savedTheme === 'dark' || savedTheme === 'light')) currentTheme = savedTheme;
         
         applyTheme();
         updateLangButtons();
@@ -249,7 +256,8 @@ document.addEventListener('DOMContentLoaded', function() {
         loadHistory();
         updateStats();
         resetSignalHero();
-        setActiveTimeframe(1);
+        setActiveForexTimeframe(1);
+        setActiveOTCTimeframe(5);
         updateExpiryDisplay();
     }
 
@@ -260,7 +268,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // ==================== RENDER ====================
     function renderForexList(assets) {
         assetsList.innerHTML = '';
         assets.forEach(asset => {
@@ -273,9 +280,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function renderOTCList() {
-        [otcCurrencies, otcCrypto, otcStocks, otcIndices].forEach(el => el.innerHTML = '');
+        [otcCurrencies, otcCrypto, otcCommodities, otcStocks, otcIndices].forEach(el => el.innerHTML = '');
         otcData.currencies.forEach(c => otcCurrencies.appendChild(createOTCItem(c)));
         otcData.crypto.forEach(c => otcCrypto.appendChild(createOTCItem(c)));
+        otcData.commodities.forEach(c => otcCommodities.appendChild(createOTCItem(c)));
         otcData.stocks.forEach(s => otcStocks.appendChild(createOTCItem(s)));
         otcData.indices.forEach(i => otcIndices.appendChild(createOTCItem(i)));
     }
@@ -303,11 +311,14 @@ document.addEventListener('DOMContentLoaded', function() {
         if (tab === 'forex') {
             tradingviewChart.style.display = 'block';
             otcBg.style.display = 'none';
+            forexTimeframes.style.display = 'flex';
+            otcTimeframes.style.display = 'none';
             loadTradingViewChart(asset);
         } else {
             tradingviewChart.style.display = 'none';
-            otcBg.style.display = 'flex';
-            otcBgAsset.textContent = asset;
+            otcBg.style.display = 'block';
+            forexTimeframes.style.display = 'none';
+            otcTimeframes.style.display = 'flex';
             if (tvWidget) { tvWidget.remove(); tvWidget = null; }
         }
     }
@@ -358,9 +369,18 @@ document.addEventListener('DOMContentLoaded', function() {
         return map[min] || "1";
     }
 
-    function setActiveTimeframe(tf) {
+    function setActiveForexTimeframe(tf) {
         currentTimeframe = tf;
-        tfPills.forEach(p => {
+        forexTimeframes.querySelectorAll('.tf-pill').forEach(p => {
+            p.classList.remove('active');
+            if (parseInt(p.dataset.tf) === tf) p.classList.add('active');
+        });
+        updateExpiryDisplay();
+    }
+
+    function setActiveOTCTimeframe(tf) {
+        currentTimeframe = tf;
+        otcTimeframes.querySelectorAll('.tf-pill').forEach(p => {
             p.classList.remove('active');
             if (parseInt(p.dataset.tf) === tf) p.classList.add('active');
         });
@@ -368,8 +388,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updateExpiryDisplay() {
-        heroTimeframeBadge.textContent = `${currentTimeframe} min`;
-        heroExpiry.textContent = `${currentTimeframe} min`;
+        if (currentTab === 'forex') {
+            heroTimeframeBadge.textContent = `${currentTimeframe} min`;
+            heroExpiry.textContent = `${currentTimeframe} min`;
+        } else {
+            heroTimeframeBadge.textContent = `${currentTimeframe}s`;
+            heroExpiry.textContent = `${currentTimeframe}s`;
+        }
     }
 
     // ==================== ANALYSIS ====================
@@ -477,9 +502,9 @@ document.addEventListener('DOMContentLoaded', function() {
         heroArrow.textContent = isUp ? '▲' : '▼';
         heroAction.textContent = isUp ? t('buy_call') : t('sell_put');
         heroAsset.textContent = currentAsset;
-        heroTimeframeBadge.textContent = `${currentTimeframe} min`;
+        heroTimeframeBadge.textContent = currentTab === 'forex' ? `${currentTimeframe} min` : `${currentTimeframe}s`;
         heroProbability.textContent = `${probability}%`;
-        heroExpiry.textContent = `${currentTimeframe} min`;
+        heroExpiry.textContent = currentTab === 'forex' ? `${currentTimeframe} min` : `${currentTimeframe}s`;
         heroVolatility.textContent = volatility;
         
         const advices = t('advices');
@@ -496,9 +521,9 @@ document.addEventListener('DOMContentLoaded', function() {
         heroArrow.textContent = '—';
         heroAction.textContent = t('waiting_signal');
         heroAsset.textContent = currentAsset;
-        heroTimeframeBadge.textContent = `${currentTimeframe} min`;
+        heroTimeframeBadge.textContent = currentTab === 'forex' ? `${currentTimeframe} min` : `${currentTimeframe}s`;
         heroProbability.textContent = '--%';
-        heroExpiry.textContent = `${currentTimeframe} min`;
+        heroExpiry.textContent = currentTab === 'forex' ? `${currentTimeframe} min` : `${currentTimeframe}s`;
         heroVolatility.textContent = '--';
         heroAdvice.textContent = t('press_button');
     }
@@ -506,7 +531,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // ==================== TIMER ====================
     function startLockTimer() {
         isLocked = true;
-        lockSeconds = currentTimeframe * 60;
+        // Для OTC таймфрейм в секундах, для FOREX в минутах
+        if (currentTab === 'otc') {
+            lockSeconds = currentTimeframe; // секунды
+        } else {
+            lockSeconds = currentTimeframe * 60; // минуты в секунды
+        }
         timerBox.classList.add('active');
         updateLockTimerDisplay();
         disableControls();
@@ -525,16 +555,22 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updateLockTimerDisplay() {
-        const m = Math.floor(lockSeconds / 60);
-        const s = lockSeconds % 60;
-        timerValue.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        if (currentTab === 'otc') {
+            timerValue.textContent = `00:${String(lockSeconds).padStart(2,'0')}`;
+        } else {
+            const m = Math.floor(lockSeconds / 60);
+            const s = lockSeconds % 60;
+            timerValue.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        }
     }
 
     function disableControls() {
         generateBtn.classList.add('disabled');
         assetSearch.disabled = true;
-        timeframePills.style.pointerEvents = 'none';
-        timeframePills.style.opacity = '0.5';
+        forexTimeframes.style.pointerEvents = 'none';
+        forexTimeframes.style.opacity = '0.5';
+        otcTimeframes.style.pointerEvents = 'none';
+        otcTimeframes.style.opacity = '0.5';
         assetsList.style.pointerEvents = 'none';
         assetsList.style.opacity = '0.5';
         otcCategories.style.pointerEvents = 'none';
@@ -544,8 +580,10 @@ document.addEventListener('DOMContentLoaded', function() {
     function enableControls() {
         generateBtn.classList.remove('disabled');
         assetSearch.disabled = false;
-        timeframePills.style.pointerEvents = 'auto';
-        timeframePills.style.opacity = '1';
+        forexTimeframes.style.pointerEvents = 'auto';
+        forexTimeframes.style.opacity = '1';
+        otcTimeframes.style.pointerEvents = 'auto';
+        otcTimeframes.style.opacity = '1';
         assetsList.style.pointerEvents = 'auto';
         assetsList.style.opacity = '1';
         otcCategories.style.pointerEvents = 'auto';
@@ -555,14 +593,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // ==================== HISTORY ====================
     function addToHistory(isUp, probability) {
         const now = new Date();
-        const timeStr = now.toLocaleTimeString(currentLang === 'ru' ? 'ru-RU' : 'en-US', { hour: '2-digit', minute: '2-digit' });
+        const timeStr = now.toLocaleTimeString(currentLang === 'ru' ? 'ru-RU' : 'en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
         const historyItem = document.createElement('div');
         historyItem.className = `history-item ${isUp ? 'up' : 'down'}`;
+        const expiryStr = currentTab === 'forex' ? `${currentTimeframe}m` : `${currentTimeframe}s`;
         historyItem.innerHTML = `
             <span class="hi-asset">${currentAsset}</span>
             <span class="hi-dir">${isUp ? '▲ CALL' : '▼ PUT'}</span>
             <span class="hi-prob">${probability}%</span>
-            <span class="hi-exp">${currentTimeframe}m</span>
+            <span class="hi-exp">${expiryStr}</span>
             <span class="hi-time">${timeStr}</span>
         `;
         if (historyList.querySelector('.empty-history')) historyList.innerHTML = '';
@@ -659,7 +698,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function setupEventListeners() {
-        // Language switch
         document.querySelectorAll('.lang-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 currentLang = this.dataset.lang;
@@ -668,17 +706,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 resetSignalHero();
                 updateExpiryDisplay();
                 localStorage.setItem('binarySignalLang', currentLang);
-                // Reload chart with new language
-                if (currentTab === 'forex') {
-                    loadTradingViewChart(currentAsset);
-                }
+                if (currentTab === 'forex') loadTradingViewChart(currentAsset);
             });
         });
 
-        // Theme toggle
         themeToggle.addEventListener('click', toggleTheme);
 
-        // Tabs
         tabBtns.forEach(btn => {
             btn.addEventListener('click', function() {
                 if (isLocked || isAnalyzing) return;
@@ -701,16 +734,26 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
         
-        // Timeframes
-        tfPills.forEach(pill => {
+        // Forex timeframes
+        forexTimeframes.querySelectorAll('.tf-pill').forEach(pill => {
             pill.addEventListener('click', function() {
                 if (isLocked || isAnalyzing) return;
                 const tf = parseInt(this.dataset.tf);
-                setActiveTimeframe(tf);
+                setActiveForexTimeframe(tf);
                 resetSignalHero();
                 if (currentTab === 'forex' && tvWidget) {
                     try { tvWidget.chart().setResolution(getTVInterval(tf)); } catch(e) {}
                 }
+            });
+        });
+
+        // OTC timeframes (seconds)
+        otcTimeframes.querySelectorAll('.tf-pill').forEach(pill => {
+            pill.addEventListener('click', function() {
+                if (isLocked || isAnalyzing) return;
+                const tf = parseInt(this.dataset.tf);
+                setActiveOTCTimeframe(tf);
+                resetSignalHero();
             });
         });
         
