@@ -9,15 +9,29 @@ document.addEventListener('DOMContentLoaded', function() {
     ];
 
     const otcData = {
-        currencies: ["EUR/USD OTC", "GBP/USD OTC", "USD/JPY OTC", "AUD/USD OTC", "USD/CAD OTC", "EUR/GBP OTC", "USD/CHF OTC", "NZD/USD OTC"],
-        crypto: ["BTC/USD", "ETH/USD", "XRP/USD", "LTC/USD", "BNB/USD", "SOL/USD", "ADA/USD", "DOT/USD"],
-        stocks: ["AAPL", "TSLA", "AMZN", "GOOGL", "MSFT", "META", "NFLX", "NVDA"],
-        indices: ["S&P 500", "NASDAQ", "DJIA", "FTSE 100", "DAX 40", "NIKKEI 225", "HSI"]
+        currencies: [
+            "EUR/USD OTC", "GBP/USD OTC", "USD/JPY OTC", "AUD/USD OTC", 
+            "USD/CAD OTC", "EUR/GBP OTC", "USD/CHF OTC", "NZD/USD OTC",
+            "EUR/JPY OTC", "GBP/JPY OTC", "EUR/AUD OTC", "AUD/JPY OTC"
+        ],
+        crypto: [
+            "BTC/USD", "ETH/USD", "XRP/USD", "LTC/USD", "BNB/USD", 
+            "SOL/USD", "ADA/USD", "DOT/USD", "DOGE/USD", "AVAX/USD",
+            "MATIC/USD", "LINK/USD"
+        ],
+        stocks: [
+            "AAPL", "TSLA", "AMZN", "GOOGL", "MSFT", "META", "NFLX", "NVDA",
+            "AMD", "INTC", "BA", "NKE", "DIS", "V", "JPM", "GS"
+        ],
+        indices: [
+            "S&P 500", "NASDAQ", "DJIA", "FTSE 100", "DAX 40", 
+            "NIKKEI 225", "HSI", "ASX 200", "CAC 40", "IBEX 35"
+        ]
     };
 
     let currentAsset = "EUR/USD";
     let currentTab = 'forex';
-    let currentTimeframe = 1; // По умолчанию 1 минута
+    let currentTimeframe = 1;
     let isLocked = false;
     let isAnalyzing = false;
     let lockTimerInterval = null;
@@ -48,8 +62,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const timerValue = document.getElementById('timerValue');
     const tradingviewChart = document.getElementById('tradingviewChart');
     const chartPlaceholder = document.getElementById('chartPlaceholder');
-    const otcSimple = document.getElementById('otcSimple');
-    const otcSimpleAsset = document.getElementById('otcSimpleAsset');
+    const otcMini = document.getElementById('otcMini');
+    const otcMiniAsset = document.getElementById('otcMiniAsset');
     const historyList = document.getElementById('historyList');
     const clearHistoryBtn = document.getElementById('clearHistory');
     const tabBtns = document.querySelectorAll('.tab-btn');
@@ -117,12 +131,12 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (tab === 'forex') {
             tradingviewChart.style.display = 'block';
-            otcSimple.style.display = 'none';
+            otcMini.style.display = 'none';
             loadTradingViewChart(asset);
         } else {
             tradingviewChart.style.display = 'none';
-            otcSimple.style.display = 'flex';
-            otcSimpleAsset.textContent = asset;
+            otcMini.style.display = 'flex';
+            otcMiniAsset.textContent = asset;
             if (tvWidget) { tvWidget.remove(); tvWidget = null; }
         }
     }
@@ -155,7 +169,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 "allow_symbol_change": false,
                 "save_image": false,
                 "details": false,
-                "studies": ["MASimple@tv-basicstudies"],
+                "studies": [],
                 "width": "100%",
                 "height": "100%"
             });
@@ -496,7 +510,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     assetsList.style.display = 'none';
                     otcCategories.style.display = 'block';
                     tradingviewChart.style.display = 'none';
-                    otcSimple.style.display = 'flex';
+                    otcMini.style.display = 'flex';
                     if (tvWidget) { tvWidget.remove(); tvWidget = null; }
                     selectAsset('BTC/USD', 'otc');
                 }
