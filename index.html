@@ -56,7 +56,7 @@
 
             <!-- Центр -->
             <section class="main-content">
-                <!-- Верхняя панель: только актив -->
+                <!-- Верхняя панель -->
                 <div class="control-bar">
                     <div class="asset-display">
                         <h2 id="currentAsset">EUR/USD</h2>
@@ -65,9 +65,9 @@
                     <span class="mode-badge">Бинарные опционы</span>
                 </div>
 
-                <!-- Контент -->
+                <!-- Контент: Сигнал + Маленький график -->
                 <div class="content-area" id="contentArea">
-                    <!-- Сигнал (верхняя половина) -->
+                    <!-- Сигнал (почти весь экран) -->
                     <div class="signal-hero" id="signalHero">
                         <div class="signal-hero-inner">
                             <div class="hero-direction">
@@ -96,24 +96,17 @@
                         </div>
                     </div>
 
-                    <!-- График / OTC (нижняя половина) -->
-                    <div class="chart-section" id="chartSection">
-                        <div class="chart-container" id="tradingviewChart">
+                    <!-- Маленький график / OTC -->
+                    <div class="chart-mini" id="chartMini">
+                        <div class="chart-container-mini" id="tradingviewChart">
                             <div class="chart-placeholder" id="chartPlaceholder">
                                 <div class="loading-spinner"></div>
                             </div>
                         </div>
-                        <!-- OTC: только сигнал, без анимации -->
-                        <div class="otc-simple" id="otcSimple" style="display: none;">
-                            <div class="otc-simple-inner">
-                                <div class="otc-simple-icon">📡</div>
-                                <div class="otc-simple-title">OTC MARKET</div>
-                                <div class="otc-simple-asset" id="otcSimpleAsset">Выберите актив</div>
-                                <div class="otc-simple-info">Внебиржевой рынок • Графики недоступны</div>
-                                <div class="otc-simple-status">
-                                    <span class="status-dot"></span> Рынок активен
-                                </div>
-                            </div>
+                        <!-- OTC: только актив -->
+                        <div class="otc-mini" id="otcMini" style="display: none;">
+                            <span class="otc-mini-label">OTC</span>
+                            <span class="otc-mini-asset" id="otcMiniAsset">Выберите актив</span>
                         </div>
                     </div>
 
@@ -141,7 +134,7 @@
                     </div>
                 </div>
 
-                <!-- Нижняя панель: Таймфрейм + Кнопка + Таймер -->
+                <!-- Нижняя панель -->
                 <div class="action-bar">
                     <div class="timeframe-row">
                         <span class="tf-label">⏱ Таймфрейм / Экспирация:</span>
