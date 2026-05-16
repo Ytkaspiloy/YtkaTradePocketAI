@@ -6,7 +6,6 @@
     <title>TradeSignal Pro • Премиум Бот</title>
     <link rel="icon" type="image/png" href="https://image2url.com/images/1766001097047-30fbff9b-a368-4dbf-965a-4f3ce2de2e5e.png">
     <link rel="stylesheet" href="style.css">
-    <!-- TradingView Widget Library -->
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 </head>
 <body>
@@ -18,30 +17,24 @@
                 <span class="logo-text">TradeSignal <span class="pro-badge">PREMIUM</span></span>
             </div>
             <div class="header-status">
-                <span class="status-dot"></span> Онлайн
+                <span class="status-dot"></span> Онлайн • Анализ рынка активен
             </div>
         </header>
 
-        <!-- Main Trading Dashboard -->
         <main class="dashboard">
-            <!-- Левая панель: Активы и поиск -->
-            <section class="assets-panel">
+            <!-- Левая панель: Активы -->
+            <aside class="assets-panel">
                 <div class="search-box">
                     <input type="text" id="assetSearch" placeholder="🔍 Поиск актива...">
                 </div>
                 
-                <!-- Вкладки: FOREX / OTC -->
                 <div class="tabs">
                     <button class="tab-btn active" data-tab="forex">FOREX</button>
                     <button class="tab-btn" data-tab="otc">OTC</button>
                 </div>
 
-                <!-- Контейнер списка активов -->
-                <div class="assets-list" id="assetsList">
-                    <!-- Заполняется через JS -->
-                </div>
+                <div class="assets-list" id="assetsList"></div>
 
-                <!-- OTC категории (скрыты по умолчанию) -->
                 <div class="otc-categories" id="otcCategories" style="display: none;">
                     <div class="otc-group">
                         <h4>💱 ВАЛЮТЫ</h4>
@@ -60,68 +53,89 @@
                         <div class="otc-items" id="otcIndices"></div>
                     </div>
                 </div>
-            </section>
+            </aside>
 
-            <!-- Центральная панель: График и управление -->
-            <section class="trading-panel">
-                <div class="chart-header">
-                    <h2 id="currentAsset">EUR/USD</h2>
-                    <div class="timeframe-selector">
-                        <label>⏱ Таймфрейм:</label>
-                        <select id="timeframeSelect">
-                            <option value="1">1 мин</option>
-                            <option value="2">2 мин</option>
-                            <option value="3">3 мин</option>
-                            <option value="5" selected>5 мин</option>
-                            <option value="10">10 мин</option>
-                            <option value="15">15 мин</option>
-                            <option value="30">30 мин</option>
-                            <option value="60">1 час</option>
-                            <option value="240">4 часа</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <!-- TradingView Widget Container -->
-                <div class="chart-container" id="tradingviewChart">
-                    <div class="chart-placeholder" id="chartPlaceholder">
-                        <span>📈 График загружается...</span>
-                    </div>
-                </div>
-
-                <!-- Сигнал-панель -->
-                <div class="signal-area">
-                    <div class="timer-display" id="timerDisplay">
-                        <span class="timer-label">Следующий сигнал через:</span>
-                        <span class="timer-value" id="timerValue">--:--</span>
+            <!-- Центр: График + Панель управления -->
+            <section class="main-content">
+                <!-- Верхняя панель управления -->
+                <div class="control-bar">
+                    <div class="asset-display">
+                        <h2 id="currentAsset">EUR/USD</h2>
+                        <span class="live-badge">● LIVE</span>
                     </div>
                     
+                    <!-- Улучшенный выбор таймфрейма -->
+                    <div class="timeframe-pills">
+                        <button class="tf-pill" data-tf="1">1м</button>
+                        <button class="tf-pill" data-tf="2">2м</button>
+                        <button class="tf-pill" data-tf="3">3м</button>
+                        <button class="tf-pill active" data-tf="5">5м</button>
+                        <button class="tf-pill" data-tf="10">10м</button>
+                        <button class="tf-pill" data-tf="15">15м</button>
+                        <button class="tf-pill" data-tf="30">30м</button>
+                        <button class="tf-pill" data-tf="60">1Ч</button>
+                        <button class="tf-pill" data-tf="240">4Ч</button>
+                    </div>
+                </div>
+
+                <!-- Увеличенный график -->
+                <div class="chart-wrapper" id="chartWrapper">
+                    <div class="chart-container" id="tradingviewChart">
+                        <div class="chart-placeholder" id="chartPlaceholder">
+                            <div class="loading-animation">
+                                <div class="spinner"></div>
+                                <span>Загрузка графика...</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Оверлей анализа -->
+                    <div class="analysis-overlay" id="analysisOverlay">
+                        <div class="analysis-content">
+                            <div class="analysis-spinner"></div>
+                            <div class="analysis-text">
+                                <span class="analysis-title">🔬 Анализ рынка</span>
+                                <span class="analysis-detail" id="analysisDetail">Сканирование паттернов...</span>
+                            </div>
+                            <div class="analysis-progress">
+                                <div class="progress-bar" id="progressBar"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Нижняя панель: Таймер + Кнопка + Сигнал В РЯД -->
+                <div class="action-panel">
+                    <!-- Таймер -->
+                    <div class="timer-box" id="timerBox">
+                        <span class="timer-icon">⏱</span>
+                        <div class="timer-info">
+                            <span class="timer-label">Таймер</span>
+                            <span class="timer-value" id="timerValue">--:--</span>
+                        </div>
+                    </div>
+
+                    <!-- Кнопка генерации -->
                     <button class="generate-btn" id="generateBtn">
-                        <span class="btn-icon">⚡</span> СГЕНЕРИРОВАТЬ СИГНАЛ
+                        <span class="btn-content">
+                            <span class="btn-icon">⚡</span>
+                            <span class="btn-text">СГЕНЕРИРОВАТЬ СИГНАЛ</span>
+                        </span>
                     </button>
 
-                    <!-- Карточка сигнала -->
+                    <!-- Карточка сигнала (компактная, рядом) -->
                     <div class="signal-card" id="signalCard">
-                        <div class="signal-direction" id="signalDirection">
-                            <span class="arrow"></span>
-                            <span class="direction-text"></span>
-                        </div>
-                        <div class="signal-info">
-                            <div class="info-row">
-                                <span>Вероятность:</span>
-                                <span class="probability" id="signalProbability"></span>
-                            </div>
-                            <div class="info-row">
-                                <span>Таймфрейм:</span>
-                                <span id="signalTimeframe"></span>
-                            </div>
-                            <div class="info-row">
-                                <span>Рекомендуемая экспирация:</span>
-                                <span id="signalExpiry"></span>
-                            </div>
-                            <div class="info-row">
-                                <span>Волатильность:</span>
-                                <span id="signalVolatility"></span>
+                        <div class="signal-compact">
+                            <div class="signal-dir-icon" id="signalDirIcon">—</div>
+                            <div class="signal-details">
+                                <div class="signal-direction-text" id="signalDirectionText">Ожидание</div>
+                                <div class="signal-meta">
+                                    <span class="signal-prob" id="signalProbability">--</span>
+                                    <span class="signal-divider">|</span>
+                                    <span class="signal-expiry" id="signalExpiry">--</span>
+                                    <span class="signal-divider">|</span>
+                                    <span class="signal-volatility" id="signalVolatility">--</span>
+                                </div>
                             </div>
                         </div>
                         <div class="signal-advice" id="signalAdvice"></div>
@@ -129,18 +143,18 @@
                 </div>
             </section>
 
-            <!-- Правая панель: История сигналов -->
-            <section class="history-panel">
-                <h3>📋 История сигналов</h3>
+            <!-- Правая панель: История -->
+            <aside class="history-panel">
+                <h3>📋 История</h3>
                 <div class="history-list" id="historyList">
                     <div class="empty-history">Нет сигналов</div>
                 </div>
-                <button class="clear-btn" id="clearHistory">Очистить историю</button>
-            </section>
+                <button class="clear-btn" id="clearHistory">Очистить</button>
+            </aside>
         </main>
 
         <footer class="footer">
-            <span>© 2026 TradeSignal Premium. Все права защищены.</span>
+            <span>© 2026 TradeSignal Premium. ИИ-анализ рынка в реальном времени.</span>
         </footer>
     </div>
 
