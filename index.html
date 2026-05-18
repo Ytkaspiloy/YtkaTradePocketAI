@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
-    <title>YTKA AI Pro • Binary Options Bot</title>
+    <title>BinarySignal Pro • Binary Options Bot</title>
     <link rel="icon" type="image/png" href="https://image2url.com/images/1766001097047-30fbff9b-a368-4dbf-965a-4f3ce2de2e5e.png">
     <link rel="stylesheet" href="style.css">
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
@@ -14,7 +14,7 @@
         <header class="header">
             <div class="logo-area">
                 <img src="https://image2url.com/images/1766001097047-30fbff9b-a368-4dbf-965a-4f3ce2de2e5e.png" alt="Logo" class="logo-img">
-                <span class="logo-text">YTKA AI <span class="pro-badge">PRO</span></span>
+                <span class="logo-text">BinarySignal <span class="pro-badge">PRO</span></span>
             </div>
             <div class="header-controls">
                 <div class="lang-switch">
@@ -30,12 +30,13 @@
             <div class="header-stats">
                 <span class="stat-badge">📊 <span data-i18n="signals">Signals</span>: <strong id="totalSignals">0</strong></span>
                 <span class="stat-badge">🎯 <span data-i18n="accuracy">Accuracy</span>: <strong id="avgAccuracy">--</strong></span>
+                <span class="stat-badge">🏆 <span data-i18n="wins">Wins</span>: <strong id="totalWins">0</strong></span>
                 <span class="header-status"><span class="status-dot"></span> <span data-i18n="online">Online</span></span>
             </div>
         </header>
 
         <main class="dashboard">
-            <!-- Left Panel: Assets -->
+            <!-- Left Panel -->
             <aside class="assets-panel">
                 <div class="search-box">
                     <input type="text" id="assetSearch" data-i18n-placeholder="search_placeholder" placeholder="🔍 Search asset...">
@@ -43,6 +44,10 @@
                 <div class="tabs">
                     <button class="tab-btn active" data-tab="forex">FOREX</button>
                     <button class="tab-btn" data-tab="otc">OTC</button>
+                </div>
+                <div class="forex-closed" id="forexClosed" style="display: none;">
+                    <div class="closed-icon">📴</div>
+                    <div class="closed-text" data-i18n="forex_closed">Forex closed on weekends</div>
                 </div>
                 <div class="assets-list" id="assetsList"></div>
                 <div class="otc-categories" id="otcCategories" style="display: none;">
@@ -71,7 +76,6 @@
 
             <!-- Center -->
             <section class="main-content">
-                <!-- Top bar -->
                 <div class="control-bar">
                     <div class="asset-display">
                         <h2 id="currentAsset">EUR/USD</h2>
@@ -80,22 +84,22 @@
                     <span class="mode-badge" data-i18n="binary_options">Binary Options</span>
                 </div>
 
-                <!-- Content: Signal OVER Chart -->
                 <div class="content-area" id="contentArea">
-                    <!-- Chart (background) -->
+                    <!-- Chart background -->
                     <div class="chart-full" id="chartFull">
                         <div class="chart-container-full" id="tradingviewChart">
                             <div class="chart-placeholder" id="chartPlaceholder">
                                 <div class="loading-spinner"></div>
                             </div>
                         </div>
-                        <!-- OTC background - чисто тёмный/светлый фон без надписей -->
                         <div class="otc-bg" id="otcBg" style="display: none;"></div>
                     </div>
 
-                    <!-- Signal (overlay on top) -->
+                    <!-- Signal overlay -->
                     <div class="signal-overlay" id="signalOverlay">
                         <div class="signal-hero" id="signalHero">
+                            <!-- Close button -->
+                            <button class="signal-close" id="signalClose" data-i18n-title="close_signal" title="Close">✕</button>
                             <div class="signal-hero-inner">
                                 <div class="hero-direction">
                                     <div class="hero-arrow" id="heroArrow">—</div>
@@ -103,7 +107,7 @@
                                 </div>
                                 <div class="hero-asset-info">
                                     <span class="hero-asset" id="heroAsset">EUR/USD</span>
-                                    <span class="hero-timeframe-badge" id="heroTimeframeBadge">1 min</span>
+                                    <span class="hero-timeframe-badge" id="heroTimeframeBadge">1m</span>
                                 </div>
                                 <div class="hero-stats">
                                     <div class="hero-stat">
@@ -111,18 +115,27 @@
                                         <span class="hero-stat-label" data-i18n="probability">Probability</span>
                                     </div>
                                     <div class="hero-stat">
-                                        <span class="hero-stat-value" id="heroExpiry">1 min</span>
+                                        <span class="hero-stat-value" id="heroExpiry">1m</span>
                                         <span class="hero-stat-label" data-i18n="expiry">Expiry</span>
                                     </div>
                                     <div class="hero-stat">
                                         <span class="hero-stat-value" id="heroVolatility">--</span>
                                         <span class="hero-stat-label" data-i18n="volatility">Volatility</span>
                                     </div>
+                                    <div class="hero-stat" id="entryPriceStat" style="display: none;">
+                                        <span class="hero-stat-value" id="heroEntryPrice">--</span>
+                                        <span class="hero-stat-label" data-i18n="entry_price">Entry</span>
+                                    </div>
                                 </div>
                                 <div class="hero-advice" id="heroAdvice" data-i18n="press_button">💡 Press the button to get a signal</div>
+                                <!-- Result display -->
+                                <div class="hero-result" id="heroResult" style="display: none;"></div>
                             </div>
                         </div>
                     </div>
+
+                    <!-- Fireworks canvas -->
+                    <canvas class="fireworks-canvas" id="fireworksCanvas"></canvas>
 
                     <!-- Analysis overlay -->
                     <div class="analysis-overlay" id="analysisOverlay">
@@ -130,7 +143,7 @@
                             <div class="analysis-icon">🔬</div>
                             <div class="analysis-title" data-i18n="market_analysis">MARKET ANALYSIS</div>
                             <div class="analysis-steps" id="analysisSteps">
-                                <div class="step" id="step1"><span class="step-icon">📊</span><span data-i18n="step1">Data Collection</span><span class="step-dot"></span></div>
+                                <div class="step" id="step1"><span class="step-icon">📊</span><span data-i18n="step1">Data</span><span class="step-dot"></span></div>
                                 <div class="step" id="step2"><span class="step-icon">📈</span><span data-i18n="step2">Patterns</span><span class="step-dot"></span></div>
                                 <div class="step" id="step3"><span class="step-icon">🎯</span><span data-i18n="step3">Levels</span><span class="step-dot"></span></div>
                                 <div class="step" id="step4"><span class="step-icon">🧠</span><span data-i18n="step4">Indicators</span><span class="step-dot"></span></div>
@@ -143,7 +156,7 @@
                                 </div>
                                 <span class="progress-percent" id="progressPercent">0%</span>
                             </div>
-                            <div class="analysis-live" id="analysisLive">Initializing neural network...</div>
+                            <div class="analysis-live" id="analysisLive"></div>
                         </div>
                     </div>
                 </div>
@@ -152,18 +165,16 @@
                 <div class="action-bar">
                     <div class="timeframe-row">
                         <span class="tf-label" data-i18n="timeframe_expiry">⏱ Timeframe / Expiry:</span>
-                        <div class="timeframe-pills forex-tf" id="forexTimeframes">
-                            <button class="tf-pill active" data-tf="1">1m</button>
+                        <div class="timeframe-pills" id="timeframePills">
+                            <button class="tf-pill active" data-tf="5">5s</button>
+                            <button class="tf-pill" data-tf="15">15s</button>
+                            <button class="tf-pill" data-tf="30">30s</button>
+                            <button class="tf-pill" data-tf="1">1m</button>
                             <button class="tf-pill" data-tf="2">2m</button>
                             <button class="tf-pill" data-tf="3">3m</button>
                             <button class="tf-pill" data-tf="5">5m</button>
                             <button class="tf-pill" data-tf="10">10m</button>
                             <button class="tf-pill" data-tf="15">15m</button>
-                        </div>
-                        <div class="timeframe-pills otc-tf" id="otcTimeframes" style="display: none;">
-                            <button class="tf-pill active" data-tf="5">5s</button>
-                            <button class="tf-pill" data-tf="15">15s</button>
-                            <button class="tf-pill" data-tf="30">30s</button>
                         </div>
                     </div>
                     <div class="action-row">
@@ -179,7 +190,7 @@
                 </div>
             </section>
 
-            <!-- Right Panel: History -->
+            <!-- Right Panel -->
             <aside class="history-panel">
                 <h3 data-i18n="history">📋 History</h3>
                 <div class="mini-stats">
