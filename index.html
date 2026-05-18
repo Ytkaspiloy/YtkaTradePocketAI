@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, viewport-fit=cover">
     <title>BinarySignal Pro • Forex Bot</title>
     <link rel="icon" type="image/png" href="https://image2url.com/images/1766001097047-30fbff9b-a368-4dbf-965a-4f3ce2de2e5e.png">
     <link rel="stylesheet" href="style.css">
@@ -17,17 +17,15 @@
             </div>
             <div class="header-controls">
                 <div class="lang-switch">
-                    <button class="lang-btn active" data-lang="ru">🇷🇺 RU</button>
-                    <button class="lang-btn" data-lang="en">🇬🇧 EN</button>
+                    <button class="lang-btn active" data-lang="ru">RU</button>
+                    <button class="lang-btn" data-lang="en">EN</button>
                 </div>
-                <div class="theme-switch">
-                    <button class="theme-btn" id="themeToggle"><span class="theme-icon">🌙</span></button>
-                </div>
+                <button class="theme-btn" id="themeToggle"><span class="theme-icon">🌙</span></button>
             </div>
             <div class="header-stats">
-                <span class="stat-badge">📊 <span data-i18n="signals">Signals</span>: <strong id="totalSignals">0</strong></span>
-                <span class="stat-badge">🎯 <span data-i18n="accuracy">Accuracy</span>: <strong id="avgAccuracy">--</strong></span>
-                <span class="stat-badge">🏆 <span data-i18n="wins">Wins</span>: <strong id="totalWins">0</strong></span>
+                <span class="stat-badge">📊 <strong id="totalSignals">0</strong></span>
+                <span class="stat-badge">🎯 <strong id="avgAccuracy">--</strong></span>
+                <span class="stat-badge">🏆 <strong id="totalWins">0</strong></span>
                 <span class="header-status"><span class="status-dot"></span> <span data-i18n="online">Online</span></span>
             </div>
         </header>
@@ -35,12 +33,12 @@
         <main class="dashboard">
             <aside class="assets-panel">
                 <div class="search-box">
-                    <input type="text" id="assetSearch" data-i18n-placeholder="search_placeholder" placeholder="🔍 Search...">
+                    <input type="text" id="assetSearch" placeholder="🔍 Search...">
                 </div>
                 <div class="panel-label">FOREX</div>
-                <div class="forex-closed" id="forexClosed" style="display: none;">
+                <div class="forex-closed" id="forexClosed" style="display:none">
                     <div class="closed-icon">📴</div>
-                    <div class="closed-text" data-i18n="forex_closed">Forex closed on weekends</div>
+                    <div class="closed-text" data-i18n="forex_closed">Market closed</div>
                 </div>
                 <div class="assets-list" id="assetsList"></div>
             </aside>
@@ -49,26 +47,25 @@
                 <div class="control-bar">
                     <div class="asset-display">
                         <h2 id="currentAsset">EUR/USD</h2>
-                        <span class="live-badge">● LIVE</span>
                         <span class="price-display" id="priceDisplay">--</span>
                     </div>
-                    <span class="mode-badge">Forex</span>
                 </div>
 
                 <div class="content-area" id="contentArea">
                     <div class="chart-full" id="chartFull">
                         <div class="chart-container-full" id="tradingviewChart">
-                            <div class="chart-placeholder" id="chartPlaceholder"><div class="loading-spinner"></div></div>
+                            <div class="chart-placeholder"><div class="loading-spinner"></div></div>
                         </div>
                     </div>
 
-                    <div class="signal-overlay" id="signalOverlay">
-                        <div class="signal-hero" id="signalHero">
-                            <button class="signal-close" id="signalClose" data-i18n-title="close_signal" title="Close">✕</button>
-                            <div class="signal-hero-inner">
+                    <div class="signal-modal" id="signalModal">
+                        <div class="signal-modal-bg" id="signalModalBg"></div>
+                        <div class="signal-card" id="signalCard">
+                            <button class="signal-close-btn" id="signalClose">✕</button>
+                            <div class="signal-card-scroll">
                                 <div class="hero-direction">
                                     <div class="hero-arrow" id="heroArrow">—</div>
-                                    <div class="hero-action" id="heroAction" data-i18n="waiting_signal">WAITING</div>
+                                    <div class="hero-action" id="heroAction">WAITING</div>
                                 </div>
                                 <div class="hero-asset-info">
                                     <span class="hero-asset" id="heroAsset">EUR/USD</span>
@@ -77,22 +74,22 @@
                                 <div class="hero-stats">
                                     <div class="hero-stat">
                                         <span class="hero-stat-value gold" id="heroProbability">--%</span>
-                                        <span class="hero-stat-label" data-i18n="probability">Probability</span>
+                                        <span class="hero-stat-label">Probability</span>
                                     </div>
                                     <div class="hero-stat">
                                         <span class="hero-stat-value" id="heroExpiry">1m</span>
-                                        <span class="hero-stat-label" data-i18n="expiry">Expiry</span>
+                                        <span class="hero-stat-label">Expiry</span>
                                     </div>
                                     <div class="hero-stat">
                                         <span class="hero-stat-value" id="heroVolatility">--</span>
-                                        <span class="hero-stat-label" data-i18n="volatility">Volatility</span>
+                                        <span class="hero-stat-label">Volatility</span>
                                     </div>
                                     <div class="hero-stat" id="entryPriceStat" style="display:none">
                                         <span class="hero-stat-value" id="heroEntryPrice">--</span>
-                                        <span class="hero-stat-label" data-i18n="entry_price">Entry</span>
+                                        <span class="hero-stat-label">Entry</span>
                                     </div>
                                 </div>
-                                <div class="hero-advice" id="heroAdvice" data-i18n="press_button">💡 Press button to get signal</div>
+                                <div class="hero-advice" id="heroAdvice">💡 Press button</div>
                                 <div class="hero-result" id="heroResult" style="display:none"></div>
                             </div>
                         </div>
@@ -103,14 +100,14 @@
                     <div class="analysis-overlay" id="analysisOverlay">
                         <div class="analysis-card">
                             <div class="analysis-icon">🔬</div>
-                            <div class="analysis-title" data-i18n="market_analysis">MARKET ANALYSIS</div>
+                            <div class="analysis-title">MARKET ANALYSIS</div>
                             <div class="analysis-steps" id="analysisSteps">
-                                <div class="step" id="step1"><span class="step-icon">📊</span><span data-i18n="step1">Data</span><span class="step-dot"></span></div>
-                                <div class="step" id="step2"><span class="step-icon">📈</span><span data-i18n="step2">Patterns</span><span class="step-dot"></span></div>
-                                <div class="step" id="step3"><span class="step-icon">🎯</span><span data-i18n="step3">Levels</span><span class="step-dot"></span></div>
-                                <div class="step" id="step4"><span class="step-icon">🧠</span><span data-i18n="step4">Indicators</span><span class="step-dot"></span></div>
-                                <div class="step" id="step5"><span class="step-icon">⚡</span><span data-i18n="step5">Volatility</span><span class="step-dot"></span></div>
-                                <div class="step" id="step6"><span class="step-icon">💡</span><span data-i18n="step6">Signal</span><span class="step-dot"></span></div>
+                                <div class="step" id="step1"><span class="step-icon">📊</span><span>Data</span><span class="step-dot"></span></div>
+                                <div class="step" id="step2"><span class="step-icon">📈</span><span>Patterns</span><span class="step-dot"></span></div>
+                                <div class="step" id="step3"><span class="step-icon">🎯</span><span>Levels</span><span class="step-dot"></span></div>
+                                <div class="step" id="step4"><span class="step-icon">🧠</span><span>Indicators</span><span class="step-dot"></span></div>
+                                <div class="step" id="step5"><span class="step-icon">⚡</span><span>Volatility</span><span class="step-dot"></span></div>
+                                <div class="step" id="step6"><span class="step-icon">💡</span><span>Signal</span><span class="step-dot"></span></div>
                             </div>
                             <div class="progress-container">
                                 <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
@@ -123,7 +120,7 @@
 
                 <div class="action-bar">
                     <div class="timeframe-row">
-                        <span class="tf-label" data-i18n="timeframe_expiry">⏱ Timeframe / Expiry:</span>
+                        <span class="tf-label">⏱ Timeframe / Expiry:</span>
                         <div class="timeframe-pills" id="timeframePills">
                             <button class="tf-pill active" data-tf="1">1m</button>
                             <button class="tf-pill" data-tf="2">2m</button>
@@ -138,10 +135,10 @@
                     <div class="action-row">
                         <button class="generate-btn" id="generateBtn">
                             <span class="btn-icon">⚡</span>
-                            <span class="btn-text" data-i18n="get_signal">GET SIGNAL</span>
+                            <span class="btn-text">GET SIGNAL</span>
                         </button>
                         <div class="timer-box" id="timerBox">
-                            <span class="timer-label" data-i18n="timer">⏱ Timer:</span>
+                            <span class="timer-label">⏱ Timer:</span>
                             <span class="timer-value" id="timerValue">--:--</span>
                         </div>
                     </div>
@@ -149,18 +146,16 @@
             </section>
 
             <aside class="history-panel">
-                <h3 data-i18n="history">📋 History</h3>
+                <h3>📋 History</h3>
                 <div class="mini-stats">
-                    <div class="mini-stat"><span class="mini-stat-val" id="miniTotalSignals">0</span><span class="mini-stat-lbl" data-i18n="signals">Signals</span></div>
-                    <div class="mini-stat"><span class="mini-stat-val green" id="miniWinRate">--%</span><span class="mini-stat-lbl" data-i18n="accuracy">Accuracy</span></div>
-                    <div class="mini-stat"><span class="mini-stat-val gold" id="miniAvgProb">--%</span><span class="mini-stat-lbl" data-i18n="avg_prob">Avg Prob</span></div>
+                    <div class="mini-stat"><span class="mini-stat-val" id="miniTotalSignals">0</span><span class="mini-stat-lbl">Signals</span></div>
+                    <div class="mini-stat"><span class="mini-stat-val green" id="miniWinRate">--%</span><span class="mini-stat-lbl">Winrate</span></div>
+                    <div class="mini-stat"><span class="mini-stat-val gold" id="miniAvgProb">--%</span><span class="mini-stat-lbl">Avg Prob</span></div>
                 </div>
-                <div class="history-list" id="historyList"><div class="empty-history" data-i18n="no_signals">No signals</div></div>
-                <button class="clear-btn" id="clearHistory" data-i18n="clear">Clear</button>
+                <div class="history-list" id="historyList"><div class="empty-history">No signals</div></div>
+                <button class="clear-btn" id="clearHistory">Clear</button>
             </aside>
         </main>
-
-        <footer class="footer"><span>© 2026 BinarySignal Pro. <span data-i18n="footer_text">AI Forex bot.</span></span></footer>
     </div>
     <script src="script.js"></script>
 </body>
