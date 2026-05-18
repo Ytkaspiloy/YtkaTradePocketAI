@@ -1,4 +1,4 @@
-// BinarySignal Pro - Real entry, RU/EN, minimize, timer stays, chart TF syncs
+// BinarySignal Pro - No price/entry, Timer NEVER resets on close, RU/EN works
 
 document.addEventListener('DOMContentLoaded', function() {
     
@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', function() {
         ru: {
             online:"Онлайн",search_placeholder:"🔍 Поиск...",forex_closed:"Рынок закрыт (выходные)",
             probability:"Вероятность",expiry:"Экспирация",volatility:"Волатильность",
-            entry_price:"Точка входа",press_button:"💡 Нажмите кнопку для сигнала",
+            press_button:"💡 Нажмите кнопку для сигнала",
             market_analysis:"АНАЛИЗ РЫНКА",step1:"Сбор данных",step2:"Паттерны",
             step3:"Уровни",step4:"Индикаторы",step5:"Волатильность",step6:"Сигнал",
             timeframe_expiry:"⏱ Таймфрейм / Экспирация:",get_signal:"ПОЛУЧИТЬ СИГНАЛ",
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
         en: {
             online:"Online",search_placeholder:"🔍 Search...",forex_closed:"Market closed (weekend)",
             probability:"Probability",expiry:"Expiry",volatility:"Volatility",
-            entry_price:"Entry Price",press_button:"💡 Press button for signal",
+            press_button:"💡 Press button for signal",
             market_analysis:"MARKET ANALYSIS",step1:"Data Collection",step2:"Patterns",
             step3:"Levels",step4:"Indicators",step5:"Volatility",step6:"Signal",
             timeframe_expiry:"⏱ Timeframe / Expiry:",get_signal:"GET SIGNAL",
@@ -51,10 +51,9 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentAsset = "EUR/USD";
     let currentTimeframe = 60;
     let isLocked = false, isAnalyzing = false, lockTimerInterval = null, lockSeconds = 0;
-    let tvWidget = null, entryPrice = null, signalDirection = null, signalActive = false;
-    let currentBid = null, currentAsk = null;
+    let tvWidget = null, signalDirection = null, signalActive = false;
     let isMinimized = false;
-    let fireworksInterval = null;
+    let signalVisible = true; // Whether signal card is visible (close just hides)
 
     function t(key) { return translations[currentLang][key] || key; }
     function $(id) { return document.getElementById(id); }
@@ -70,7 +69,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const isUp = signalDirection === 'up';
             $('heroAction').textContent = isUp ? t('buy_call') : t('sell_put');
         }
-        $('heroEntryPrice').parentElement.querySelector('.hero-stat-label').textContent = t('entry_price');
     }
 
     function applyTheme() {
@@ -80,30 +78,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function isWeekend() { const d = new Date().getDay(); return d===0||d===6; }
-
-    // ========== REAL PRICE via Twelve Data + backup ==========
-    async function fetchPrice(symbol) {
-        try {
-            const pair = symbol.replace('/','');
-            const resp = await fetch(`https://api.twelvedata.com/price?symbol=${pair}&apikey=demo`);
-            const data = await resp.json();
-            if(data.price) {
-                currentBid = parseFloat(data.price);
-                currentAsk = currentBid * 1.0001;
-                $('priceDisplay').textContent = currentBid.toFixed(5);
-                return { bid: currentBid, ask: currentAsk };
-            }
-        } catch(e) {}
-        const fb = 1.0500 + Math.random() * 0.15;
-        currentBid = fb; currentAsk = fb * 1.0001;
-        $('priceDisplay').textContent = fb.toFixed(5);
-        return { bid: fb, ask: fb * 1.0001 };
-    }
-
-    function getEntryPrice() {
-        if(currentBid) return currentBid;
-        return 1.0800 + Math.random() * 0.1;
-    }
 
     function init() {
         applyTheme(); applyLang();
@@ -118,8 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
         resetSignal();
         setTF(60);
         checkForex();
-        fetchPrice(currentAsset);
-        setInterval(() => fetchPrice(currentAsset), 2000);
+        setInterval(checkForex, 30000);
         restoreTimer();
     }
 
@@ -139,9 +112,8 @@ document.addEventListener('DOMContentLoaded', function() {
         currentAsset = a; $('currentAsset').textContent = a;
         document.querySelectorAll('.asset-item').forEach(e => e.classList.remove('active'));
         [...document.querySelectorAll('.asset-item')].find(e => e.textContent.trim()===a)?.classList.add('active');
-        if(!signalActive) resetSignal();
-        else updateSignalDisplay();
-        loadTV(a); fetchPrice(a);
+        if(signalActive) updateSignalDisplay();
+        loadTV(a);
     }
 
     function loadTV(symbol) {
@@ -178,21 +150,11 @@ document.addEventListener('DOMContentLoaded', function() {
             if(parseInt(p.dataset.tf)*60 === sec) p.classList.add('active');
         });
         updateExpiry();
-        // Force chart timeframe update
         if(tvWidget && tvWidget.chart) {
             try {
-                const tvInt = getTVInt(sec);
-                tvWidget.chart().setResolution(tvInt);
-                // Also reload symbol to force refresh
-                setTimeout(() => {
-                    if(tvWidget && tvWidget.chart) {
-                        tvWidget.chart().setSymbol(`FX:${currentAsset.replace('/','')}`);
-                    }
-                }, 100);
-            } catch(e) {
-                // Reload chart if setResolution fails
-                loadTV(currentAsset);
-            }
+                tvWidget.chart().setResolution(getTVInt(sec));
+                setTimeout(() => { if(tvWidget && tvWidget.chart) tvWidget.chart().setSymbol(`FX:${currentAsset.replace('/','')}`); }, 100);
+            } catch(e) { loadTV(currentAsset); }
         }
     }
 
@@ -205,18 +167,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function checkForex() {
         if(isWeekend()) {
-            $('forexClosed').style.display='flex';
-            $('assetsList').style.display='none';
+            $('forexClosed').style.display='flex'; $('assetsList').style.display='none';
             $('generateBtn').classList.add('disabled');
-            $('timeframePills').style.pointerEvents='none';
-            $('timeframePills').style.opacity='0.5';
+            $('timeframePills').style.pointerEvents='none'; $('timeframePills').style.opacity='0.5';
         } else {
-            $('forexClosed').style.display='none';
-            $('assetsList').style.display='flex';
+            $('forexClosed').style.display='none'; $('assetsList').style.display='flex';
             if(!isLocked) {
                 $('generateBtn').classList.remove('disabled');
-                $('timeframePills').style.pointerEvents='auto';
-                $('timeframePills').style.opacity='1';
+                $('timeframePills').style.pointerEvents='auto'; $('timeframePills').style.opacity='1';
             }
         }
     }
@@ -260,18 +218,16 @@ document.addEventListener('DOMContentLoaded', function() {
     function ease(t){return t<0.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;}
 
     // ========== SIGNAL ==========
-    async function generateSignal() {
-        await fetchPrice(currentAsset);
-        entryPrice = getEntryPrice();
-        const prevPrice = currentBid || entryPrice;
-        const isUp = entryPrice >= prevPrice;
+    function generateSignal() {
+        const isUp = Math.random() >= 0.5;
         const probability = Math.floor(Math.random()*12)+78;
-        const vols = ['Низкая','Умеренная','Средняя','Повышенная','Высокая'];
-        const volEn = ['Low','Moderate','Medium','Elevated','High'];
-        const vol = currentLang==='ru'?vols[Math.floor(Math.random()*5)]:volEn[Math.floor(Math.random()*5)];
+        const volsRu = ['Низкая','Умеренная','Средняя','Повышенная','Высокая'];
+        const volsEn = ['Low','Moderate','Medium','Elevated','High'];
+        const vol = currentLang==='ru'?volsRu[Math.floor(Math.random()*5)]:volsEn[Math.floor(Math.random()*5)];
         signalDirection = isUp?'up':'down';
         signalActive = true;
         isMinimized = false;
+        signalVisible = true;
         
         updateSignalDisplay();
         $('signalCard').classList.add('active', isUp?'up':'down');
@@ -280,8 +236,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         $('heroProbability').textContent = `${probability}%`;
         $('heroVolatility').textContent = vol;
-        $('heroEntryPrice').textContent = entryPrice.toFixed(5);
-        $('entryPriceStat').style.display = 'flex';
         $('heroResult').style.display = 'none';
         $('heroResult').className = 'hero-result';
         updateExpiry();
@@ -298,10 +252,6 @@ document.addEventListener('DOMContentLoaded', function() {
         $('heroArrow').textContent = isUp?'▲':'▼';
         $('heroAction').textContent = isUp?t('buy_call'):t('sell_put');
         $('heroAsset').textContent = currentAsset;
-        if(entryPrice) {
-            $('heroEntryPrice').textContent = entryPrice.toFixed(5);
-            $('entryPriceStat').style.display = 'flex';
-        }
     }
 
     function updateMiniDisplay() {
@@ -312,14 +262,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function resetSignal() {
-        signalActive = false; signalDirection = null; entryPrice = null; isMinimized = false;
+        signalActive = false; signalDirection = null; isMinimized = false; signalVisible = false;
         $('heroArrow').textContent = '—';
         $('heroAction').textContent = t('waiting_signal');
         $('heroAsset').textContent = currentAsset;
         $('heroProbability').textContent = '--%';
         $('heroVolatility').textContent = '--';
-        $('heroEntryPrice').textContent = '--';
-        $('entryPriceStat').style.display = 'none';
         $('heroResult').style.display = 'none';
         $('heroResult').className = 'hero-result';
         $('heroAdvice').textContent = t('press_button');
@@ -338,22 +286,29 @@ document.addEventListener('DOMContentLoaded', function() {
     function expandSignal() {
         isMinimized = false;
         $('signalModal').classList.add('visible');
-        $('signalMini').classList.remove('visible');
+        $('signalMini').classList.add('visible');
         updateSignalDisplay();
     }
 
-    function closeSignalVisual() {
-        // Just hide visuals, timer keeps running
-        isMinimized = false;
+    // Close just hides visuals - TIMER KEEPS RUNNING
+    function hideSignalVisuals() {
+        signalVisible = false;
         $('signalModal').classList.remove('visible');
         $('signalMini').classList.remove('visible');
-        $('signalCard').classList.remove('active','up','down');
-        $('heroResult').style.display = 'none';
-        $('heroResult').className = 'hero-result';
         stopFireworks();
     }
 
-    // ========== TIMER ==========
+    function showSignalVisuals() {
+        signalVisible = true;
+        if(isMinimized) {
+            $('signalMini').classList.add('visible');
+        } else {
+            $('signalModal').classList.add('visible');
+            $('signalMini').classList.add('visible');
+        }
+    }
+
+    // ========== TIMER (NEVER RESETS ON CLOSE) ==========
     function startTimer() {
         isLocked = true;
         lockSeconds = currentTimeframe;
@@ -389,7 +344,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if(isLocked && lockSeconds > 0) {
             localStorage.setItem('bsTimer', JSON.stringify({
                 asset: currentAsset, tf: currentTimeframe, sec: lockSeconds,
-                entry: entryPrice, dir: signalDirection, exp: Math.floor(Date.now()/1000)+lockSeconds
+                dir: signalDirection, exp: Math.floor(Date.now()/1000)+lockSeconds,
+                minimized: isMinimized, visible: signalVisible
             }));
         } else { localStorage.removeItem('bsTimer'); }
     }
@@ -402,21 +358,22 @@ document.addEventListener('DOMContentLoaded', function() {
             const rem = st.exp - Math.floor(Date.now()/1000);
             if(rem <= 0) { localStorage.removeItem('bsTimer'); return; }
             currentAsset = st.asset; currentTimeframe = st.tf;
-            entryPrice = st.entry; signalDirection = st.dir;
-            lockSeconds = rem; signalActive = true; isMinimized = false;
+            signalDirection = st.dir; lockSeconds = rem;
+            signalActive = true; isMinimized = st.minimized || false;
+            signalVisible = st.visible !== false;
             $('currentAsset').textContent = currentAsset;
             setTF(currentTimeframe);
             updateSignalDisplay();
             $('signalCard').classList.add('active', signalDirection==='up'?'up':'down');
-            $('signalModal').classList.add('visible');
-            $('signalMini').classList.add('visible');
+            if(signalVisible) {
+                if(isMinimized) { $('signalMini').classList.add('visible'); }
+                else { $('signalModal').classList.add('visible'); $('signalMini').classList.add('visible'); }
+            }
             $('heroProbability').textContent = '80%';
             $('heroVolatility').textContent = currentLang==='ru'?'Средняя':'Medium';
-            $('heroEntryPrice').textContent = entryPrice.toFixed(5);
-            $('entryPriceStat').style.display = 'flex';
             $('heroResult').style.display = 'none';
             updateExpiry();
-            $('heroAdvice').textContent = '💡 Сигнал активен';
+            $('heroAdvice').textContent = currentLang==='ru'?'💡 Сигнал активен':'💡 Signal active';
             updateMiniDisplay();
             isLocked = true;
             $('timerBox').classList.add('active');
@@ -444,28 +401,21 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ========== RESULT ==========
-    async function checkResult() {
-        if(!signalActive||!entryPrice) return;
-        await fetchPrice(currentAsset);
-        const cp = getEntryPrice();
-        let result;
-        if(cp>entryPrice) result='up';
-        else if(cp<entryPrice) result='down';
-        else result='draw';
-        let isWin = false;
-        if(signalDirection==='up'&&result==='up') isWin=true;
-        else if(signalDirection==='down'&&result==='down') isWin=true;
-        else if(result==='draw') isWin=null;
-        const profit = Math.abs(((cp-entryPrice)/entryPrice)*100).toFixed(2);
+    function checkResult() {
+        if(!signalActive) return;
+        const isUp = signalDirection === 'up';
+        // Random result for demo, replace with real API
+        const winRoll = Math.random();
+        const isWin = winRoll > 0.4;
+        const profit = (Math.random()*5+1).toFixed(2);
         $('heroResult').style.display = 'block';
-        $('signalModal').classList.add('visible');
-        $('signalMini').classList.add('visible');
-        if(isWin===true) {
+        showSignalVisuals();
+        if(isWin) {
             $('heroResult').textContent = t('win_result').replace('{profit}', profit);
             $('heroResult').className = 'hero-result win';
             startFireworks();
             updateLastResult('win');
-        } else if(isWin===false) {
+        } else if(winRoll > 0.2) {
             $('heroResult').textContent = t('lose_result');
             $('heroResult').className = 'hero-result lose';
             $('signalCard').style.animation = 'shake 0.6s ease';
@@ -478,13 +428,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         updateStats();
         $('heroResult').scrollIntoView({ behavior:'smooth', block:'center' });
-        // Auto hide visuals after 6s, but timer already expired
-        setTimeout(() => {
-            closeSignalVisual();
-            resetSignal();
-            enableCtrls();
-            checkForex();
-        }, 6000);
+        setTimeout(() => { resetSignal(); enableCtrls(); checkForex(); }, 6000);
     }
 
     function updateLastResult(result) {
@@ -577,11 +521,10 @@ document.addEventListener('DOMContentLoaded', function() {
         renderAssets(f.length>0?f:forexAssets);
     }
 
-    async function handleGenerate() {
+    function handleGenerate() {
         if(isLocked||isAnalyzing||isWeekend()) return;
         resetSignal();
         stopFireworks();
-        await fetchPrice(currentAsset);
         startAnalysis(() => { generateSignal(); startTimer(); });
     }
 
@@ -603,8 +546,8 @@ document.addEventListener('DOMContentLoaded', function() {
             applyTheme();
         });
         
-        // Close - just hide visual, timer keeps running
-        $('signalClose').addEventListener('click', (e) => { e.stopPropagation(); closeSignalVisual(); });
+        // Close button - HIDE VISUALS ONLY, timer keeps running
+        $('signalClose').addEventListener('click', (e) => { e.stopPropagation(); hideSignalVisuals(); });
         // Minimize
         $('signalMinimize').addEventListener('click', (e) => { e.stopPropagation(); minimizeSignal(); });
         // Expand from mini
@@ -622,7 +565,6 @@ document.addEventListener('DOMContentLoaded', function() {
         $('generateBtn').addEventListener('click', handleGenerate);
         $('assetSearch').addEventListener('input', function() { if(!isLocked&&!isAnalyzing) filterAssets(this.value); });
         $('clearHistory').addEventListener('click', clearHistory);
-        setInterval(checkForex, 30000);
     }
 
     init();
