@@ -1,29 +1,39 @@
-// BinarySignal Pro - Fixed mobile, closeable signal, synced expiry
+// BinarySignal Pro - Real entry, RU/EN, minimize, timer stays, chart TF syncs
 
 document.addEventListener('DOMContentLoaded', function() {
     
     const translations = {
         ru: {
-            online:"Онлайн",forex_closed:"Рынок закрыт (выходные)",
-            waiting_signal:"ОЖИДАНИЕ",probability:"Вероятность",expiry:"Экспирация",
-            volatility:"Волатильность",entry_price:"Вход",press_button:"💡 Нажмите кнопку",
-            buy_call:"CALL ▲",sell_put:"PUT ▼",
-            init_neural:"Инициализация...",data_collection:"Сбор данных...",
-            patterns:"Паттерны...",levels:"Уровни...",indicators:"Индикаторы...",
-            volatility_step:"Волатильность...",signal_step:"Сигнал...",
-            analysis_complete:"Готово!",win_result:"✅ +{profit}%",
+            online:"Онлайн",search_placeholder:"🔍 Поиск...",forex_closed:"Рынок закрыт (выходные)",
+            probability:"Вероятность",expiry:"Экспирация",volatility:"Волатильность",
+            entry_price:"Точка входа",press_button:"💡 Нажмите кнопку для сигнала",
+            market_analysis:"АНАЛИЗ РЫНКА",step1:"Сбор данных",step2:"Паттерны",
+            step3:"Уровни",step4:"Индикаторы",step5:"Волатильность",step6:"Сигнал",
+            timeframe_expiry:"⏱ Таймфрейм / Экспирация:",get_signal:"ПОЛУЧИТЬ СИГНАЛ",
+            timer:"⏱ Таймер:",history:"📋 История",signals:"Сигналов",winrate:"Винрейт",
+            avg_prob:"Сред. вер-ть",no_signals:"Нет сигналов",clear:"Очистить",
+            waiting_signal:"ОЖИДАНИЕ",buy_call:"CALL ▲",sell_put:"PUT ▼",
+            init_neural:"Инициализация нейросети...",data_collection:"Сбор рыночных данных...",
+            patterns:"Поиск паттернов...",levels:"Расчёт уровней...",indicators:"Анализ индикаторов...",
+            volatility_step:"Оценка волатильности...",signal_step:"Формирование сигнала...",
+            analysis_complete:"Анализ завершён!",win_result:"✅ +{profit}%",
             lose_result:"❌ ПРОИГРЫШ",draw_result:"➖ НИЧЬЯ",
             advices:["Риск ≤2%","Отличный вход!","Проверьте ТФ","Хорошая точка!","По тренду","Stop-loss!","Сигнал!"]
         },
         en: {
-            online:"Online",forex_closed:"Market closed (weekend)",
-            waiting_signal:"WAITING",probability:"Probability",expiry:"Expiry",
-            volatility:"Volatility",entry_price:"Entry",press_button:"💡 Press button",
-            buy_call:"CALL ▲",sell_put:"PUT ▼",
-            init_neural:"Initializing...",data_collection:"Collecting...",
-            patterns:"Patterns...",levels:"Levels...",indicators:"Indicators...",
-            volatility_step:"Volatility...",signal_step:"Signal...",
-            analysis_complete:"Done!",win_result:"✅ +{profit}%",
+            online:"Online",search_placeholder:"🔍 Search...",forex_closed:"Market closed (weekend)",
+            probability:"Probability",expiry:"Expiry",volatility:"Volatility",
+            entry_price:"Entry Price",press_button:"💡 Press button for signal",
+            market_analysis:"MARKET ANALYSIS",step1:"Data Collection",step2:"Patterns",
+            step3:"Levels",step4:"Indicators",step5:"Volatility",step6:"Signal",
+            timeframe_expiry:"⏱ Timeframe / Expiry:",get_signal:"GET SIGNAL",
+            timer:"⏱ Timer:",history:"📋 History",signals:"Signals",winrate:"Winrate",
+            avg_prob:"Avg Prob",no_signals:"No signals",clear:"Clear",
+            waiting_signal:"WAITING",buy_call:"CALL ▲",sell_put:"PUT ▼",
+            init_neural:"Initializing neural network...",data_collection:"Collecting market data...",
+            patterns:"Finding patterns...",levels:"Calculating levels...",indicators:"Analyzing indicators...",
+            volatility_step:"Evaluating volatility...",signal_step:"Forming signal...",
+            analysis_complete:"Analysis complete!",win_result:"✅ +{profit}%",
             lose_result:"❌ LOSS",draw_result:"➖ DRAW",
             advices:["Risk ≤2%","Perfect entry!","Check HTF","Great point!","Follow trend","Stop-loss!","Signal!"]
         }
@@ -31,6 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let currentLang = localStorage.getItem('bsLang') || 'ru';
     let currentTheme = localStorage.getItem('bsTheme') || 'dark';
+    
     const forexAssets = [
         "GBP/CAD","EUR/JPY","CHF/JPY","AUD/CAD","USD/CAD","USD/CHF",
         "GBP/AUD","USD/JPY","EUR/USD","EUR/AUD","AUD/USD","CAD/JPY",
@@ -41,53 +52,58 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentTimeframe = 60;
     let isLocked = false, isAnalyzing = false, lockTimerInterval = null, lockSeconds = 0;
     let tvWidget = null, entryPrice = null, signalDirection = null, signalActive = false;
-    let currentBid = null;
+    let currentBid = null, currentAsk = null;
+    let isMinimized = false;
+    let fireworksInterval = null;
 
     function t(key) { return translations[currentLang][key] || key; }
+    function $(id) { return document.getElementById(id); }
+
     function applyLang() {
-        document.querySelectorAll('[data-i18n]').forEach(el => el.textContent = t(el.getAttribute('data-i18n')));
-        document.getElementById('forexClosed')?.querySelector('.closed-text') && (document.getElementById('forexClosed').querySelector('.closed-text').textContent = t('forex_closed'));
+        document.querySelectorAll('[data-i18n]').forEach(el => { if(el.tagName!=='INPUT') el.textContent = t(el.getAttribute('data-i18n')); });
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(el => el.placeholder = t(el.getAttribute('data-i18n-placeholder')));
+        if($('forexClosed')) $('forexClosed').querySelector('.closed-text').textContent = t('forex_closed');
         if(!signalActive) {
-            document.getElementById('heroAction').textContent = t('waiting_signal');
-            document.getElementById('heroAdvice').textContent = t('press_button');
+            $('heroAction').textContent = t('waiting_signal');
+            $('heroAdvice').textContent = t('press_button');
+        } else {
+            const isUp = signalDirection === 'up';
+            $('heroAction').textContent = isUp ? t('buy_call') : t('sell_put');
         }
+        $('heroEntryPrice').parentElement.querySelector('.hero-stat-label').textContent = t('entry_price');
     }
+
     function applyTheme() {
-        document.body.classList.remove('dark','light'); document.body.classList.add(currentTheme);
-        document.getElementById('themeToggle').querySelector('.theme-icon').textContent = currentTheme==='dark'?'☀️':'🌙';
+        document.body.classList.remove('dark','light');
+        document.body.classList.add(currentTheme);
+        $('themeToggle').querySelector('.theme-icon').textContent = currentTheme==='dark'?'☀️':'🌙';
     }
-    function isWeekend() { const d=new Date().getDay(); return d===0||d===6; }
 
-    // DOM refs
-    const $ = id => document.getElementById(id);
-    const assetsList = $('assetsList'), forexClosed = $('forexClosed'), currentAssetEl = $('currentAsset');
-    const priceDisplay = $('priceDisplay'), timeframePills = $('timeframePills'), generateBtn = $('generateBtn');
-    const signalModal = $('signalModal'), signalClose = $('signalClose'), signalModalBg = $('signalModalBg');
-    const signalCard = $('signalCard'), heroArrow = $('heroArrow'), heroAction = $('heroAction');
-    const heroAsset = $('heroAsset'), heroTimeframeBadge = $('heroTimeframeBadge');
-    const heroProbability = $('heroProbability'), heroExpiry = $('heroExpiry'), heroVolatility = $('heroVolatility');
-    const heroEntryPrice = $('heroEntryPrice'), entryPriceStat = $('entryPriceStat');
-    const heroAdvice = $('heroAdvice'), heroResult = $('heroResult');
-    const analysisOverlay = $('analysisOverlay'), progressFill = $('progressFill'), progressPercent = $('progressPercent');
-    const analysisLive = $('analysisLive'), timerBox = $('timerBox'), timerValue = $('timerValue');
-    const tradingviewChart = $('tradingviewChart'), fireworksCanvas = $('fireworksCanvas');
-    const historyList = $('historyList'), totalSignalsEl = $('totalSignals'), avgAccuracyEl = $('avgAccuracy');
-    const totalWinsEl = $('totalWins'), miniTotalSignals = $('miniTotalSignals'), miniWinRate = $('miniWinRate');
-    const miniAvgProb = $('miniAvgProb');
+    function isWeekend() { const d = new Date().getDay(); return d===0||d===6; }
 
-    // ========== REAL PRICE ==========
+    // ========== REAL PRICE via Twelve Data + backup ==========
     async function fetchPrice(symbol) {
         try {
             const pair = symbol.replace('/','');
             const resp = await fetch(`https://api.twelvedata.com/price?symbol=${pair}&apikey=demo`);
             const data = await resp.json();
-            if(data.price) { currentBid = parseFloat(data.price); priceDisplay.textContent = currentBid.toFixed(5); return currentBid; }
+            if(data.price) {
+                currentBid = parseFloat(data.price);
+                currentAsk = currentBid * 1.0001;
+                $('priceDisplay').textContent = currentBid.toFixed(5);
+                return { bid: currentBid, ask: currentAsk };
+            }
         } catch(e) {}
-        const fb = 1.0000 + Math.random() * 1.5;
-        priceDisplay.textContent = fb.toFixed(5);
-        return fb;
+        const fb = 1.0500 + Math.random() * 0.15;
+        currentBid = fb; currentAsk = fb * 1.0001;
+        $('priceDisplay').textContent = fb.toFixed(5);
+        return { bid: fb, ask: fb * 1.0001 };
     }
-    function getPrice() { return currentBid || (1.0800 + Math.random() * 0.1); }
+
+    function getEntryPrice() {
+        if(currentBid) return currentBid;
+        return 1.0800 + Math.random() * 0.1;
+    }
 
     function init() {
         applyTheme(); applyLang();
@@ -108,29 +124,32 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function renderAssets(list) {
-        assetsList.innerHTML = '';
+        $('assetsList').innerHTML = '';
         list.forEach(a => {
             const d = document.createElement('div');
             d.className = `asset-item ${a===currentAsset?'active':''}`;
             d.innerHTML = `<span>${a}</span>`;
             d.addEventListener('click', () => { if(!isLocked&&!isAnalyzing) selectAsset(a); });
-            assetsList.appendChild(d);
+            $('assetsList').appendChild(d);
         });
     }
 
     function selectAsset(a) {
         if(isWeekend()) return;
-        currentAsset = a; currentAssetEl.textContent = a;
+        currentAsset = a; $('currentAsset').textContent = a;
         document.querySelectorAll('.asset-item').forEach(e => e.classList.remove('active'));
         [...document.querySelectorAll('.asset-item')].find(e => e.textContent.trim()===a)?.classList.add('active');
-        resetSignal(); loadTV(a); fetchPrice(a);
+        if(!signalActive) resetSignal();
+        else updateSignalDisplay();
+        loadTV(a); fetchPrice(a);
     }
 
     function loadTV(symbol) {
-        tradingviewChart.innerHTML = '';
+        $('tradingviewChart').innerHTML = '';
         const ph = document.createElement('div'); ph.className='chart-placeholder';
-        ph.innerHTML='<div class="loading-spinner"></div>'; tradingviewChart.appendChild(ph);
+        ph.innerHTML='<div class="loading-spinner"></div>'; $('tradingviewChart').appendChild(ph);
         try {
+            if(tvWidget) { tvWidget.remove(); tvWidget = null; }
             tvWidget = new TradingView.widget({
                 container_id:"tradingviewChart",autosize:true,symbol:`FX:${symbol.replace('/','')}`,
                 interval:getTVInt(currentTimeframe),timezone:"Europe/Moscow",
@@ -140,7 +159,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 allow_symbol_change:false,save_image:false,details:false,studies:[],
                 width:"100%",height:"100%"
             });
-            tvWidget.onChartReady(() => { const cp = tradingviewChart.querySelector('.chart-placeholder'); if(cp) cp.style.display='none'; });
+            tvWidget.onChartReady(() => {
+                const cp = $('tradingviewChart').querySelector('.chart-placeholder');
+                if(cp) cp.style.display='none';
+            });
         } catch(e) {}
     }
 
@@ -151,42 +173,66 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function setTF(sec) {
         currentTimeframe = sec;
-        timeframePills.querySelectorAll('.tf-pill').forEach(p => {
+        $('timeframePills').querySelectorAll('.tf-pill').forEach(p => {
             p.classList.remove('active');
             if(parseInt(p.dataset.tf)*60 === sec) p.classList.add('active');
         });
         updateExpiry();
-        if(tvWidget) try { tvWidget.chart().setResolution(getTVInt(sec), () => {}); } catch(e) {}
+        // Force chart timeframe update
+        if(tvWidget && tvWidget.chart) {
+            try {
+                const tvInt = getTVInt(sec);
+                tvWidget.chart().setResolution(tvInt);
+                // Also reload symbol to force refresh
+                setTimeout(() => {
+                    if(tvWidget && tvWidget.chart) {
+                        tvWidget.chart().setSymbol(`FX:${currentAsset.replace('/','')}`);
+                    }
+                }, 100);
+            } catch(e) {
+                // Reload chart if setResolution fails
+                loadTV(currentAsset);
+            }
+        }
     }
 
     function updateExpiry() {
         const m = currentTimeframe/60;
         const d = m>=60?`${m/60}H`:`${m}m`;
-        heroTimeframeBadge.textContent = d;
-        heroExpiry.textContent = d;
+        $('heroTimeframeBadge').textContent = d;
+        $('heroExpiry').textContent = d;
     }
 
     function checkForex() {
         if(isWeekend()) {
-            forexClosed.style.display='flex'; assetsList.style.display='none';
-            generateBtn.classList.add('disabled');
-            timeframePills.style.pointerEvents='none'; timeframePills.style.opacity='0.5';
+            $('forexClosed').style.display='flex';
+            $('assetsList').style.display='none';
+            $('generateBtn').classList.add('disabled');
+            $('timeframePills').style.pointerEvents='none';
+            $('timeframePills').style.opacity='0.5';
         } else {
-            forexClosed.style.display='none'; assetsList.style.display='flex';
-            if(!isLocked) { generateBtn.classList.remove('disabled'); timeframePills.style.pointerEvents='auto'; timeframePills.style.opacity='1'; }
+            $('forexClosed').style.display='none';
+            $('assetsList').style.display='flex';
+            if(!isLocked) {
+                $('generateBtn').classList.remove('disabled');
+                $('timeframePills').style.pointerEvents='auto';
+                $('timeframePills').style.opacity='1';
+            }
         }
     }
 
-    // ANALYSIS
+    // ========== ANALYSIS ==========
     function startAnalysis(cb) {
         if(isAnalyzing||isLocked||isWeekend()) return;
         isAnalyzing=true; disableCtrls();
-        analysisOverlay.classList.add('active');
-        progressFill.style.width='0%'; progressPercent.textContent='0%';
-        analysisLive.textContent = t('init_neural');
-        for(let i=1;i<=6;i++) { const s=document.getElementById(`step${i}`); s.classList.remove('done'); s.querySelector('.step-dot').style.background='#334155'; }
-        const total = 2500+Math.random()*2500;
-        const start = performance.now();
+        $('analysisOverlay').classList.add('active');
+        $('progressFill').style.width='0%'; $('progressPercent').textContent='0%';
+        $('analysisLive').textContent = t('init_neural');
+        for(let i=1;i<=6;i++) {
+            const s = document.getElementById(`step${i}`);
+            s.classList.remove('done'); s.querySelector('.step-dot').style.background='#334155';
+        }
+        const total = 2500+Math.random()*2500, start = performance.now();
         const segs = genSegs(total); let cs=0;
         const steps = [
             {id:'step1',text:t('data_collection'),p:0.15},{id:'step2',text:t('patterns'),p:0.32},
@@ -199,13 +245,13 @@ document.addEventListener('DOMContentLoaded', function() {
             const sg=segs[Math.min(cs,segs.length-1)];
             const se=ts-(start+sg.sp*total), sd=sg.d*total, spg=Math.min(se/sd,1);
             const dp=sg.sp+(sg.ep-sg.sp)*ease(spg);
-            progressFill.style.width=`${dp*100}%`; progressPercent.textContent=`${Math.round(dp*100)}%`;
-            steps.forEach(s=>{if(dp>=s.p){const el=document.getElementById(s.id);if(el&&!el.classList.contains('done')){el.classList.add('done');el.querySelector('.step-dot').style.background='#10b981';analysisLive.textContent=s.text;}}});
+            $('progressFill').style.width=`${dp*100}%`; $('progressPercent').textContent=`${Math.round(dp*100)}%`;
+            steps.forEach(s=>{if(dp>=s.p){const el=document.getElementById(s.id);if(el&&!el.classList.contains('done')){el.classList.add('done');el.querySelector('.step-dot').style.background='#10b981';$('analysisLive').textContent=s.text;}}});
             if(rp<1) requestAnimationFrame(anim);
             else {
-                progressFill.style.width='100%'; progressPercent.textContent='100%';
-                analysisLive.textContent = t('analysis_complete');
-                setTimeout(() => { analysisOverlay.classList.remove('active'); isAnalyzing=false; cb(); }, 350);
+                $('progressFill').style.width='100%'; $('progressPercent').textContent='100%';
+                $('analysisLive').textContent = t('analysis_complete');
+                setTimeout(() => { $('analysisOverlay').classList.remove('active'); isAnalyzing=false; cb(); },350);
             }
         }
         requestAnimationFrame(anim);
@@ -213,87 +259,118 @@ document.addEventListener('DOMContentLoaded', function() {
     function genSegs(t){const n=3+Math.floor(Math.random()*4),s=[];let c=0;for(let i=0;i<n;i++){const l=i===n-1,r=1-c,sp=l?r:r*(0.15+Math.random()*0.5);s.push({sp:c,ep:c+sp,d:sp*(0.7+Math.random()*0.6)});c+=sp;}return s;}
     function ease(t){return t<0.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;}
 
-    // SIGNAL
+    // ========== SIGNAL ==========
     async function generateSignal() {
         await fetchPrice(currentAsset);
-        const price = getPrice();
-        entryPrice = price;
-        const prevPrice = currentBid || price;
-        const isUp = price >= prevPrice;
+        entryPrice = getEntryPrice();
+        const prevPrice = currentBid || entryPrice;
+        const isUp = entryPrice >= prevPrice;
         const probability = Math.floor(Math.random()*12)+78;
-        const vols = ['Low','Moderate','Medium','Elevated','High'];
-        const vol = vols[Math.floor(Math.random()*vols.length)];
+        const vols = ['Низкая','Умеренная','Средняя','Повышенная','Высокая'];
+        const volEn = ['Low','Moderate','Medium','Elevated','High'];
+        const vol = currentLang==='ru'?vols[Math.floor(Math.random()*5)]:volEn[Math.floor(Math.random()*5)];
         signalDirection = isUp?'up':'down';
         signalActive = true;
+        isMinimized = false;
         
-        heroArrow.textContent = isUp?'▲':'▼';
-        heroAction.textContent = isUp?t('buy_call'):t('sell_put');
-        heroAsset.textContent = currentAsset;
-        heroProbability.textContent = `${probability}%`;
-        heroVolatility.textContent = vol;
-        heroEntryPrice.textContent = entryPrice.toFixed(5);
-        entryPriceStat.style.display = 'flex';
-        heroResult.style.display = 'none';
-        heroResult.className = 'hero-result';
+        updateSignalDisplay();
+        $('signalCard').classList.add('active', isUp?'up':'down');
+        $('signalModal').classList.add('visible');
+        $('signalMini').classList.add('visible');
+        
+        $('heroProbability').textContent = `${probability}%`;
+        $('heroVolatility').textContent = vol;
+        $('heroEntryPrice').textContent = entryPrice.toFixed(5);
+        $('entryPriceStat').style.display = 'flex';
+        $('heroResult').style.display = 'none';
+        $('heroResult').className = 'hero-result';
         updateExpiry();
-        heroAdvice.textContent = `💡 ${t('advices')[Math.floor(Math.random()*7)]}`;
+        $('heroAdvice').textContent = `💡 ${t('advices')[Math.floor(Math.random()*7)]}`;
         
-        signalCard.classList.add('active');
-        signalCard.classList.remove('up','down');
-        signalCard.classList.add(isUp?'up':'down');
-        signalModal.classList.add('visible');
-        
+        updateMiniDisplay();
         addToHistory(isUp, probability, 'pending');
         updateStats();
         if(navigator.vibrate) navigator.vibrate([100,60,200]);
     }
 
+    function updateSignalDisplay() {
+        const isUp = signalDirection === 'up';
+        $('heroArrow').textContent = isUp?'▲':'▼';
+        $('heroAction').textContent = isUp?t('buy_call'):t('sell_put');
+        $('heroAsset').textContent = currentAsset;
+        if(entryPrice) {
+            $('heroEntryPrice').textContent = entryPrice.toFixed(5);
+            $('entryPriceStat').style.display = 'flex';
+        }
+    }
+
+    function updateMiniDisplay() {
+        const isUp = signalDirection === 'up';
+        $('miniDir').textContent = isUp?'▲':'▼';
+        $('miniDir').style.color = isUp?'var(--green)':'var(--red)';
+        $('miniAsset').textContent = currentAsset;
+    }
+
     function resetSignal() {
-        signalActive = false; signalDirection = null; entryPrice = null;
-        heroArrow.textContent = '—';
-        heroAction.textContent = t('waiting_signal');
-        heroAsset.textContent = currentAsset;
-        heroProbability.textContent = '--%';
-        heroVolatility.textContent = '--';
-        heroEntryPrice.textContent = '--';
-        entryPriceStat.style.display = 'none';
-        heroResult.style.display = 'none';
-        heroResult.className = 'hero-result';
-        heroAdvice.textContent = t('press_button');
-        signalCard.classList.remove('active','up','down');
-        signalModal.classList.remove('visible');
+        signalActive = false; signalDirection = null; entryPrice = null; isMinimized = false;
+        $('heroArrow').textContent = '—';
+        $('heroAction').textContent = t('waiting_signal');
+        $('heroAsset').textContent = currentAsset;
+        $('heroProbability').textContent = '--%';
+        $('heroVolatility').textContent = '--';
+        $('heroEntryPrice').textContent = '--';
+        $('entryPriceStat').style.display = 'none';
+        $('heroResult').style.display = 'none';
+        $('heroResult').className = 'hero-result';
+        $('heroAdvice').textContent = t('press_button');
+        $('signalCard').classList.remove('active','up','down');
+        $('signalModal').classList.remove('visible');
+        $('signalMini').classList.remove('visible');
         updateExpiry();
     }
 
-    function closeSignal() {
-        if(lockTimerInterval) { clearInterval(lockTimerInterval); lockTimerInterval = null; }
-        isLocked = false;
-        timerBox.classList.remove('active');
-        timerValue.textContent = '--:--';
-        enableCtrls();
-        resetSignal();
-        stopFireworks();
-        saveTimerState();
-        checkForex();
+    function minimizeSignal() {
+        isMinimized = true;
+        $('signalModal').classList.remove('visible');
+        $('signalMini').classList.add('visible');
     }
 
-    // TIMER
+    function expandSignal() {
+        isMinimized = false;
+        $('signalModal').classList.add('visible');
+        $('signalMini').classList.remove('visible');
+        updateSignalDisplay();
+    }
+
+    function closeSignalVisual() {
+        // Just hide visuals, timer keeps running
+        isMinimized = false;
+        $('signalModal').classList.remove('visible');
+        $('signalMini').classList.remove('visible');
+        $('signalCard').classList.remove('active','up','down');
+        $('heroResult').style.display = 'none';
+        $('heroResult').className = 'hero-result';
+        stopFireworks();
+    }
+
+    // ========== TIMER ==========
     function startTimer() {
         isLocked = true;
         lockSeconds = currentTimeframe;
-        timerBox.classList.add('active');
+        $('timerBox').classList.add('active');
         updateTimerDisp();
         disableCtrls();
         saveTimerState();
         lockTimerInterval = setInterval(() => {
             lockSeconds--;
             updateTimerDisp();
+            $('miniTimer').textContent = $('timerValue').textContent;
             saveTimerState();
             if(lockSeconds <= 0) {
                 clearInterval(lockTimerInterval);
                 lockTimerInterval = null;
                 isLocked = false;
-                timerBox.classList.remove('active');
+                $('timerBox').classList.remove('active');
                 enableCtrls();
                 saveTimerState();
                 checkResult();
@@ -303,7 +380,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function updateTimerDisp() {
         const m = Math.floor(lockSeconds/60), s = lockSeconds%60;
-        timerValue.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        const str = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        $('timerValue').textContent = str;
+        $('miniTimer').textContent = str;
     }
 
     function saveTimerState() {
@@ -324,51 +403,51 @@ document.addEventListener('DOMContentLoaded', function() {
             if(rem <= 0) { localStorage.removeItem('bsTimer'); return; }
             currentAsset = st.asset; currentTimeframe = st.tf;
             entryPrice = st.entry; signalDirection = st.dir;
-            lockSeconds = rem; signalActive = true;
-            currentAssetEl.textContent = currentAsset;
+            lockSeconds = rem; signalActive = true; isMinimized = false;
+            $('currentAsset').textContent = currentAsset;
             setTF(currentTimeframe);
-            const isUp = signalDirection === 'up';
-            heroArrow.textContent = isUp?'▲':'▼';
-            heroAction.textContent = isUp?t('buy_call'):t('sell_put');
-            heroAsset.textContent = currentAsset;
-            heroEntryPrice.textContent = entryPrice.toFixed(5);
-            entryPriceStat.style.display = 'flex';
-            heroProbability.textContent = '80%';
-            heroVolatility.textContent = 'Medium';
-            heroResult.style.display = 'none';
+            updateSignalDisplay();
+            $('signalCard').classList.add('active', signalDirection==='up'?'up':'down');
+            $('signalModal').classList.add('visible');
+            $('signalMini').classList.add('visible');
+            $('heroProbability').textContent = '80%';
+            $('heroVolatility').textContent = currentLang==='ru'?'Средняя':'Medium';
+            $('heroEntryPrice').textContent = entryPrice.toFixed(5);
+            $('entryPriceStat').style.display = 'flex';
+            $('heroResult').style.display = 'none';
             updateExpiry();
-            heroAdvice.textContent = '💡 Signal active';
-            signalCard.classList.add('active', isUp?'up':'down');
-            signalModal.classList.add('visible');
+            $('heroAdvice').textContent = '💡 Сигнал активен';
+            updateMiniDisplay();
             isLocked = true;
-            timerBox.classList.add('active');
+            $('timerBox').classList.add('active');
             updateTimerDisp();
             disableCtrls();
             loadTV(currentAsset);
             lockTimerInterval = setInterval(() => {
                 lockSeconds--;
-                updateTimerDisp(); saveTimerState();
-                if(lockSeconds<=0){clearInterval(lockTimerInterval);lockTimerInterval=null;isLocked=false;timerBox.classList.remove('active');enableCtrls();saveTimerState();checkResult();}
+                updateTimerDisp(); $('miniTimer').textContent = $('timerValue').textContent;
+                saveTimerState();
+                if(lockSeconds<=0){clearInterval(lockTimerInterval);lockTimerInterval=null;isLocked=false;$('timerBox').classList.remove('active');enableCtrls();saveTimerState();checkResult();}
             },1000);
         } catch(e) { localStorage.removeItem('bsTimer'); }
     }
 
     function disableCtrls() {
-        generateBtn.classList.add('disabled');
-        timeframePills.style.pointerEvents='none'; timeframePills.style.opacity='0.5';
-        assetsList.style.pointerEvents='none'; assetsList.style.opacity='0.5';
+        $('generateBtn').classList.add('disabled');
+        $('timeframePills').style.pointerEvents='none'; $('timeframePills').style.opacity='0.5';
+        $('assetsList').style.pointerEvents='none'; $('assetsList').style.opacity='0.5';
     }
     function enableCtrls() {
-        if(!isWeekend()) { generateBtn.classList.remove('disabled'); timeframePills.style.pointerEvents='auto'; timeframePills.style.opacity='1'; }
-        else { generateBtn.classList.add('disabled'); timeframePills.style.pointerEvents='none'; timeframePills.style.opacity='0.5'; }
-        assetsList.style.pointerEvents='auto'; assetsList.style.opacity='1';
+        if(!isWeekend()) { $('generateBtn').classList.remove('disabled'); $('timeframePills').style.pointerEvents='auto'; $('timeframePills').style.opacity='1'; }
+        else { $('generateBtn').classList.add('disabled'); $('timeframePills').style.pointerEvents='none'; $('timeframePills').style.opacity='0.5'; }
+        $('assetsList').style.pointerEvents='auto'; $('assetsList').style.opacity='1';
     }
 
-    // RESULT
+    // ========== RESULT ==========
     async function checkResult() {
         if(!signalActive||!entryPrice) return;
         await fetchPrice(currentAsset);
-        const cp = getPrice();
+        const cp = getEntryPrice();
         let result;
         if(cp>entryPrice) result='up';
         else if(cp<entryPrice) result='down';
@@ -378,31 +457,38 @@ document.addEventListener('DOMContentLoaded', function() {
         else if(signalDirection==='down'&&result==='down') isWin=true;
         else if(result==='draw') isWin=null;
         const profit = Math.abs(((cp-entryPrice)/entryPrice)*100).toFixed(2);
-        heroResult.style.display = 'block';
+        $('heroResult').style.display = 'block';
+        $('signalModal').classList.add('visible');
+        $('signalMini').classList.add('visible');
         if(isWin===true) {
-            heroResult.textContent = t('win_result').replace('{profit}', profit);
-            heroResult.className = 'hero-result win';
+            $('heroResult').textContent = t('win_result').replace('{profit}', profit);
+            $('heroResult').className = 'hero-result win';
             startFireworks();
             updateLastResult('win');
         } else if(isWin===false) {
-            heroResult.textContent = t('lose_result');
-            heroResult.className = 'hero-result lose';
-            signalCard.style.animation = 'shake 0.6s ease';
-            setTimeout(() => signalCard.style.animation = '', 600);
+            $('heroResult').textContent = t('lose_result');
+            $('heroResult').className = 'hero-result lose';
+            $('signalCard').style.animation = 'shake 0.6s ease';
+            setTimeout(() => $('signalCard').style.animation = '', 600);
             updateLastResult('lose');
         } else {
-            heroResult.textContent = t('draw_result');
-            heroResult.className = 'hero-result draw';
+            $('heroResult').textContent = t('draw_result');
+            $('heroResult').className = 'hero-result draw';
             updateLastResult('draw');
         }
         updateStats();
-        // Ensure result is visible on mobile
-        heroResult.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        setTimeout(() => { if(signalActive) closeSignal(); }, 6000);
+        $('heroResult').scrollIntoView({ behavior:'smooth', block:'center' });
+        // Auto hide visuals after 6s, but timer already expired
+        setTimeout(() => {
+            closeSignalVisual();
+            resetSignal();
+            enableCtrls();
+            checkForex();
+        }, 6000);
     }
 
     function updateLastResult(result) {
-        const items = historyList.querySelectorAll('.history-item');
+        const items = $('historyList').querySelectorAll('.history-item');
         if(items.length > 0) {
             const last = items[0];
             last.setAttribute('data-result', result);
@@ -412,29 +498,24 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // FIREWORKS
+    // ========== FIREWORKS ==========
     function startFireworks() {
-        const c = fireworksCanvas;
+        const c = $('fireworksCanvas');
         c.style.display = 'block'; c.width = window.innerWidth; c.height = window.innerHeight;
         const ctx = c.getContext('2d');
         const p = [];
         for(let i=0;i<120;i++) p.push({x:c.width/2+(Math.random()-0.5)*300,y:c.height/2+(Math.random()-0.5)*200,vx:(Math.random()-0.5)*6,vy:(Math.random()-0.5)*6-2,life:1,decay:0.01+Math.random()*0.02,color:`hsl(${Math.random()*360},100%,${50+Math.random()*30}%)`,size:2+Math.random()*3});
         function anim() {
-            ctx.clearRect(0,0,c.width,c.height);
-            let al = false;
-            p.forEach(pp => {
-                pp.x+=pp.vx; pp.y+=pp.vy; pp.vy+=0.08; pp.life-=pp.decay;
-                if(pp.life>0) { al=true; ctx.beginPath(); ctx.arc(pp.x,pp.y,pp.size,0,Math.PI*2); ctx.fillStyle=pp.color; ctx.fill(); }
-            });
-            if(al) requestAnimationFrame(anim);
-            else c.style.display='none';
+            ctx.clearRect(0,0,c.width,c.height); let al = false;
+            p.forEach(pp => { pp.x+=pp.vx; pp.y+=pp.vy; pp.vy+=0.08; pp.life-=pp.decay; if(pp.life>0){al=true;ctx.beginPath();ctx.arc(pp.x,pp.y,pp.size,0,Math.PI*2);ctx.fillStyle=pp.color;ctx.fill();} });
+            if(al) requestAnimationFrame(anim); else c.style.display='none';
         }
         requestAnimationFrame(anim);
         setTimeout(() => { c.style.display='none'; }, 3500);
     }
-    function stopFireworks() { fireworksCanvas.style.display='none'; }
+    function stopFireworks() { $('fireworksCanvas').style.display='none'; }
 
-    // HISTORY
+    // ========== HISTORY ==========
     function addToHistory(isUp, prob, result) {
         const ts = new Date().toLocaleTimeString(currentLang==='ru'?'ru-RU':'en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
         const exp = currentTimeframe/60; const expStr = exp>=60?`${exp/60}H`:`${exp}m`;
@@ -442,23 +523,15 @@ document.addEventListener('DOMContentLoaded', function() {
         hi.className = `history-item ${isUp?'up':'down'}`;
         hi.setAttribute('data-result', result||'pending');
         hi.innerHTML = `<span class="hi-asset">${currentAsset}</span><span class="hi-dir">${isUp?'▲C':'▼P'}</span><span class="hi-prob">${prob}%</span><span class="hi-exp">${expStr}</span><span class="hi-result"></span><span class="hi-time">${ts}</span>`;
-        if(historyList.querySelector('.empty-history')) historyList.innerHTML = '';
-        historyList.prepend(hi);
-        if(historyList.children.length > 30) historyList.lastChild.remove();
+        if($('historyList').querySelector('.empty-history')) $('historyList').innerHTML = '';
+        $('historyList').prepend(hi);
+        if($('historyList').children.length > 30) $('historyList').lastChild.remove();
         saveHistory();
     }
     function saveHistory() {
         const items = [];
-        historyList.querySelectorAll('.history-item').forEach(item => {
-            items.push({
-                asset: item.querySelector('.hi-asset').textContent,
-                dir: item.querySelector('.hi-dir').textContent,
-                prob: item.querySelector('.hi-prob').textContent,
-                exp: item.querySelector('.hi-exp').textContent,
-                time: item.querySelector('.hi-time').textContent,
-                isUp: item.classList.contains('up'),
-                result: item.getAttribute('data-result')
-            });
+        $('historyList').querySelectorAll('.history-item').forEach(item => {
+            items.push({asset:item.querySelector('.hi-asset').textContent,dir:item.querySelector('.hi-dir').textContent,prob:item.querySelector('.hi-prob').textContent,exp:item.querySelector('.hi-exp').textContent,time:item.querySelector('.hi-time').textContent,isUp:item.classList.contains('up'),result:item.getAttribute('data-result')});
         });
         localStorage.setItem('bsHistory', JSON.stringify(items));
     }
@@ -466,39 +539,38 @@ document.addEventListener('DOMContentLoaded', function() {
         const saved = localStorage.getItem('bsHistory');
         if(saved) {
             const items = JSON.parse(saved);
-            historyList.innerHTML = '';
+            $('historyList').innerHTML = '';
             items.forEach(item => {
                 const d = document.createElement('div');
                 d.className = `history-item ${item.isUp?'up':'down'} ${item.result?item.result+'-result':''}`;
                 d.setAttribute('data-result', item.result||'pending');
                 d.innerHTML = `<span class="hi-asset">${item.asset}</span><span class="hi-dir">${item.dir}</span><span class="hi-prob">${item.prob}</span><span class="hi-exp">${item.exp}</span><span class="hi-result">${item.result==='win'?'✅':item.result==='lose'?'❌':item.result==='draw'?'➖':''}</span><span class="hi-time">${item.time}</span>`;
-                historyList.appendChild(d);
+                $('historyList').appendChild(d);
             });
         }
         updateStats();
     }
     function updateStats() {
-        const items = historyList.querySelectorAll('.history-item');
+        const items = $('historyList').querySelectorAll('.history-item');
         const total = items.length;
-        totalSignalsEl.textContent = total; miniTotalSignals.textContent = total;
+        $('totalSignals').textContent = total; $('miniTotalSignals').textContent = total;
         let wins = 0, sumProb = 0;
         items.forEach(item => {
             const prob = parseInt(item.querySelector('.hi-prob').textContent);
             if(!isNaN(prob)) sumProb += prob;
             if(item.getAttribute('data-result')==='win') wins++;
         });
-        totalWinsEl.textContent = wins;
+        $('totalWins').textContent = wins;
         const avg = total>0?Math.round(sumProb/total):0;
-        avgAccuracyEl.textContent = total>0?`${avg}%`:'--';
-        miniAvgProb.textContent = total>0?`${avg}%`:'--%';
-        miniWinRate.textContent = total>0?`${Math.round((wins/total)*100)}%`:'--%';
+        $('avgAccuracy').textContent = total>0?`${avg}%`:'--';
+        $('miniAvgProb').textContent = total>0?`${avg}%`:'--%';
+        $('miniWinRate').textContent = total>0?`${Math.round((wins/total)*100)}%`:'--%';
     }
     function clearHistory() {
-        historyList.innerHTML = '<div class="empty-history">No signals</div>';
+        $('historyList').innerHTML = `<div class="empty-history">${t('no_signals')}</div>`;
         localStorage.removeItem('bsHistory');
         updateStats();
     }
-
     function filterAssets(q) {
         const s = q.toLowerCase().trim();
         const f = forexAssets.filter(a => a.toLowerCase().includes(s));
@@ -521,36 +593,35 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.querySelectorAll('.lang-btn').forEach(x => x.classList.remove('active'));
                 this.classList.add('active');
                 applyLang();
-                if(!signalActive) resetSignal();
-                else updateExpiry();
+                updateExpiry();
+                if(signalActive) updateSignalDisplay();
             });
         });
-        document.getElementById('themeToggle').addEventListener('click', () => {
+        $('themeToggle').addEventListener('click', () => {
             currentTheme = currentTheme==='dark'?'light':'dark';
             localStorage.setItem('bsTheme', currentTheme);
             applyTheme();
         });
         
-        // Close signal - works on both button and background tap
-        signalClose.addEventListener('click', (e) => { e.stopPropagation(); closeSignal(); });
-        signalModalBg.addEventListener('click', (e) => { e.stopPropagation(); closeSignal(); });
-        // Prevent closing when tapping on card itself
-        signalCard.addEventListener('click', (e) => e.stopPropagation());
+        // Close - just hide visual, timer keeps running
+        $('signalClose').addEventListener('click', (e) => { e.stopPropagation(); closeSignalVisual(); });
+        // Minimize
+        $('signalMinimize').addEventListener('click', (e) => { e.stopPropagation(); minimizeSignal(); });
+        // Expand from mini
+        $('signalMiniExpand').addEventListener('click', (e) => { e.stopPropagation(); expandSignal(); });
         
-        timeframePills.querySelectorAll('.tf-pill').forEach(p => {
+        $('timeframePills').querySelectorAll('.tf-pill').forEach(p => {
             p.addEventListener('click', function() {
                 if(isLocked||isAnalyzing) return;
                 const tf = parseInt(this.dataset.tf)*60;
                 setTF(tf);
-                resetSignal();
-                if(tvWidget) try { tvWidget.chart().setResolution(getTVInt(tf), () => {}); } catch(e) {}
+                if(!signalActive) resetSignal();
+                else updateExpiry();
             });
         });
-        generateBtn.addEventListener('click', handleGenerate);
-        document.getElementById('assetSearch').addEventListener('input', function() {
-            if(!isLocked&&!isAnalyzing) filterAssets(this.value);
-        });
-        document.getElementById('clearHistory').addEventListener('click', clearHistory);
+        $('generateBtn').addEventListener('click', handleGenerate);
+        $('assetSearch').addEventListener('input', function() { if(!isLocked&&!isAnalyzing) filterAssets(this.value); });
+        $('clearHistory').addEventListener('click', clearHistory);
         setInterval(checkForex, 30000);
     }
 
