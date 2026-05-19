@@ -1,4 +1,4 @@
-// BinarySignal Pro - БЕЗ прибыли в процентах, БЕЗ рандомных результатов
+// BinarySignal Pro - Без результата сделок, график грузится при смене валюты
 
 document.addEventListener('DOMContentLoaded', function() {
     
@@ -10,17 +10,16 @@ document.addEventListener('DOMContentLoaded', function() {
             market_analysis:"АНАЛИЗ РЫНКА",step1:"Сбор данных",step2:"Паттерны",
             step3:"Уровни",step4:"Индикаторы",step5:"Волатильность",step6:"Сигнал",
             timeframe_expiry:"⏱ Таймфрейм / Экспирация:",get_signal:"ПОЛУЧИТЬ СИГНАЛ",
-            timer:"⏱ Таймер:",history:"📋 История",signals:"Сигналов",winrate:"Винрейт",
+            timer:"⏱ Таймер:",history:"📋 История",signals:"Сигналов",
             avg_prob:"Сред. вер-ть",no_signals:"Нет сигналов",clear:"Очистить",
             waiting_signal:"ОЖИДАНИЕ",buy_call:"CALL ▲",sell_put:"PUT ▼",
             init_neural:"Инициализация нейросети...",data_collection:"Сбор рыночных данных...",
             patterns:"Поиск паттернов...",levels:"Расчёт уровней...",indicators:"Анализ индикаторов...",
             volatility_step:"Оценка волатильности...",signal_step:"Формирование сигнала...",
             analysis_complete:"Анализ завершён!",
-            win_result:"✅ ПОБЕДА",
-            lose_result:"❌ ПРОИГРЫШ",
-            draw_result:"➖ НИЧЬЯ",
-            advices:["Риск ≤2%","Отличный вход!","Проверьте ТФ","Хорошая точка!","По тренду","Stop-loss!","Сигнал!"]
+            advices:["Риск ≤2%","Отличный вход!","Проверьте ТФ","Хорошая точка!","По тренду","Stop-loss!","Сигнал!"],
+            signal_active:"💡 Сигнал активен",
+            timer_expired:"⏰ Время экспирации истекло"
         },
         en: {
             online:"Online",search_placeholder:"🔍 Search...",forex_closed:"Market closed (weekend)",
@@ -29,17 +28,16 @@ document.addEventListener('DOMContentLoaded', function() {
             market_analysis:"MARKET ANALYSIS",step1:"Data Collection",step2:"Patterns",
             step3:"Levels",step4:"Indicators",step5:"Volatility",step6:"Signal",
             timeframe_expiry:"⏱ Timeframe / Expiry:",get_signal:"GET SIGNAL",
-            timer:"⏱ Timer:",history:"📋 History",signals:"Signals",winrate:"Winrate",
+            timer:"⏱ Timer:",history:"📋 History",signals:"Signals",
             avg_prob:"Avg Prob",no_signals:"No signals",clear:"Clear",
             waiting_signal:"WAITING",buy_call:"CALL ▲",sell_put:"PUT ▼",
             init_neural:"Initializing neural network...",data_collection:"Collecting market data...",
             patterns:"Finding patterns...",levels:"Calculating levels...",indicators:"Analyzing indicators...",
             volatility_step:"Evaluating volatility...",signal_step:"Forming signal...",
             analysis_complete:"Analysis complete!",
-            win_result:"✅ WIN",
-            lose_result:"❌ LOSS",
-            draw_result:"➖ DRAW",
-            advices:["Risk ≤2%","Perfect entry!","Check HTF","Great point!","Follow trend","Stop-loss!","Signal!"]
+            advices:["Risk ≤2%","Perfect entry!","Check HTF","Great point!","Follow trend","Stop-loss!","Signal!"],
+            signal_active:"💡 Signal active",
+            timer_expired:"⏰ Expiry time reached"
         }
     };
 
@@ -51,7 +49,6 @@ document.addEventListener('DOMContentLoaded', function() {
         "GBP/AUD","USD/JPY","EUR/USD","EUR/AUD","AUD/USD","CAD/JPY",
         "AUD/JPY","EUR/GBP","GBP/JPY","GBP/CHF","EUR/CAD","CAD/CHF","AUD/CHF"
     ];
-    const timeframeMap = {1:60,2:120,3:180,5:300,10:600,15:900,30:1800,60:3600};
     let currentAsset = "EUR/USD";
     let currentTimeframe = 60;
     let isLocked = false, isAnalyzing = false, lockTimerInterval = null, lockSeconds = 0;
@@ -72,6 +69,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             const isUp = signalDirection === 'up';
             $('heroAction').textContent = isUp ? t('buy_call') : t('sell_put');
+            $('heroAdvice').textContent = t('signal_active');
         }
     }
 
@@ -121,25 +119,49 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function loadTV(symbol) {
+        // Очищаем контейнер
         $('tradingviewChart').innerHTML = '';
         const ph = document.createElement('div'); ph.className='chart-placeholder';
         ph.innerHTML='<div class="loading-spinner"></div>'; $('tradingviewChart').appendChild(ph);
-        try {
-            if(tvWidget) { tvWidget.remove(); tvWidget = null; }
-            tvWidget = new TradingView.widget({
-                container_id:"tradingviewChart",autosize:true,symbol:`FX:${symbol.replace('/','')}`,
-                interval:getTVInt(currentTimeframe),timezone:"Europe/Moscow",
-                theme:currentTheme,style:"1",locale:currentLang==='ru'?'ru':'en',
-                toolbar_bg:currentTheme==='dark'?"#1a2236":"#f8fafc",
-                enable_publishing:false,hide_top_toolbar:true,hide_side_toolbar:true,
-                allow_symbol_change:false,save_image:false,details:false,studies:[],
-                width:"100%",height:"100%"
-            });
-            tvWidget.onChartReady(() => {
-                const cp = $('tradingviewChart').querySelector('.chart-placeholder');
-                if(cp) cp.style.display='none';
-            });
-        } catch(e) {}
+        
+        // Удаляем старый виджет если есть
+        if(tvWidget) {
+            try { tvWidget.remove(); } catch(e) {}
+            tvWidget = null;
+        }
+        
+        // Даём DOM время обновиться
+        setTimeout(() => {
+            try {
+                tvWidget = new TradingView.widget({
+                    container_id:"tradingviewChart",
+                    autosize:true,
+                    symbol:`FX:${symbol.replace('/','')}`,
+                    interval:getTVInt(currentTimeframe),
+                    timezone:"Europe/Moscow",
+                    theme:currentTheme,
+                    style:"1",
+                    locale:currentLang==='ru'?'ru':'en',
+                    toolbar_bg:currentTheme==='dark'?"#1a2236":"#f8fafc",
+                    enable_publishing:false,
+                    hide_top_toolbar:true,
+                    hide_side_toolbar:true,
+                    allow_symbol_change:false,
+                    save_image:false,
+                    details:false,
+                    studies:[],
+                    width:"100%",
+                    height:"100%"
+                });
+                
+                tvWidget.onChartReady(() => {
+                    const cp = $('tradingviewChart').querySelector('.chart-placeholder');
+                    if(cp) cp.style.display='none';
+                });
+            } catch(e) {
+                console.error('TradingView widget error:', e);
+            }
+        }, 100);
     }
 
     function getTVInt(sec) {
@@ -157,7 +179,11 @@ document.addEventListener('DOMContentLoaded', function() {
         if(tvWidget && tvWidget.chart) {
             try {
                 tvWidget.chart().setResolution(getTVInt(sec));
-                setTimeout(() => { if(tvWidget && tvWidget.chart) tvWidget.chart().setSymbol(`FX:${currentAsset.replace('/','')}`); }, 100);
+                setTimeout(() => { 
+                    if(tvWidget && tvWidget.chart) {
+                        tvWidget.chart().setSymbol(`FX:${currentAsset.replace('/','')}`); 
+                    }
+                }, 200);
             } catch(e) { loadTV(currentAsset); }
         }
     }
@@ -240,13 +266,11 @@ document.addEventListener('DOMContentLoaded', function() {
         
         $('heroProbability').textContent = `${probability}%`;
         $('heroVolatility').textContent = vol;
-        $('heroResult').style.display = 'none';
-        $('heroResult').className = 'hero-result';
         updateExpiry();
         $('heroAdvice').textContent = `💡 ${t('advices')[Math.floor(Math.random()*7)]}`;
         
         updateMiniDisplay();
-        addToHistory(isUp, probability, 'pending');
+        addToHistory(isUp, probability);
         updateStats();
         if(navigator.vibrate) navigator.vibrate([100,60,200]);
     }
@@ -256,6 +280,7 @@ document.addEventListener('DOMContentLoaded', function() {
         $('heroArrow').textContent = isUp?'▲':'▼';
         $('heroAction').textContent = isUp?t('buy_call'):t('sell_put');
         $('heroAsset').textContent = currentAsset;
+        $('heroAdvice').textContent = t('signal_active');
     }
 
     function updateMiniDisplay() {
@@ -272,8 +297,6 @@ document.addEventListener('DOMContentLoaded', function() {
         $('heroAsset').textContent = currentAsset;
         $('heroProbability').textContent = '--%';
         $('heroVolatility').textContent = '--';
-        $('heroResult').style.display = 'none';
-        $('heroResult').className = 'hero-result';
         $('heroAdvice').textContent = t('press_button');
         $('signalCard').classList.remove('active','up','down');
         $('signalModal').classList.remove('visible');
@@ -298,7 +321,6 @@ document.addEventListener('DOMContentLoaded', function() {
         signalVisible = false;
         $('signalModal').classList.remove('visible');
         $('signalMini').classList.remove('visible');
-        stopFireworks();
     }
 
     function showSignalVisuals() {
@@ -331,7 +353,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 $('timerBox').classList.remove('active');
                 enableCtrls();
                 saveTimerState();
-                // Таймер истёк, но результат НЕ определяется автоматически
                 onTimerExpired();
             }
         }, 1000);
@@ -375,9 +396,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             $('heroProbability').textContent = '80%';
             $('heroVolatility').textContent = currentLang==='ru'?'Средняя':'Medium';
-            $('heroResult').style.display = 'none';
             updateExpiry();
-            $('heroAdvice').textContent = currentLang==='ru'?'💡 Сигнал активен':'💡 Signal active';
+            $('heroAdvice').textContent = t('signal_active');
             updateMiniDisplay();
             isLocked = true;
             $('timerBox').classList.add('active');
@@ -408,96 +428,27 @@ document.addEventListener('DOMContentLoaded', function() {
         $('assetsList').style.pointerEvents='auto'; $('assetsList').style.opacity='1';
     }
 
-    // ========== TIMER EXPIRED - NO AUTO RESULT ==========
+    // ========== TIMER EXPIRED - НЕТ РЕЗУЛЬТАТА ==========
     function onTimerExpired() {
-        // Таймер истёк, но результат НЕ определяется здесь.
-        // Вы можете добавить свою логику результата.
-        // Пока просто показываем сигнал и даём пользователю возможность
-        // вручную отметить результат через вызов markResult('win'/'lose'/'draw')
-        console.log('Timer expired. Call markResult() to set outcome.');
-        
-        // Показываем карточку сигнала, если была скрыта
+        // Таймер истёк — показываем уведомление и сбрасываем сигнал
+        $('heroAdvice').textContent = t('timer_expired');
         showSignalVisuals();
         
-        // Автоматически сбрасываем сигнал через некоторое время
+        // Автоматически сбрасываем через некоторое время
         setTimeout(() => {
             resetSignal();
             enableCtrls();
             checkForex();
-        }, 10000);
+        }, 5000);
     }
 
-    // ========== RESULT - ВЫ МОЖЕТЕ ВЫЗВАТЬ ЭТУ ФУНКЦИЮ ВРУЧНУЮ ==========
-    function markResult(resultType) {
-        // resultType: 'win', 'lose', или 'draw'
-        if(!signalActive) return;
-        
-        $('heroResult').style.display = 'block';
-        showSignalVisuals();
-        
-        if(resultType === 'win') {
-            $('heroResult').textContent = t('win_result');
-            $('heroResult').className = 'hero-result win';
-            startFireworks();
-            updateLastResult('win');
-        } else if(resultType === 'lose') {
-            $('heroResult').textContent = t('lose_result');
-            $('heroResult').className = 'hero-result lose';
-            $('signalCard').style.animation = 'shake 0.6s ease';
-            setTimeout(() => $('signalCard').style.animation = '', 600);
-            updateLastResult('lose');
-        } else if(resultType === 'draw') {
-            $('heroResult').textContent = t('draw_result');
-            $('heroResult').className = 'hero-result draw';
-            updateLastResult('draw');
-        }
-        
-        updateStats();
-        $('heroResult').scrollIntoView({ behavior:'smooth', block:'center' });
-        
-        setTimeout(() => {
-            resetSignal();
-            enableCtrls();
-            checkForex();
-        }, 6000);
-    }
-
-    function updateLastResult(result) {
-        const items = $('historyList').querySelectorAll('.history-item');
-        if(items.length > 0) {
-            const last = items[0];
-            last.setAttribute('data-result', result);
-            last.classList.add(result+'-result');
-            last.querySelector('.hi-result').textContent = result==='win'?'✅':result==='lose'?'❌':'➖';
-            saveHistory();
-        }
-    }
-
-    // ========== FIREWORKS ==========
-    function startFireworks() {
-        const c = $('fireworksCanvas');
-        c.style.display = 'block'; c.width = window.innerWidth; c.height = window.innerHeight;
-        const ctx = c.getContext('2d');
-        const p = [];
-        for(let i=0;i<120;i++) p.push({x:c.width/2+(Math.random()-0.5)*300,y:c.height/2+(Math.random()-0.5)*200,vx:(Math.random()-0.5)*6,vy:(Math.random()-0.5)*6-2,life:1,decay:0.01+Math.random()*0.02,color:`hsl(${Math.random()*360},100%,${50+Math.random()*30}%)`,size:2+Math.random()*3});
-        function anim() {
-            ctx.clearRect(0,0,c.width,c.height); let al = false;
-            p.forEach(pp => { pp.x+=pp.vx; pp.y+=pp.vy; pp.vy+=0.08; pp.life-=pp.decay; if(pp.life>0){al=true;ctx.beginPath();ctx.arc(pp.x,pp.y,pp.size,0,Math.PI*2);ctx.fillStyle=pp.color;ctx.fill();} });
-            if(al) requestAnimationFrame(anim); else c.style.display='none';
-        }
-        requestAnimationFrame(anim);
-        setTimeout(() => { c.style.display='none'; }, 3500);
-    }
-    function stopFireworks() { $('fireworksCanvas').style.display='none'; }
-
-    // ========== HISTORY ==========
-    function addToHistory(isUp, prob, result) {
+    // ========== HISTORY (без результатов) ==========
+    function addToHistory(isUp, prob) {
         const ts = new Date().toLocaleTimeString(currentLang==='ru'?'ru-RU':'en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
         const exp = currentTimeframe/60; const expStr = exp>=60?`${exp/60}H`:`${exp}m`;
         const hi = document.createElement('div');
         hi.className = `history-item ${isUp?'up':'down'}`;
-        hi.setAttribute('data-result', result||'pending');
-        hi.innerHTML = `<span class="hi-asset">${currentAsset}</span><span class="hi-dir">${isUp?'▲C':'▼P'}</span><span class="hi-prob">${prob}%</span><span class="hi-exp">${expStr}</span><span class="hi-result"></span><span class="hi-time">${ts}</span>`;
+        hi.innerHTML = `<span class="hi-asset">${currentAsset}</span><span class="hi-dir">${isUp?'▲C':'▼P'}</span><span class="hi-prob">${prob}%</span><span class="hi-exp">${expStr}</span><span class="hi-time">${ts}</span>`;
         if($('historyList').querySelector('.empty-history')) $('historyList').innerHTML = '';
         $('historyList').prepend(hi);
         if($('historyList').children.length > 30) $('historyList').lastChild.remove();
@@ -506,7 +457,14 @@ document.addEventListener('DOMContentLoaded', function() {
     function saveHistory() {
         const items = [];
         $('historyList').querySelectorAll('.history-item').forEach(item => {
-            items.push({asset:item.querySelector('.hi-asset').textContent,dir:item.querySelector('.hi-dir').textContent,prob:item.querySelector('.hi-prob').textContent,exp:item.querySelector('.hi-exp').textContent,time:item.querySelector('.hi-time').textContent,isUp:item.classList.contains('up'),result:item.getAttribute('data-result')});
+            items.push({
+                asset:item.querySelector('.hi-asset').textContent,
+                dir:item.querySelector('.hi-dir').textContent,
+                prob:item.querySelector('.hi-prob').textContent,
+                exp:item.querySelector('.hi-exp').textContent,
+                time:item.querySelector('.hi-time').textContent,
+                isUp:item.classList.contains('up')
+            });
         });
         localStorage.setItem('bsHistory', JSON.stringify(items));
     }
@@ -517,9 +475,8 @@ document.addEventListener('DOMContentLoaded', function() {
             $('historyList').innerHTML = '';
             items.forEach(item => {
                 const d = document.createElement('div');
-                d.className = `history-item ${item.isUp?'up':'down'} ${item.result?item.result+'-result':''}`;
-                d.setAttribute('data-result', item.result||'pending');
-                d.innerHTML = `<span class="hi-asset">${item.asset}</span><span class="hi-dir">${item.dir}</span><span class="hi-prob">${item.prob}</span><span class="hi-exp">${item.exp}</span><span class="hi-result">${item.result==='win'?'✅':item.result==='lose'?'❌':item.result==='draw'?'➖':''}</span><span class="hi-time">${item.time}</span>`;
+                d.className = `history-item ${item.isUp?'up':'down'}`;
+                d.innerHTML = `<span class="hi-asset">${item.asset}</span><span class="hi-dir">${item.dir}</span><span class="hi-prob">${item.prob}</span><span class="hi-exp">${item.exp}</span><span class="hi-time">${item.time}</span>`;
                 $('historyList').appendChild(d);
             });
         }
@@ -529,17 +486,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const items = $('historyList').querySelectorAll('.history-item');
         const total = items.length;
         $('totalSignals').textContent = total; $('miniTotalSignals').textContent = total;
-        let wins = 0, sumProb = 0;
+        let sumProb = 0;
         items.forEach(item => {
             const prob = parseInt(item.querySelector('.hi-prob').textContent);
             if(!isNaN(prob)) sumProb += prob;
-            if(item.getAttribute('data-result')==='win') wins++;
         });
-        $('totalWins').textContent = wins;
         const avg = total>0?Math.round(sumProb/total):0;
         $('avgAccuracy').textContent = total>0?`${avg}%`:'--';
         $('miniAvgProb').textContent = total>0?`${avg}%`:'--%';
-        $('miniWinRate').textContent = total>0?`${Math.round((wins/total)*100)}%`:'--%';
     }
     function clearHistory() {
         $('historyList').innerHTML = `<div class="empty-history">${t('no_signals')}</div>`;
@@ -555,7 +509,6 @@ document.addEventListener('DOMContentLoaded', function() {
     function handleGenerate() {
         if(isLocked||isAnalyzing||isWeekend()) return;
         resetSignal();
-        stopFireworks();
         startAnalysis(() => { generateSignal(); startTimer(); });
     }
 
@@ -594,9 +547,6 @@ document.addEventListener('DOMContentLoaded', function() {
         $('assetSearch').addEventListener('input', function() { if(!isLocked&&!isAnalyzing) filterAssets(this.value); });
         $('clearHistory').addEventListener('click', clearHistory);
     }
-
-    // Делаем markResult доступным глобально, чтобы вы могли вызывать из консоли
-    window.markResult = markResult;
 
     init();
 });
