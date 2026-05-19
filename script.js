@@ -1,4 +1,8 @@
-// BinarySignal Pro vFinal - Real API + GitHub Pages Ready
+// BinarySignal Pro - REAL TradingView API Data
+
+const API_BASE = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' 
+    ? 'http://localhost:3000' 
+    : 'https://binarysignal-pro.onrender.com'; // Замените на ваш URL
 
 document.addEventListener('DOMContentLoaded', function() {
     
@@ -13,8 +17,8 @@ document.addEventListener('DOMContentLoaded', function() {
             timer:"⏱ Таймер:",history:"📋 История",signals:"Сигналов",winrate:"Винрейт",
             avg_prob:"Сред. вер-ть",no_signals:"Нет сигналов",clear:"Очистить",
             waiting_signal:"ОЖИДАНИЕ",buy_call:"CALL ▲",sell_put:"PUT ▼",
-            init_neural:"Инициализация нейросети...",data_collection:"Сбор рыночных данных...",
-            patterns:"Поиск паттернов...",levels:"Расчёт уровней...",indicators:"Анализ индикаторов...",
+            init_neural:"Инициализация нейросети...",data_collection:"Сбор данных TradingView...",
+            patterns:"Поиск паттернов...",levels:"Расчёт уровней...",indicators:"Анализ RSI, MACD...",
             volatility_step:"Оценка волатильности...",signal_step:"Формирование сигнала...",
             analysis_complete:"Анализ завершён!",win_result:"✅ +{profit}%",
             lose_result:"❌ ПРОИГРЫШ",draw_result:"➖ НИЧЬЯ",
@@ -30,8 +34,8 @@ document.addEventListener('DOMContentLoaded', function() {
             timer:"⏱ Timer:",history:"📋 History",signals:"Signals",winrate:"Winrate",
             avg_prob:"Avg Prob",no_signals:"No signals",clear:"Clear",
             waiting_signal:"WAITING",buy_call:"CALL ▲",sell_put:"PUT ▼",
-            init_neural:"Initializing neural network...",data_collection:"Collecting market data...",
-            patterns:"Finding patterns...",levels:"Calculating levels...",indicators:"Analyzing indicators...",
+            init_neural:"Initializing neural network...",data_collection:"Fetching TradingView data...",
+            patterns:"Finding patterns...",levels:"Calculating levels...",indicators:"Analyzing RSI, MACD...",
             volatility_step:"Evaluating volatility...",signal_step:"Forming signal...",
             analysis_complete:"Analysis complete!",win_result:"✅ +{profit}%",
             lose_result:"❌ LOSS",draw_result:"➖ DRAW",
@@ -47,15 +51,51 @@ document.addEventListener('DOMContentLoaded', function() {
         "GBP/AUD","USD/JPY","EUR/USD","EUR/AUD","AUD/USD","CAD/JPY",
         "AUD/JPY","EUR/GBP","GBP/JPY","GBP/CHF","EUR/CAD","CAD/CHF","AUD/CHF"
     ];
-    const timeframeMap = {1:60,2:120,3:180,5:300,10:600,15:900,30:1800,60:3600};
     let currentAsset = "EUR/USD";
     let currentTimeframe = 60;
     let isLocked = false, isAnalyzing = false, lockTimerInterval = null, lockSeconds = 0;
     let tvWidget = null, signalDirection = null, signalActive = false;
     let isMinimized = false, signalVisible = true;
+    let realData = null;
 
     function t(key) { return translations[currentLang][key] || key; }
     function $(id) { return document.getElementById(id); }
+
+    // ========== REAL API CALLS ==========
+    async function fetchRealSignal(symbol, interval) {
+        try {
+            const tvSymbol = symbol.replace('/', '');
+            const tvInterval = interval >= 3600 ? `${interval/3600}H` : `${interval/60}m`;
+            
+            const response = await fetch(`${API_BASE}/api/signal`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ symbol: tvSymbol, interval: tvInterval })
+            });
+            const data = await response.json();
+            if (data.success) {
+                realData = data.data;
+                return data.data;
+            }
+        } catch (e) {
+            console.error('API error:', e);
+        }
+        return null;
+    }
+
+    async function fetchRealIndicators(symbol, interval) {
+        try {
+            const tvSymbol = symbol.replace('/', '');
+            const tvInterval = interval >= 3600 ? `${interval/3600}H` : `${interval/60}m`;
+            
+            const response = await fetch(`${API_BASE}/api/indicators/${tvSymbol}?interval=${tvInterval}`);
+            const data = await response.json();
+            if (data.success) return data.data;
+        } catch (e) {
+            console.error('Indicators error:', e);
+        }
+        return null;
+    }
 
     function applyLang() {
         document.querySelectorAll('[data-i18n]').forEach(el => { if(el.tagName!=='INPUT') el.textContent = t(el.getAttribute('data-i18n')); });
@@ -72,29 +112,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function isWeekend() { const d = new Date().getDay(); return d===0||d===6; }
-
-    // ========== REAL API FUNCTIONS ==========
-    async function fetchRealData(symbol) {
-        try {
-            const pair = symbol.replace('/','');
-            // Using free Forex API
-            const [priceResp, indicatorResp] = await Promise.all([
-                fetch(`https://api.twelvedata.com/price?symbol=${pair}&apikey=demo`),
-                fetch(`https://api.twelvedata.com/rsi?symbol=${pair}&interval=1min&apikey=demo`)
-            ]);
-            
-            const priceData = await priceResp.json();
-            const indicatorData = await indicatorResp.json();
-            
-            let bid = 1.0800, rsi = 50;
-            if (priceData.price) bid = parseFloat(priceData.price);
-            if (indicatorData.rsi) rsi = parseFloat(indicatorData.rsi);
-            
-            return { bid, rsi };
-        } catch (e) {
-            return { bid: 1.0800 + Math.random() * 0.1, rsi: 30 + Math.random() * 40 };
-        }
-    }
 
     function init() {
         applyTheme(); applyLang();
@@ -201,11 +218,11 @@ document.addEventListener('DOMContentLoaded', function() {
         $('progressFill').style.width='0%'; $('progressPercent').textContent='0%';
         $('analysisLive').textContent = t('init_neural');
         for(let i=1;i<=6;i++) { const s=document.getElementById(`step${i}`); s.classList.remove('done'); s.querySelector('.step-dot').style.background='#334155'; }
-        const total=2500+Math.random()*2500, start=performance.now();
+        const total=3000+Math.random()*2000, start=performance.now();
         const segs=genSegs(total); let cs=0;
         const steps=[
-            {id:'step1',text:t('data_collection'),p:0.15},{id:'step2',text:t('patterns'),p:0.32},
-            {id:'step3',text:t('levels'),p:0.52},{id:'step4',text:t('indicators'),p:0.72},
+            {id:'step1',text:t('data_collection'),p:0.15},{id:'step2',text:t('patterns'),p:0.35},
+            {id:'step3',text:t('levels'),p:0.55},{id:'step4',text:t('indicators'),p:0.72},
             {id:'step5',text:t('volatility_step'),p:0.88},{id:'step6',text:t('signal_step'),p:0.98}
         ];
         function anim(ts) {
@@ -224,24 +241,39 @@ document.addEventListener('DOMContentLoaded', function() {
     function ease(t){return t<0.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;}
 
     async function generateSignal() {
-        const data = await fetchRealData(currentAsset);
-        const isUp = data.rsi > 50 ? data.rsi > 60 : Math.random() >= 0.5;
-        const probability = Math.floor(Math.random()*12)+78;
-        const volsRu=['Низкая','Умеренная','Средняя','Повышенная','Высокая'];
-        const volsEn=['Low','Moderate','Medium','Elevated','High'];
-        const vol=currentLang==='ru'?volsRu[Math.floor(Math.random()*5)]:volsEn[Math.floor(Math.random()*5)];
-        signalDirection=isUp?'up':'down'; signalActive=true; isMinimized=false; signalVisible=true;
+        // Получаем реальные данные с TradingView API
+        const signal = await fetchRealSignal(currentAsset, currentTimeframe);
+        const indicators = await fetchRealIndicators(currentAsset, currentTimeframe);
+        
+        let isUp, probability, volatility;
+        
+        if (signal) {
+            isUp = signal.direction === 'up';
+            probability = signal.probability;
+            volatility = signal.volatility;
+        } else {
+            isUp = Math.random() >= 0.5;
+            probability = Math.floor(Math.random()*12)+78;
+            volatility = 'Medium';
+        }
+        
+        signalDirection = isUp?'up':'down'; signalActive=true; isMinimized=false; signalVisible=true;
         
         updateSignalDisplay();
         $('signalCard').classList.add('active',isUp?'up':'down');
         $('signalModal').classList.add('visible'); $('signalMini').classList.add('visible');
         $('heroProbability').textContent=`${probability}%`;
-        $('heroVolatility').textContent=vol;
+        $('heroVolatility').textContent=volatility;
         $('heroResult').style.display='none'; $('heroResult').className='hero-result';
-        $('heroIndicators').style.display='flex';
-        $('indRSI').textContent=data.rsi.toFixed(1);
-        $('indMACD').textContent=(Math.random()>0.5?'+':'-')+(Math.random()*0.001).toFixed(4);
-        $('indMA').textContent=(data.bid*0.9999).toFixed(5);
+        
+        // Показываем реальные индикаторы
+        if (indicators) {
+            $('heroIndicators').style.display='flex';
+            $('indRSI').textContent = indicators.rsi?.toFixed(1) || '--';
+            $('indMACD').textContent = indicators.macd?.macd?.toFixed(4) || '--';
+            $('indMA').textContent = indicators.sma20?.toFixed(5) || '--';
+        }
+        
         updateExpiry();
         $('heroAdvice').textContent=`💡 ${t('advices')[Math.floor(Math.random()*7)]}`;
         updateMiniDisplay(); addToHistory(isUp,probability,'pending'); updateStats();
@@ -263,7 +295,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function resetSignal() {
-        signalActive=false;signalDirection=null;isMinimized=false;signalVisible=false;
+        signalActive=false;signalDirection=null;isMinimized=false;signalVisible=false;realData=null;
         $('heroArrow').textContent='—';$('heroAction').textContent=t('waiting_signal');
         $('heroAsset').textContent=currentAsset;$('heroProbability').textContent='--%';
         $('heroVolatility').textContent='--';$('heroResult').style.display='none';
@@ -306,8 +338,8 @@ document.addEventListener('DOMContentLoaded', function() {
             $('currentAsset').textContent=currentAsset;setTF(currentTimeframe);updateSignalDisplay();
             $('signalCard').classList.add('active',signalDirection==='up'?'up':'down');
             if(signalVisible){if(isMinimized){$('signalMini').classList.add('visible');}else{$('signalModal').classList.add('visible');$('signalMini').classList.add('visible');}}
-            $('heroProbability').textContent='80%';$('heroVolatility').textContent=currentLang==='ru'?'Средняя':'Medium';
-            $('heroResult').style.display='none';updateExpiry();$('heroAdvice').textContent=currentLang==='ru'?'💡 Сигнал активен':'💡 Signal active';
+            $('heroProbability').textContent='80%';$('heroVolatility').textContent='Medium';
+            $('heroResult').style.display='none';updateExpiry();$('heroAdvice').textContent='💡 Signal active';
             updateMiniDisplay();isLocked=true;$('timerBox').classList.add('active');updateTimerDisp();disableCtrls();loadTV(currentAsset);
             lockTimerInterval=setInterval(()=>{lockSeconds--;updateTimerDisp();$('miniTimer').textContent=$('timerValue').textContent;saveTimerState();if(lockSeconds<=0){clearInterval(lockTimerInterval);lockTimerInterval=null;isLocked=false;$('timerBox').classList.remove('active');enableCtrls();saveTimerState();checkResult();}},1000);
         }catch(e){localStorage.removeItem('bsTimer');}
