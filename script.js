@@ -1,4 +1,4 @@
-// BinarySignal Pro - No price/entry, Timer NEVER resets on close, RU/EN works
+// BinarySignal Pro - БЕЗ прибыли в процентах, БЕЗ рандомных результатов
 
 document.addEventListener('DOMContentLoaded', function() {
     
@@ -16,8 +16,10 @@ document.addEventListener('DOMContentLoaded', function() {
             init_neural:"Инициализация нейросети...",data_collection:"Сбор рыночных данных...",
             patterns:"Поиск паттернов...",levels:"Расчёт уровней...",indicators:"Анализ индикаторов...",
             volatility_step:"Оценка волатильности...",signal_step:"Формирование сигнала...",
-            analysis_complete:"Анализ завершён!",win_result:"✅ +{profit}%",
-            lose_result:"❌ ПРОИГРЫШ",draw_result:"➖ НИЧЬЯ",
+            analysis_complete:"Анализ завершён!",
+            win_result:"✅ ПОБЕДА",
+            lose_result:"❌ ПРОИГРЫШ",
+            draw_result:"➖ НИЧЬЯ",
             advices:["Риск ≤2%","Отличный вход!","Проверьте ТФ","Хорошая точка!","По тренду","Stop-loss!","Сигнал!"]
         },
         en: {
@@ -33,8 +35,10 @@ document.addEventListener('DOMContentLoaded', function() {
             init_neural:"Initializing neural network...",data_collection:"Collecting market data...",
             patterns:"Finding patterns...",levels:"Calculating levels...",indicators:"Analyzing indicators...",
             volatility_step:"Evaluating volatility...",signal_step:"Forming signal...",
-            analysis_complete:"Analysis complete!",win_result:"✅ +{profit}%",
-            lose_result:"❌ LOSS",draw_result:"➖ DRAW",
+            analysis_complete:"Analysis complete!",
+            win_result:"✅ WIN",
+            lose_result:"❌ LOSS",
+            draw_result:"➖ DRAW",
             advices:["Risk ≤2%","Perfect entry!","Check HTF","Great point!","Follow trend","Stop-loss!","Signal!"]
         }
     };
@@ -53,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let isLocked = false, isAnalyzing = false, lockTimerInterval = null, lockSeconds = 0;
     let tvWidget = null, signalDirection = null, signalActive = false;
     let isMinimized = false;
-    let signalVisible = true; // Whether signal card is visible (close just hides)
+    let signalVisible = true;
 
     function t(key) { return translations[currentLang][key] || key; }
     function $(id) { return document.getElementById(id); }
@@ -290,7 +294,6 @@ document.addEventListener('DOMContentLoaded', function() {
         updateSignalDisplay();
     }
 
-    // Close just hides visuals - TIMER KEEPS RUNNING
     function hideSignalVisuals() {
         signalVisible = false;
         $('signalModal').classList.remove('visible');
@@ -308,7 +311,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // ========== TIMER (NEVER RESETS ON CLOSE) ==========
+    // ========== TIMER ==========
     function startTimer() {
         isLocked = true;
         lockSeconds = currentTimeframe;
@@ -328,7 +331,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 $('timerBox').classList.remove('active');
                 enableCtrls();
                 saveTimerState();
-                checkResult();
+                // Таймер истёк, но результат НЕ определяется автоматически
+                onTimerExpired();
             }
         }, 1000);
     }
@@ -384,7 +388,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 lockSeconds--;
                 updateTimerDisp(); $('miniTimer').textContent = $('timerValue').textContent;
                 saveTimerState();
-                if(lockSeconds<=0){clearInterval(lockTimerInterval);lockTimerInterval=null;isLocked=false;$('timerBox').classList.remove('active');enableCtrls();saveTimerState();checkResult();}
+                if(lockSeconds<=0){
+                    clearInterval(lockTimerInterval);lockTimerInterval=null;isLocked=false;
+                    $('timerBox').classList.remove('active');enableCtrls();saveTimerState();
+                    onTimerExpired();
+                }
             },1000);
         } catch(e) { localStorage.removeItem('bsTimer'); }
     }
@@ -400,35 +408,58 @@ document.addEventListener('DOMContentLoaded', function() {
         $('assetsList').style.pointerEvents='auto'; $('assetsList').style.opacity='1';
     }
 
-    // ========== RESULT ==========
-    function checkResult() {
+    // ========== TIMER EXPIRED - NO AUTO RESULT ==========
+    function onTimerExpired() {
+        // Таймер истёк, но результат НЕ определяется здесь.
+        // Вы можете добавить свою логику результата.
+        // Пока просто показываем сигнал и даём пользователю возможность
+        // вручную отметить результат через вызов markResult('win'/'lose'/'draw')
+        console.log('Timer expired. Call markResult() to set outcome.');
+        
+        // Показываем карточку сигнала, если была скрыта
+        showSignalVisuals();
+        
+        // Автоматически сбрасываем сигнал через некоторое время
+        setTimeout(() => {
+            resetSignal();
+            enableCtrls();
+            checkForex();
+        }, 10000);
+    }
+
+    // ========== RESULT - ВЫ МОЖЕТЕ ВЫЗВАТЬ ЭТУ ФУНКЦИЮ ВРУЧНУЮ ==========
+    function markResult(resultType) {
+        // resultType: 'win', 'lose', или 'draw'
         if(!signalActive) return;
-        const isUp = signalDirection === 'up';
-        // Random result for demo, replace with real API
-        const winRoll = Math.random();
-        const isWin = winRoll > 0.4;
-        const profit = (Math.random()*5+1).toFixed(2);
+        
         $('heroResult').style.display = 'block';
         showSignalVisuals();
-        if(isWin) {
-            $('heroResult').textContent = t('win_result').replace('{profit}', profit);
+        
+        if(resultType === 'win') {
+            $('heroResult').textContent = t('win_result');
             $('heroResult').className = 'hero-result win';
             startFireworks();
             updateLastResult('win');
-        } else if(winRoll > 0.2) {
+        } else if(resultType === 'lose') {
             $('heroResult').textContent = t('lose_result');
             $('heroResult').className = 'hero-result lose';
             $('signalCard').style.animation = 'shake 0.6s ease';
             setTimeout(() => $('signalCard').style.animation = '', 600);
             updateLastResult('lose');
-        } else {
+        } else if(resultType === 'draw') {
             $('heroResult').textContent = t('draw_result');
             $('heroResult').className = 'hero-result draw';
             updateLastResult('draw');
         }
+        
         updateStats();
         $('heroResult').scrollIntoView({ behavior:'smooth', block:'center' });
-        setTimeout(() => { resetSignal(); enableCtrls(); checkForex(); }, 6000);
+        
+        setTimeout(() => {
+            resetSignal();
+            enableCtrls();
+            checkForex();
+        }, 6000);
     }
 
     function updateLastResult(result) {
@@ -546,11 +577,8 @@ document.addEventListener('DOMContentLoaded', function() {
             applyTheme();
         });
         
-        // Close button - HIDE VISUALS ONLY, timer keeps running
         $('signalClose').addEventListener('click', (e) => { e.stopPropagation(); hideSignalVisuals(); });
-        // Minimize
         $('signalMinimize').addEventListener('click', (e) => { e.stopPropagation(); minimizeSignal(); });
-        // Expand from mini
         $('signalMiniExpand').addEventListener('click', (e) => { e.stopPropagation(); expandSignal(); });
         
         $('timeframePills').querySelectorAll('.tf-pill').forEach(p => {
@@ -566,6 +594,9 @@ document.addEventListener('DOMContentLoaded', function() {
         $('assetSearch').addEventListener('input', function() { if(!isLocked&&!isAnalyzing) filterAssets(this.value); });
         $('clearHistory').addEventListener('click', clearHistory);
     }
+
+    // Делаем markResult доступным глобально, чтобы вы могли вызывать из консоли
+    window.markResult = markResult;
 
     init();
 });
