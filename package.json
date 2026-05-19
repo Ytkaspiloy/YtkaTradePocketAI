@@ -1,20 +1,21 @@
 {
   "name": "binarysignal-pro",
-  "version": "1.0.0",
-  "description": "BinarySignal Pro - Forex Bot with real TradingView data",
+  "version": "2.0.0",
+  "description": "BinarySignal Pro - Real TradingView Data Bot",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js"
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "@mathieuc/tradingview": "^1.0.0",
+    "express": "^4.21.0",
     "cors": "^2.8.5",
-    "ws": "^8.16.0",
-    "node-fetch": "^2.7.0"
+    "@mathieuc/tradingview": "github:Mathieu2301/TradingView-API"
   },
   "devDependencies": {
-    "nodemon": "^3.0.2"
+    "nodemon": "^3.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
